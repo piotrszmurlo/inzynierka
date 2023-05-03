@@ -6,9 +6,15 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+pytest = "*"
+pybind11 = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.9"
 python_full_version = "3.9.6"
+
+[scripts]
+app = "uvicorn main:app --reload"
+install = 'bash -c "pip install . && uvicorn main:app --reload"'
