@@ -9,10 +9,8 @@ import io.kvision.rest.call
 import kotlinx.coroutines.await
 
 
-
-class DataRepository : IDataRepository {
+class DataRepository(private val restClient: RestClient) : IDataRepository {
     override suspend fun getData(): Result<Data, DomainError> {
-        val restClient = RestClient()
         var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
         restClient.call<Data>("http://127.0.0.1:8000/data")
             .then { result = Ok(it) }

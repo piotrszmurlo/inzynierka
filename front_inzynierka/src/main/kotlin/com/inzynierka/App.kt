@@ -2,9 +2,9 @@ package com.inzynierka
 
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
-import com.inzynierka.data.DataRepository
-import com.inzynierka.data.DataService
 import com.inzynierka.data.DomainError
+import com.inzynierka.di.appModule
+import com.inzynierka.domain.IDataService
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
 import com.inzynierka.domain.mainAppReducer
@@ -21,23 +21,22 @@ import io.kvision.panel.root
 import io.kvision.panel.simplePanel
 import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
-import io.kvision.rest.RestClient
 import io.kvision.state.bind
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.context.GlobalContext.startKoin
 
 
-class App : Application() {
+class App : Application(), KoinComponent {
 
-    private val restClient: RestClient
     private val store: ReduxStore<MainAppState, MainAppAction>
-    private val dataRepository = DataRepository()
-    private val dataService = DataService(dataRepository)
+    private val dataService: IDataService by inject()
 
     init {
         require("css/kvapp.css")
-        restClient = RestClient()
         val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), false, false, null)
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
@@ -45,7 +44,7 @@ class App : Application() {
     override fun start() {
         root("kvapp") {
             upload { }
-            simplePanel().bind(store) {state ->
+            simplePanel().bind(store) { state ->
                 height = Pair(550, UNIT.px)
                 width = Pair(550, UNIT.px)
                 chart(
@@ -78,11 +77,14 @@ class App : Application() {
                     }
                 }
             }
-
         }
     }
 }
 
 fun main() {
+    startKoin {
+        modules(appModule)
+    }
+
     startApplication(::App, module.hot, BootstrapModule, BootstrapCssModule, CoreModule, ChartModule, ReduxModule)
 }

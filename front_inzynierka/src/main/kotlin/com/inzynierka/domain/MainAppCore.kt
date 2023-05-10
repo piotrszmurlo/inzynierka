@@ -16,9 +16,16 @@ sealed class MainAppAction : RAction {
     data class FetchDataSuccess(val data: List<Int>) : MainAppAction()
     data class FetchDataFailed(val error: DomainError) : MainAppAction()
 }
+
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
-    is MainAppAction.FetchDataStarted -> { state.copy(isFetching = true) }
-    is MainAppAction.FetchDataFailed -> { state.copy(error = action.error) }
+    is MainAppAction.FetchDataStarted -> {
+        state.copy(isFetching = true)
+    }
+
+    is MainAppAction.FetchDataFailed -> {
+        state.copy(error = action.error)
+    }
+
     is MainAppAction.FetchDataSuccess -> {
         state.copy(
             data = action.data,
