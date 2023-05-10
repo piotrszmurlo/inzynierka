@@ -23,7 +23,8 @@ import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
 import io.kvision.rest.RestClient
 import io.kvision.state.bind
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -70,7 +71,7 @@ class App : Application() {
             button("Fetch data").onClick {
                 store.dispatch { dispatch, _ ->
                     dispatch(MainAppAction.FetchDataStarted)
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.Default).launch {
                         dataService.getData()
                             .onSuccess { dispatch(MainAppAction.FetchDataSuccess(it.data)) }
                             .onFailure { dispatch(MainAppAction.FetchDataFailed(it)) }
