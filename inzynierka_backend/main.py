@@ -19,7 +19,6 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    # raise HTTPException(status_code=404, detail="Item not found")
     return {"message": f"Hello {p.subtract(100, 33)}"}
 
 

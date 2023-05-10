@@ -1,4 +1,4 @@
-package com.inzynierka.domain
+package com.inzynierka.domain.service
 
 import com.github.michaelbull.result.Result
 import com.inzynierka.data.DomainError

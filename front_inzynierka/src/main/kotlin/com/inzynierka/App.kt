@@ -4,10 +4,10 @@ import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.inzynierka.data.DomainError
 import com.inzynierka.di.appModule
-import com.inzynierka.domain.IDataService
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
 import com.inzynierka.domain.mainAppReducer
+import com.inzynierka.domain.service.IDataService
 import io.kvision.*
 import io.kvision.chart.ChartType
 import io.kvision.chart.Configuration
