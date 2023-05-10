@@ -1,15 +1,14 @@
 package com.example.data
 
+import com.example.model.Data
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.kvision.rest.RestClient
 import io.kvision.rest.call
 import kotlinx.coroutines.await
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class Data(val data: List<Int>)
+
 
 class DataRepository : IDataRepository {
     override suspend fun getData(): Result<Data, DomainError> {
