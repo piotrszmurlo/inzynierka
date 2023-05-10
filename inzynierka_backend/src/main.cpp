@@ -31,8 +31,6 @@ PYBIND11_MODULE(python_example, m) {
 
     m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
         Subtract two numbers
-
-        Some other explanation about the subtract function.
     )pbdoc");
 
 #ifdef VERSION_INFO
