@@ -14,7 +14,7 @@ class DataRepository(private val restClient: RestClient) : IDataRepository {
         var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
         restClient.call<Data>("http://127.0.0.1:8000/data")
             .then { result = Ok(it) }
-            .catch { result = Err(DomainError.NetworkError(it.message!!)) }
+            .catch { result = Err(DomainError.NetworkError(it.message)) }
             .await()
         return result
     }

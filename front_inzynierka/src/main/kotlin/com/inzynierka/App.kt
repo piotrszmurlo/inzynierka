@@ -82,6 +82,7 @@ class App : Application(), KoinComponent {
 }
 
 fun main() {
+
     startKoin {
         modules(appModule)
     }
