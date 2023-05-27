@@ -6,5 +6,5 @@ import io.kvision.types.KFile
 
 interface IDataRepository {
     suspend fun getData(): Result<Data, DomainError>
-    suspend fun postFile(kFile: KFile): Result<Unit, DomainError>
+    suspend fun postFile(kFile: KFile): Result<Data, DomainError>
 }

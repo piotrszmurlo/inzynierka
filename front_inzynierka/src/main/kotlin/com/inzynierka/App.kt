@@ -27,7 +27,6 @@ import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
 import io.kvision.state.bind
 import io.kvision.types.KFile
-import kotlinext.js.asJsObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,21 +55,20 @@ class App : Application(), KoinComponent {
 
     override fun start() {
         root("kvapp") {
-            simplePanel {
-
-            }
-            val f = formPanel<UploadFileForm> {
+            val uploadFileForm = formPanel<UploadFileForm> {
                 method = FormMethod.POST
                 enctype = FormEnctype.MULTIPART
                 action = "http://127.0.0.1:8000/file"
                 add(UploadFileForm::upload, upload { })
-//                button("uploadgowno", type = ButtonType.SUBMIT)
             }
             button("upload file").onClick {
-                CoroutineScope(Dispatchers.Default).launch {
-                    console.log(f.form.getDataWithFileContent().upload?.get(0)?.asJsObject())
-                    dataService.postFile(f.form.getDataWithFileContent().upload!![0])
-//                    store.dispatch(MainAppAction.UploadFile(f.getDataJson()))
+                store.dispatch { dispatch, _ ->
+                    dispatch(MainAppAction.UploadFileStarted)
+                    CoroutineScope(Dispatchers.Default).launch {
+                        dataService.postFile(uploadFileForm.form.getDataWithFileContent().upload!![0])
+                            .onSuccess { dispatch(MainAppAction.UploadFileSuccess) }
+                            .onFailure { dispatch(MainAppAction.UploadFileFailed(it)) }
+                    }
                 }
             }
             simplePanel().bind(store) { state ->

@@ -11,7 +11,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return dataRepository.getData()
     }
 
-    override suspend fun postFile(kFile: KFile): Result<Unit, DomainError> {
+    override suspend fun postFile(kFile: KFile): Result<Data, DomainError> {
         return dataRepository.postFile(kFile)
     }
 }

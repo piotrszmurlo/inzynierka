@@ -2,7 +2,6 @@ package com.inzynierka.domain
 
 import com.inzynierka.data.DomainError
 import io.kvision.redux.RAction
-import io.kvision.types.KFile
 import org.koin.core.component.KoinComponent
 
 data class MainAppState(
@@ -14,9 +13,11 @@ data class MainAppState(
 
 sealed class MainAppAction : RAction {
     object FetchDataStarted : MainAppAction()
+    object UploadFileStarted : MainAppAction()
+    object UploadFileSuccess : MainAppAction()
+    data class UploadFileFailed(val error: DomainError) : MainAppAction()
     data class FetchDataSuccess(val data: List<Int>) : MainAppAction()
     data class FetchDataFailed(val error: DomainError) : MainAppAction()
-    data class UploadFile(val file: List<KFile>?) : MainAppAction()
 }
 
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
@@ -35,8 +36,15 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
         )
     }
 
-    is MainAppAction.UploadFile -> {
-        console.log(action.file?.get(0)?.content)
+    is MainAppAction.UploadFileStarted -> {
+        state
+    }
+
+    is MainAppAction.UploadFileFailed -> {
+        state
+    }
+
+    is MainAppAction.UploadFileSuccess -> {
         state
     }
 }
