@@ -14,6 +14,8 @@ import io.kvision.chart.Configuration
 import io.kvision.chart.DataSets
 import io.kvision.chart.chart
 import io.kvision.core.UNIT
+import io.kvision.form.FormEnctype
+import io.kvision.form.FormMethod
 import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
 import io.kvision.form.upload.upload
@@ -25,6 +27,7 @@ import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
 import io.kvision.state.bind
 import io.kvision.types.KFile
+import kotlinext.js.asJsObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,12 +56,20 @@ class App : Application(), KoinComponent {
 
     override fun start() {
         root("kvapp") {
+            simplePanel {
+
+            }
             val f = formPanel<UploadFileForm> {
+                method = FormMethod.POST
+                enctype = FormEnctype.MULTIPART
+                action = "http://127.0.0.1:8000/file"
                 add(UploadFileForm::upload, upload { })
+//                button("uploadgowno", type = ButtonType.SUBMIT)
             }
             button("upload file").onClick {
                 CoroutineScope(Dispatchers.Default).launch {
-                    dataService.postFile(f.getDataWithFileContent().upload!![0])
+                    console.log(f.form.getDataWithFileContent().upload?.get(0)?.asJsObject())
+                    dataService.postFile(f.form.getDataWithFileContent().upload!![0])
 //                    store.dispatch(MainAppAction.UploadFile(f.getDataJson()))
                 }
             }

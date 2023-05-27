@@ -1,6 +1,12 @@
+import base64
+from pprint import pprint
+
 from fastapi import FastAPI, HTTPException, File, UploadFile
 import python_example as p
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from src.models import RemoteDataFile
 
 app = FastAPI()
 
@@ -29,6 +35,7 @@ async def get_example_data():
 
 
 @app.post("/file")
-async def post_file(file: UploadFile):
-    print(file)
+async def post_file(remote_data_file: RemoteDataFile):
+    decoded_data = base64.b64decode(remote_data_file.content).decode('utf-8').split("  ")
+    pprint(decoded_data)
     return {"data": [4, 3, 2, 1]}
