@@ -1,10 +1,9 @@
 import base64
 from pprint import pprint
 
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI
 import python_example as p
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from src.models import RemoteDataFile
 

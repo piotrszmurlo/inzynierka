@@ -14,8 +14,7 @@ import io.kvision.chart.Configuration
 import io.kvision.chart.DataSets
 import io.kvision.chart.chart
 import io.kvision.core.UNIT
-import io.kvision.form.FormEnctype
-import io.kvision.form.FormMethod
+import io.kvision.core.onChangeLaunch
 import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
 import io.kvision.form.upload.upload
@@ -26,6 +25,10 @@ import io.kvision.panel.simplePanel
 import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
 import io.kvision.state.bind
+import io.kvision.state.sub
+import io.kvision.toast.Toast
+import io.kvision.toast.ToastContainer
+import io.kvision.toast.ToastContainerPosition
 import io.kvision.types.KFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +41,8 @@ import org.koin.core.context.GlobalContext.startKoin
 
 @Serializable
 data class UploadFileForm(
-    val upload: List<KFile>? = null
+    val fileToUpload: List<KFile>? = null
 )
-
 
 class App : Application(), KoinComponent {
 
@@ -49,35 +51,62 @@ class App : Application(), KoinComponent {
 
     init {
         require("css/kvapp.css")
-        val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), false, false, null)
+        val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), isFetching = false, false, null)
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 
     override fun start() {
         root("kvapp") {
             val uploadFileForm = formPanel<UploadFileForm> {
-                method = FormMethod.POST
-                enctype = FormEnctype.MULTIPART
-                action = "http://127.0.0.1:8000/file"
-                add(UploadFileForm::upload, upload { })
+                onChangeLaunch {
+                    CoroutineScope(Dispatchers.Default).launch {
+                        store.dispatch(
+                            MainAppAction.UploadFormOnChangeHandler(
+                                getData().fileToUpload?.get(0)
+                            )
+                        )
+                    }
+                }
+                add(UploadFileForm::fileToUpload, upload { })
             }
-            button("upload file").onClick {
+            val uploadFileButton = button("upload file").bind(store) { state ->
+                disabled = state.uploadButtonDisabled
+            }
+            uploadFileButton.onClick {
                 store.dispatch { dispatch, _ ->
                     dispatch(MainAppAction.UploadFileStarted)
                     CoroutineScope(Dispatchers.Default).launch {
-                        dataService.postFile(uploadFileForm.form.getDataWithFileContent().upload!![0])
-                            .onSuccess { dispatch(MainAppAction.UploadFileSuccess) }
-                            .onFailure { dispatch(MainAppAction.UploadFileFailed(it)) }
+                        uploadFileForm.form.getDataWithFileContent().fileToUpload?.get(0)?.let { file ->
+                            dataService.postFile(file)
+                                .onSuccess {
+                                    Toast.info("File upload completed")
+                                    dispatch(MainAppAction.UploadFileSuccess)
+                                }
+                                .onFailure {
+                                    dispatch(MainAppAction.UploadFileFailed(it))
+                                    Toast.info("File upload failed")
+                                }
+                        }
                     }
                 }
             }
-            simplePanel().bind(store) { state ->
+            div().bind(store) { state ->
+                state.error?.let {
+                    val toastContainer = ToastContainer(ToastContainerPosition.TOPCENTER)
+                    toastContainer.showToast(
+                        "Some information about the error",
+                        "Error"
+                    )
+                    store.dispatch(MainAppAction.ErrorHandled)
+                }
+            }
+            simplePanel().bind(store.sub(extractor = { state -> state.data })) { state ->
                 height = Pair(550, UNIT.px)
                 width = Pair(550, UNIT.px)
                 chart(
                     Configuration(
                         ChartType.BAR,
-                        listOf(DataSets(data = state.data)),
+                        listOf(DataSets(data = state)),
                         listOf("One", "Two", "Three", "Four")
                     )
                 )
@@ -99,10 +128,17 @@ class App : Application(), KoinComponent {
                     dispatch(MainAppAction.FetchDataStarted)
                     CoroutineScope(Dispatchers.Default).launch {
                         dataService.getData()
-                            .onSuccess { dispatch(MainAppAction.FetchDataSuccess(it.data)) }
+
+                            .onSuccess {
+                                dispatch(MainAppAction.FetchDataSuccess(it.data))
+                                Toast.info("Data fetch completed")
+                            }
                             .onFailure { dispatch(MainAppAction.FetchDataFailed(it)) }
                     }
                 }
+            }
+            button("Mock fetch data error").onClick {
+                store.dispatch(MainAppAction.FetchDataFailed(DomainError.NetworkError("Mock error")))
             }
         }
     }

@@ -24,13 +24,11 @@ class DataRepository(private val restClient: RestClient) : IDataRepository {
 
     override suspend fun postFile(kFile: KFile): Result<Data, DomainError> {
         val kFileContentOnly = KFile(kFile.name, kFile.size, kFile.actualFileContentOnly)
-        console.log(kFile.actualFileContentOnly)
         var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
         restClient.post<Data, KFile>("$API_URL/file", kFileContentOnly)
             .then { result = Ok(it) }
             .catch { result = Err(DomainError.NetworkError(it.message)) }
             .await()
-
         return result
     }
 }
