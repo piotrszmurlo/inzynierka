@@ -13,6 +13,7 @@ import io.kvision.toast.ToastContainer
 import io.kvision.toast.ToastContainerPosition
 
 fun Container.mainAppComponent(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
+    
     navBar(store)
 
     div().bind(store.sub(extractor = { state -> state.tab })) { tab ->
