@@ -5,8 +5,14 @@ import io.kvision.redux.RAction
 import io.kvision.types.KFile
 import org.koin.core.component.KoinComponent
 
+sealed class Tab {
+    object Upload : Tab()
+    object Results : Tab()
+}
+
 data class MainAppState(
     val data: List<Int>,
+    val tab: Tab,
     val isFetching: Boolean,
     val success: Boolean,
     val error: DomainError?,
@@ -22,9 +28,11 @@ sealed class MainAppAction : RAction {
     data class UploadFileFailed(val error: DomainError) : MainAppAction()
     data class FetchDataSuccess(val data: List<Int>) : MainAppAction()
     data class FetchDataFailed(val error: DomainError) : MainAppAction()
+    data class TabSelected(val tab: Tab) : MainAppAction()
 }
 
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
+
     is MainAppAction.FetchDataStarted -> {
         state.copy(isFetching = true)
     }
@@ -32,7 +40,6 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
     is MainAppAction.FetchDataFailed -> {
         state.copy(error = action.error)
     }
-
 
     is MainAppAction.FetchDataSuccess -> {
         state.copy(
@@ -59,5 +66,9 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
 
     is MainAppAction.UploadFormOnChangeHandler -> {
         state.copy(uploadButtonDisabled = action.kFile == null)
+    }
+
+    is MainAppAction.TabSelected -> {
+        state.copy(tab = action.tab)
     }
 }

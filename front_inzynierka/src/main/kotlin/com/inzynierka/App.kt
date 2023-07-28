@@ -6,6 +6,7 @@ import com.inzynierka.data.DomainError
 import com.inzynierka.di.appModule
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
+import com.inzynierka.domain.Tab
 import com.inzynierka.domain.mainAppReducer
 import com.inzynierka.domain.service.IDataService
 import io.kvision.*
@@ -13,6 +14,7 @@ import io.kvision.chart.ChartType
 import io.kvision.chart.Configuration
 import io.kvision.chart.DataSets
 import io.kvision.chart.chart
+import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.UNIT
 import io.kvision.core.onChangeLaunch
@@ -25,6 +27,7 @@ import io.kvision.navbar.nav
 import io.kvision.navbar.navbar
 import io.kvision.panel.root
 import io.kvision.panel.simplePanel
+import io.kvision.panel.vPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.redux.createReduxStore
 import io.kvision.state.bind
@@ -55,32 +58,35 @@ class App : Application(), KoinComponent {
 
     init {
         require("css/kvapp.css")
-        val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), isFetching = false, false, null)
+        val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), tab = Tab.Results, isFetching = false, false, null)
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 
-    fun Container.navBar() {
+    fun Container.navBar(store: ReduxStore<MainAppState, MainAppAction>) {
         navbar("AE comparison") {
             nav(rightAlign = true) {
                 div {
-                    padding = 5.px
-                    button("Upload result")
+                    padding = 4.px
+                    button("Upload result").onClick {
+                        store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+                    }
                 }
                 div {
-                    padding = 5.px
-                    button("Browse rankings")
+                    padding = 4.px
+                    button("Browse rankings").onClick {
+                        store.dispatch(MainAppAction.TabSelected(Tab.Results))
+                    }
                 }
             }
         }
     }
 
-    fun Container.uploadFileForm() {
-
-    }
-
-    override fun start() {
-        root("kvapp") {
-            navBar()
+    fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>) {
+        vPanel(alignItems = AlignItems.CENTER) {
+            div {
+                content = "Select results file to upload"
+                padding = 8.px
+            }
             val uploadFileForm = formPanel<UploadFileForm> {
                 onChangeLaunch {
                     CoroutineScope(Dispatchers.Default).launch {
@@ -114,6 +120,34 @@ class App : Application(), KoinComponent {
                     }
                 }
             }
+        }
+    }
+
+    fun Container.results(store: ReduxStore<MainAppState, MainAppAction>) {
+        simplePanel().bind(store.sub(extractor = { state -> state.data })) { state ->
+            height = Pair(550, UNIT.px)
+            width = Pair(550, UNIT.px)
+            chart(
+                Configuration(
+                    ChartType.BAR,
+                    listOf(DataSets(data = state)),
+                    listOf("One", "Two", "Three", "Four")
+                )
+            )
+        }
+    }
+
+    override fun start() {
+        root("kvapp") {
+            navBar(store)
+
+            div().bind(store) { state ->
+                when (state.tab) {
+                    is Tab.Upload -> uploadFileForm(store)
+                    is Tab.Results -> results(store)
+                }
+            }
+
             div().bind(store) { state ->
                 state.error?.let {
                     val toastContainer = ToastContainer(ToastContainerPosition.TOPCENTER)
@@ -124,17 +158,7 @@ class App : Application(), KoinComponent {
                     store.dispatch(MainAppAction.ErrorHandled)
                 }
             }
-            simplePanel().bind(store.sub(extractor = { state -> state.data })) { state ->
-                height = Pair(550, UNIT.px)
-                width = Pair(550, UNIT.px)
-                chart(
-                    Configuration(
-                        ChartType.BAR,
-                        listOf(DataSets(data = state)),
-                        listOf("One", "Two", "Three", "Four")
-                    )
-                )
-            }
+
             div().bind(store) { state ->
                 div("example: " + state.data)
             }
