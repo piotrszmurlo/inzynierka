@@ -15,3 +15,6 @@ class LocalFile(Base):
     __tablename__ = "files"
     id = Column(Integer, primary_key=True, index=True)
     contents = Column(Text)
+    algorithm_name = Column(Text)
+    dimension = Column(Integer)
+    function_number = Column(Integer)

@@ -13,6 +13,7 @@ import io.kvision.chart.ChartType
 import io.kvision.chart.Configuration
 import io.kvision.chart.DataSets
 import io.kvision.chart.chart
+import io.kvision.core.Container
 import io.kvision.core.UNIT
 import io.kvision.core.onChangeLaunch
 import io.kvision.form.formPanel
@@ -20,6 +21,8 @@ import io.kvision.form.getDataWithFileContent
 import io.kvision.form.upload.upload
 import io.kvision.html.button
 import io.kvision.html.div
+import io.kvision.navbar.nav
+import io.kvision.navbar.navbar
 import io.kvision.panel.root
 import io.kvision.panel.simplePanel
 import io.kvision.redux.ReduxStore
@@ -30,6 +33,7 @@ import io.kvision.toast.Toast
 import io.kvision.toast.ToastContainer
 import io.kvision.toast.ToastContainerPosition
 import io.kvision.types.KFile
+import io.kvision.utils.px
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,8 +59,28 @@ class App : Application(), KoinComponent {
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 
+    fun Container.navBar() {
+        navbar("AE comparison") {
+            nav(rightAlign = true) {
+                div {
+                    padding = 5.px
+                    button("Upload result")
+                }
+                div {
+                    padding = 5.px
+                    button("Browse rankings")
+                }
+            }
+        }
+    }
+
+    fun Container.uploadFileForm() {
+
+    }
+
     override fun start() {
         root("kvapp") {
+            navBar()
             val uploadFileForm = formPanel<UploadFileForm> {
                 onChangeLaunch {
                     CoroutineScope(Dispatchers.Default).launch {
