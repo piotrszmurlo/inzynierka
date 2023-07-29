@@ -1,4 +1,7 @@
 import base64
+
+from multipart.exceptions import ParseError
+
 from src.models import RemoteDataFile, LocalFile
 import numpy as np
 
@@ -6,21 +9,22 @@ import numpy as np
 def parse_results_file(remote_data_file: RemoteDataFile):
     algorithm_name, function_number, dimension = remote_data_file.name.rsplit(".", 1)[0].rsplit("_", 2)
     print(algorithm_name, function_number, dimension)
-    raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
-    rows = raw_contents.split("\n")
-    parsed_rows = []
-    for i, row in enumerate(rows):
-        if "," in raw_contents:
-            values = row.split(',')
-        else:
-            values = row.split()
-        if len(values) == 30:
-            print(values)
-            floats = list(map(lambda value: round(float(value), 8), values))
-            parsed_row = " ".join(list(map(lambda x: str(x), floats)))
-            parsed_rows.append(parsed_row)
-    parsed_contents = "\n".join(parsed_rows)
-    print(parsed_contents)
+    try:
+        raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
+        rows = raw_contents.split("\n")
+        parsed_rows = []
+        for i, row in enumerate(rows):
+            if "," in raw_contents:
+                values = row.split(',')
+            else:
+                values = row.split()
+            if len(values) == 30:
+                floats = list(map(lambda value: round(float(value), 8), values))
+                parsed_row = " ".join(list(map(lambda x: str(x), floats)))
+                parsed_rows.append(parsed_row)
+            parsed_contents = "\n".join(parsed_rows)
+    except Exception:
+        raise ParseError()
     return algorithm_name, function_number, dimension, parsed_contents
 
 

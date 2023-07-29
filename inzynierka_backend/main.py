@@ -1,9 +1,11 @@
 import base64
 from pprint import pprint
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 import python_example as p
 from fastapi.middleware.cors import CORSMiddleware
+from multipart.exceptions import ParseError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
 from src.dbaccess import create_file, get_file, get_all_files
 
@@ -54,7 +56,12 @@ async def get_rankings(db: Session = Depends(get_db)):
 
 @app.post("/file")
 async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_db)):
-    algorithm_name, function_number, dimension, parsed_content = parse_results_file(remote_data_file)
-    file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
-    # update_rankings([file])
+    try:
+        algorithm_name, function_number, dimension, parsed_content = parse_results_file(remote_data_file)
+        file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
+        # update_rankings([file])
+    except IntegrityError:
+        raise HTTPException(409, detail='File already exists')
+    except ParseError:
+        raise HTTPException(422, detail='Unable to parse file')
     return {"data": [4, 3, 2, 10]}
