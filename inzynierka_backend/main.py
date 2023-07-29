@@ -12,7 +12,7 @@ from src.dbaccess import create_file, get_file, get_all_files
 from src import models
 from src.dbaccess import engine, SessionLocal
 from src.models import RemoteDataFile
-from src.parser import parse_results_file, update_rankings
+from src.parser import parse_results_file, update_rankings, calculate_cec_ranking
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -42,11 +42,13 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": f"Hello {p.subtract(100, 33)}"}
+    print(p.parse_results("1 2  3   4   5,2,3,4"))
+    return {"message": f"Hello {p.add(100, 33)}"}
 
 
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
+    # calculate_cec_ranking(db)
     medians, averages = update_rankings(get_all_files(db))
     return {
         "average": averages,
