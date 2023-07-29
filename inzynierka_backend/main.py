@@ -5,12 +5,12 @@ from fastapi import FastAPI, Depends
 import python_example as p
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import sessionmaker, Session
-from src.dbaccess import create_file, get_file
+from src.dbaccess import create_file, get_file, get_all_files
 
 from src import models
 from src.dbaccess import engine, SessionLocal
 from src.models import RemoteDataFile
-from src.parser import parse_results_file
+from src.parser import parse_results_file, update_rankings
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -43,13 +43,18 @@ async def root():
     return {"message": f"Hello {p.subtract(100, 33)}"}
 
 
-@app.get("/data")
-async def get_example_data():
-    return {"data": [4, 3, 2, 1]}
+@app.get("/rankings")
+async def get_rankings(db: Session = Depends(get_db)):
+    medians, averages = update_rankings(get_all_files(db))
+    return {
+        "average": averages,
+        "medians": medians
+    }
 
 
 @app.post("/file")
 async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_db)):
-    algorithm_name, function_number, dimension, content = parse_results_file(remote_data_file)
-    create_file(db, algorithm_name, dimension, function_number, content)
+    algorithm_name, function_number, dimension, parsed_content = parse_results_file(remote_data_file)
+    file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
+    # update_rankings([file])
     return {"data": [4, 3, 2, 10]}
