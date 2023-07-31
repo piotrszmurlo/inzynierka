@@ -5,12 +5,14 @@
 #include <iostream>
 #include <regex>
 
+using namespace std;
+
 int add(int i, int j) {
-    return i + j;
+    return i + j + 11;
 }
 
-std::string parse_results(std::string input) {
-    std::string a = std::regex_replace(input, std::regex("\\s+|,"), " ");
+string parse_results(string input) {
+    string a = regex_replace(input, regex("\\s+|,"), " ");
     return a;
 }
 
