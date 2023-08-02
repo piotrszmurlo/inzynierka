@@ -1,18 +1,15 @@
-import base64
-from pprint import pprint
-
 from fastapi import FastAPI, Depends, HTTPException
-import python_example as p
 from fastapi.middleware.cors import CORSMiddleware
 from multipart.exceptions import ParseError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
 from src.dbaccess import create_file, get_file, get_all_files
-
+from python_extensions import parse_results
 from src import models
 from src.dbaccess import engine, SessionLocal
 from src.models import RemoteDataFile
-from src.parser import parse_results_file, update_rankings, calculate_cec_ranking
+from src.parser import parse_results_file, update_rankings, calculate_cec_ranking, parse_remote_file_name, \
+    parse_remote_results_file_v2
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -42,8 +39,8 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    print(p.parse_results("1 2  3   4   5,2,3,4"))
-    return {"message": f"Hello {p.add(100, 33)}"}
+    print(parse_results("1 2  3   4   5,2,3,4"))
+    return {"message": f"Hello {13}"}
 
 
 @app.get("/rankings")
@@ -59,11 +56,13 @@ async def get_rankings(db: Session = Depends(get_db)):
 @app.post("/file")
 async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_db)):
     try:
-        algorithm_name, function_number, dimension, parsed_content = parse_results_file(remote_data_file)
-        file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
+        # print(parse_remote_file_name(remote_data_file.name))
+        print(parse_remote_results_file_v2(remote_data_file)[3])
+        # file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
         # update_rankings([file])
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
-    except ParseError:
+    except ParseError as e:
+        print(e)
         raise HTTPException(422, detail='Unable to parse file')
     return {"data": [4, 3, 2, 10]}

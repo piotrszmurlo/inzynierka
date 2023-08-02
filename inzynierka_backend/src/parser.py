@@ -1,14 +1,14 @@
 import base64
 
+import numpy as np
 from multipart.exceptions import ParseError
-from sqlalchemy import and_
 
 from src import models
-from src.dbaccess import get_files_for_dimension, get_all_algorithm_names_for_dimension
+from src.dbaccess import get_all_algorithm_names_for_dimension
 from src.models import RemoteDataFile, LocalFile
-import numpy as np
+from python_extensions import parse_results
 
-
+ALLOWED_EXTENSIONS = ("txt", "dat")
 def parse_results_file(remote_data_file: RemoteDataFile):
     algorithm_name, function_number, dimension = remote_data_file.name.rsplit(".", 1)[0].rsplit("_", 2)
     print(algorithm_name, function_number, dimension)
@@ -29,6 +29,21 @@ def parse_results_file(remote_data_file: RemoteDataFile):
     except Exception:
         raise ParseError()
     return algorithm_name, function_number, dimension, parsed_contents
+
+
+def parse_remote_results_file_v2(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
+    algorithm_name, function_number, dimension = parse_remote_file_name(remote_data_file.name)
+    raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
+    parsed_contents = parse_results(raw_contents)
+    return algorithm_name, function_number, dimension, parsed_contents
+
+
+def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
+    name, extension = file_name.rsplit(".", 1)
+    if extension not in ALLOWED_EXTENSIONS:
+        raise ParseError(f"Only {ALLOWED_EXTENSIONS} files allowed")
+    algorithm_name, function_number, dimension = name.rsplit("_", 2)
+    return algorithm_name, function_number, dimension
 
 
 def parse_matrix(data_file: LocalFile):

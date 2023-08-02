@@ -2,49 +2,47 @@
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
+#define MIN_VALUE 1e-8
 #include <iostream>
 #include <regex>
+#include <sstream>
 
 using namespace std;
 
-int add(int i, int j) {
-    return i + j + 11;
-}
-
 string parse_results(string input) {
-    string a = regex_replace(input, regex("\\s+|,"), " ");
-    return a;
+    string adjusted_delimiter_input = regex_replace(input, regex("[^\\S\r\n]+|,"), " ");
+    stringstream ss(adjusted_delimiter_input);
+    stringstream result("");
+    string word;
+    double value;
+    while (ss >> word) {
+        value = stod(word);
+        if (value < MIN_VALUE) {
+            value = MIN_VALUE;
+        }
+        result << value << " ";
+    }
+
+    return result.str();
 }
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(python_example, m) {
+PYBIND11_MODULE(python_extensions, m) {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        Pybind11 C++ extensions
         -----------------------
 
-        .. currentmodule:: python_example
+        .. currentmodule:: python_extensions
 
         .. autosummary::
            :toctree: _generate
 
-           add
-           subtract
            parse_results
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-
-        Some other explanation about the add function.
-    )pbdoc");
-
     m.def("parse_results", &parse_results, R"pbdoc(
         Parse results file content
-    )pbdoc");
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
     )pbdoc");
 
 #ifdef VERSION_INFO
