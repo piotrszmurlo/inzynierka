@@ -6,21 +6,30 @@
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
 string parse_results(string input) {
-    string adjusted_delimiter_input = regex_replace(input, regex("[^\\S\r\n]+|,"), " ");
+    string adjusted_delimiter_input = regex_replace(input, regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     stringstream ss(adjusted_delimiter_input);
     stringstream result("");
+    result << setprecision(8);
     string word;
     double value;
+    int rowcount = 0;
     while (ss >> word) {
         value = stod(word);
         if (value < MIN_VALUE) {
             value = MIN_VALUE;
         }
-        result << value << " ";
+        if (++rowcount == 30) {
+            result << value << "\n";
+            rowcount = 0;
+        } else {
+            result << value << " ";
+        }
+
     }
 
     return result.str();

@@ -6,6 +6,10 @@ from sqlalchemy.dialects.mysql import VARCHAR
 Base = declarative_base()
 
 
+class ParseError(Exception):
+    pass
+
+
 class RemoteDataFile(BaseModel):
     content: bytes
     name: str

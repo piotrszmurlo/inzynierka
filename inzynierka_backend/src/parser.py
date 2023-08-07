@@ -1,48 +1,36 @@
 import base64
+from curses.ascii import isdigit
 
 import numpy as np
-from multipart.exceptions import ParseError
 
 from src import models
 from src.dbaccess import get_all_algorithm_names_for_dimension
-from src.models import RemoteDataFile, LocalFile
-from python_extensions import parse_results
+from src.models import RemoteDataFile, LocalFile, ParseError
+import python_extensions as extensions
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
-def parse_results_file(remote_data_file: RemoteDataFile):
-    algorithm_name, function_number, dimension = remote_data_file.name.rsplit(".", 1)[0].rsplit("_", 2)
-    print(algorithm_name, function_number, dimension)
-    try:
-        raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
-        rows = raw_contents.split("\n")
-        parsed_rows = []
-        for i, row in enumerate(rows):
-            if "," in raw_contents:
-                values = row.split(',')
-            else:
-                values = row.split()
-            if len(values) == 30:
-                floats = list(map(lambda value: round(float(value), 8), values))
-                parsed_row = " ".join(list(map(lambda x: str(x), floats)))
-                parsed_rows.append(parsed_row)
-            parsed_contents = "\n".join(parsed_rows)
-    except Exception:
-        raise ParseError()
-    return algorithm_name, function_number, dimension, parsed_contents
 
 
-def parse_remote_results_file_v2(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
+def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
     algorithm_name, function_number, dimension = parse_remote_file_name(remote_data_file.name)
     raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
-    parsed_contents = parse_results(raw_contents)
+    parsed_contents = extensions.parse_results(raw_contents)
     return algorithm_name, function_number, dimension, parsed_contents
 
 
 def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
-    name, extension = file_name.rsplit(".", 1)
-    if extension not in ALLOWED_EXTENSIONS:
+    try:
+        name, extension = file_name.rsplit(".", 1)
+        if extension not in ALLOWED_EXTENSIONS or "." in name:
+            raise ParseError(f"Only {ALLOWED_EXTENSIONS} files allowed")
+    except ValueError:
         raise ParseError(f"Only {ALLOWED_EXTENSIONS} files allowed")
-    algorithm_name, function_number, dimension = name.rsplit("_", 2)
+    try:
+        algorithm_name, function_number, dimension = name.rsplit("_", 2)
+        if not function_number.isdigit() or not dimension.isdigit():
+            raise ParseError("File name must contain function number and dimension")
+    except ValueError:
+        raise ParseError(f"Unable to parse file name")
     return algorithm_name, function_number, dimension
 
 
