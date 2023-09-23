@@ -10,6 +10,10 @@
 
 using namespace std;
 
+bool contains_non_numeric_characters(string input) {
+    any_of(input.begin(), input.end(), ::isdigit);
+}
+
 string parse_results(string input) {
     string adjusted_delimiter_input = regex_replace(input, regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     stringstream ss(adjusted_delimiter_input);
@@ -19,6 +23,7 @@ string parse_results(string input) {
     double value;
     int rowcount = 0;
     while (ss >> word) {
+
         value = stod(word);
         if (value < MIN_VALUE) {
             value = MIN_VALUE;
@@ -34,6 +39,7 @@ string parse_results(string input) {
 
     return result.str();
 }
+
 
 namespace py = pybind11;
 

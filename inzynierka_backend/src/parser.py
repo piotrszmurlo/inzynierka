@@ -1,5 +1,4 @@
 import base64
-from curses.ascii import isdigit
 
 import numpy as np
 
@@ -9,6 +8,9 @@ from src.models import RemoteDataFile, LocalFile, ParseError
 import python_extensions as extensions
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
+LAST_ROW_INDEX = 15
+DIMENSION_10 = 10
+DIMENSION_20 = 20
 
 
 def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
@@ -41,17 +43,16 @@ def parse_matrix(data_file: LocalFile):
         values = row.split()
         if values:
             results_matrix = np.insert(results_matrix, i, values, axis=0)
-            print(results_matrix.shape)
     return results_matrix
 
 
 def update_rankings(data_files: list[LocalFile]):
-    averages = {}
-    medians = {}
+    averages = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
+    medians = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
     for file in data_files:
         results_matrix = parse_matrix(file)
-        averages[file.algorithm_name] = np.average(results_matrix[15])
-        medians[file.algorithm_name] = np.median(results_matrix[15])
+        averages[file.dimension][file.algorithm_name] = np.average(results_matrix[LAST_ROW_INDEX])
+        medians[file.dimension][file.algorithm_name] = np.median(results_matrix[LAST_ROW_INDEX])
     return medians, averages
 
 

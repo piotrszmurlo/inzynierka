@@ -45,6 +45,8 @@ async def root():
 async def get_rankings(db: Session = Depends(get_db)):
     # calculate_cec_ranking(db)
     medians, averages = update_rankings(get_all_files(db))
+    for file in get_all_files(db):
+        print(file.dimension)
     return {
         "average": averages,
         "medians": medians
@@ -54,8 +56,9 @@ async def get_rankings(db: Session = Depends(get_db)):
 @app.post("/file")
 async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_db)):
     try:
+        print()
         # print(parse_remote_file_name(remote_data_file.name))
-        print(parse_remote_results_file(remote_data_file)[3])
+        # print(parse_remote_results_file(remote_data_file)[3])
         # file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
         # update_rankings([file])
     except IntegrityError:
