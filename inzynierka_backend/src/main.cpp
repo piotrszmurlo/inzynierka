@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -10,8 +11,9 @@
 
 using namespace std;
 
-bool contains_non_numeric_characters(string input) {
-    any_of(input.begin(), input.end(), ::isdigit);
+double calculate_average(string input) {
+    Eigen::MatrixXd m(2,2);
+    return 2.33;
 }
 
 string parse_results(string input) {
@@ -22,6 +24,7 @@ string parse_results(string input) {
     string word;
     double value;
     int rowcount = 0;
+    calculate_average(input);
     while (ss >> word) {
 
         value = stod(word);
@@ -39,6 +42,8 @@ string parse_results(string input) {
 
     return result.str();
 }
+
+
 
 
 namespace py = pybind11;
