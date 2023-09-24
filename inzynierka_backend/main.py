@@ -1,3 +1,7 @@
+from itertools import groupby
+from operator import attrgetter
+from pprint import pprint
+
 import numpy as np
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,9 +11,9 @@ from src.dbaccess import create_file, get_file, get_all_files
 import python_extensions as extensions
 from src import models
 from src.dbaccess import engine, SessionLocal
-from src.models import RemoteDataFile, ParseError
-from src.parser import parse_remote_results_file, update_rankings, calculate_cec_ranking, parse_remote_file_name
-
+from src.models import RemoteDataFile, ParseError, LocalFile
+from src.parser import parse_remote_results_file, get_updated_rankings, parse_remote_file_name, get_final_error_and_fes, \
+    parse_file_to_numpy_array, get_final_error_and_fes_for_files, calculate_cec_ranking
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -45,11 +49,10 @@ async def root():
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
     # calculate_cec_ranking(db)
-    medians, averages = update_rankings(get_all_files(db))
-    d = np.ones((5, 30))
-    # d.flags.writeable = True
-    print(extensions.scale_by_2(d))
-    # print(d)
+    medians, averages = get_updated_rankings(get_all_files(db))
+    listings = get_all_files(db).order_by(LocalFile.algorithm_name).all()
+    key_listings = {k: list(g) for k, g in groupby(listings, attrgetter('algorithm_name'))}
+    calculate_cec_ranking(get_final_error_and_fes_for_files(key_listings))
     return {
         "average": averages,
         "medians": medians

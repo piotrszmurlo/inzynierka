@@ -8,8 +8,19 @@
 #include <regex>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
+
+struct FunctionAlgorithmTrial {
+    FunctionAlgorithmTrial(const string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
+        algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
+    string algorithmName;
+    int functionNumber;
+    int trialNumber;
+    double finalError;
+    int numberOfEvaluations;
+};
 
 double calculate_average(string input) {
     Eigen::MatrixXd m(2,2);
@@ -19,6 +30,10 @@ double calculate_average(string input) {
 Eigen::MatrixXd scale_by_2(Eigen::MatrixXd v) {
     v *= 2;
     return v;
+}
+
+int calculate_cec2022_score(vector<FunctionAlgorithmTrial> input) {
+    
 }
 
 string parse_results(string input) {
@@ -76,6 +91,8 @@ PYBIND11_MODULE(python_extensions, m) {
         calculate average from file dcontent
     )pbdoc");
     
+    py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
+        .def(py::init<const string&, const int&, const double&, const int&>());
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
