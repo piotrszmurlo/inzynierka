@@ -16,6 +16,11 @@ double calculate_average(string input) {
     return 2.33;
 }
 
+Eigen::MatrixXd scale_by_2(Eigen::MatrixXd v) {
+    v *= 2;
+    return v;
+}
+
 string parse_results(string input) {
     string adjusted_delimiter_input = regex_replace(input, regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     stringstream ss(adjusted_delimiter_input);
@@ -24,7 +29,6 @@ string parse_results(string input) {
     string word;
     double value;
     int rowcount = 0;
-    calculate_average(input);
     while (ss >> word) {
 
         value = stod(word);
@@ -44,8 +48,6 @@ string parse_results(string input) {
 }
 
 
-
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(python_extensions, m) {
@@ -59,11 +61,21 @@ PYBIND11_MODULE(python_extensions, m) {
            :toctree: _generate
 
            parse_results
+           calculate_average
     )pbdoc";
 
     m.def("parse_results", &parse_results, R"pbdoc(
         Parse results file content
     )pbdoc");
+
+    m.def("calculate_average", &calculate_average, R"pbdoc(
+        calculate average from file content
+    )pbdoc");
+
+    m.def("scale_by_2", &scale_by_2, R"pbdoc(
+        calculate average from file dcontent
+    )pbdoc");
+    
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

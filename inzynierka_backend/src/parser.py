@@ -12,7 +12,6 @@ LAST_ROW_INDEX = 15
 DIMENSION_10 = 10
 DIMENSION_20 = 20
 
-
 def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
     algorithm_name, function_number, dimension = parse_remote_file_name(remote_data_file.name)
     raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
@@ -36,7 +35,7 @@ def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
     return algorithm_name, function_number, dimension
 
 
-def parse_matrix(data_file: LocalFile):
+def parse_file_to_matrix(data_file: LocalFile):
     rows = data_file.contents.split("\n")
     results_matrix = np.zeros((0, 30))
     for i, row in enumerate(rows):
@@ -50,7 +49,7 @@ def update_rankings(data_files: list[LocalFile]):
     averages = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
     medians = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
     for file in data_files:
-        results_matrix = parse_matrix(file)
+        results_matrix = parse_file_to_matrix(file)
         averages[file.dimension][file.algorithm_name] = np.average(results_matrix[LAST_ROW_INDEX])
         medians[file.dimension][file.algorithm_name] = np.median(results_matrix[LAST_ROW_INDEX])
     return medians, averages
@@ -65,6 +64,6 @@ def calculate_cec_ranking(db):
         for file in algorithm_files:
             print("GOWNOOOOOOO")
             # print(file)
-            ooo = parse_matrix(file)
+            ooo = parse_file_to_matrix(file)
             print(ooo.shape)
             return
