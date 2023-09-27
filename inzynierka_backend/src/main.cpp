@@ -1,17 +1,20 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-#define MIN_VALUE 1e-8
+#include <pybind11/iostream.h>
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <iomanip>
 #include <vector>
 
-using namespace std;
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+#define MIN_VALUE 1e-8
+#define CORRECTION_TERM 
 
+
+using namespace std;
+namespace py = pybind11;
 
 struct FunctionAlgorithmTrial {
     FunctionAlgorithmTrial(const string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
@@ -26,23 +29,27 @@ struct FunctionAlgorithmTrial {
 
 
 bool operator==(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
-    return a.finalError == b.finalError && a.numberOfEvaluations == b.numberOfEvaluations;}
+    return a.finalError == b.finalError && a.numberOfEvaluations == b.numberOfEvaluations;
+}
+
+bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
+    if (a.finalError != b.finalError) {
+        return a.finalError < b.finalError;
+    } else {
+        return a.numberOfEvaluations > b.numberOfEvaluations;
+    }
+}
 
 
-unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgorithmTrial>> input) {
+unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgorithmTrial>> input, const int& totalNumberOfFunctions, const int& numberOfTrials) {
     unordered_map<string, float> scores;
     for (auto trial : input) {
-        sort(trial.begin(), trial.end(), [](FunctionAlgorithmTrial a, FunctionAlgorithmTrial b) {
-            if (a.finalError != b.finalError) {
-                return a.finalError < b.finalError;
-            } else {
-                return a.numberOfEvaluations > b.numberOfEvaluations;
-            }
-        });
+        sort(trial.begin(), trial.end());
 
+        // rank trials
         int equalValuesCount = 1;
         for (auto j = 0; j < trial.size(); j++) {
-            if (trial[j] == trial[j + 1]) {
+            if (trial[j] == trial[j + 1]) { // 60?
                 ++equalValuesCount;
             } else {
                 for (int k = 0; k < equalValuesCount; k++) {
@@ -56,9 +63,11 @@ unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgor
             }
         }
     }
-    // correction term n(n-1)/2
+
+    // apply correction term n(n-1)/2 * number of functions
+    int correctionTerm = numberOfTrials * (numberOfTrials - 1) / 2 * totalNumberOfFunctions;
     for (auto& it: scores) {
-        it.second -= 30*(30 - 1)/2*5;
+        it.second -= correctionTerm;
     }
     return scores;
 }
@@ -90,7 +99,7 @@ string parse_results(string input) {
 }
 
 
-namespace py = pybind11;
+
 
 PYBIND11_MODULE(python_extensions, m) {
     m.doc() = R"pbdoc(

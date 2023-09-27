@@ -11,6 +11,7 @@ ALLOWED_EXTENSIONS = ("txt", "dat")
 FINAL_ERROR_INDEX = 15
 FINAL_FES_INDEX = 16
 FUNCTIONS_COUNT = 5
+TRIALS_COUNT = 30
 DIMENSION_10 = 10
 DIMENSION_20 = 20
 ALL_DIMENSIONS = [DIMENSION_10, DIMENSION_20]
@@ -49,7 +50,7 @@ def parse_file_to_numpy_array(data_file: LocalFile):
     return results_matrix
 
 
-def get_final_error_and_fesV2(data_file: LocalFile):
+def get_final_error_and_evaluations_number(data_file: LocalFile):
     rows = data_file.contents.split("\n")
     evaluations = rows[FINAL_FES_INDEX].split()
     results = []
@@ -59,10 +60,10 @@ def get_final_error_and_fesV2(data_file: LocalFile):
 
 
 # results[function_number - 1]
-def get_final_error_and_fes_for_filesV2(data_files: list[LocalFile]):
+def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]):
     results = [[] for _ in range(FUNCTIONS_COUNT)]
     for data_file in data_files:
-        results[data_file.function_number - 1] += get_final_error_and_fesV2(data_file)
+        results[data_file.function_number - 1] += get_final_error_and_evaluations_number(data_file)
     return results
 
 
@@ -77,8 +78,8 @@ def get_updated_rankings(data_files: list[LocalFile], db: Session):
     # for dimension in ALL_DIMENSIONS:
     for dimension in [DIMENSION_10]:
         cec2022[dimension] = extensions.calculate_cec2022_score(
-            get_final_error_and_fes_for_filesV2(
-                get_files_for_dimension(db, DIMENSION_10)
-            )
+            get_final_error_and_evaluation_number_for_files(
+                get_files_for_dimension(db, DIMENSION_10),
+            ), FUNCTIONS_COUNT, TRIALS_COUNT
         )
     return medians, averages, cec2022
