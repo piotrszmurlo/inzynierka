@@ -48,7 +48,7 @@ async def root():
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
     # calculate_cec_ranking(db)
-    medians, averages = get_updated_rankings(get_all_files(db))
+    medians, averages, cec2022 = get_updated_rankings(get_all_files(db), db)
     listings = get_all_files(db).order_by(LocalFile.algorithm_name).all()
     key_listings = {k: list(g) for k, g in groupby(listings, attrgetter('algorithm_name'))}
     # calculate_cec_ranking(get_final_error_and_fes_for_files(key_listings))
@@ -56,7 +56,8 @@ async def get_rankings(db: Session = Depends(get_db)):
     print(extensions.calculate_cec2022_score(a))
     return {
         "average": averages,
-        "medians": medians
+        "medians": medians,
+        "cec2022": cec2022
     }
 
 

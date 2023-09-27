@@ -1,7 +1,9 @@
 import base64
 
 import numpy as np
+from sqlalchemy.orm import Session
 
+from src.dbaccess import get_files_for_dimension
 from src.models import RemoteDataFile, LocalFile, ParseError
 import python_extensions as extensions
 
@@ -11,6 +13,7 @@ FINAL_FES_INDEX = 16
 FUNCTIONS_COUNT = 5
 DIMENSION_10 = 10
 DIMENSION_20 = 20
+ALL_DIMENSIONS = [DIMENSION_10, DIMENSION_20]
 
 
 def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
@@ -63,13 +66,19 @@ def get_final_error_and_fes_for_filesV2(data_files: list[LocalFile]):
     return results
 
 
-def get_updated_rankings(data_files: list[LocalFile]):
-    averages = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
-    medians = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
-    cec2022 = {dimension: {} for dimension in [DIMENSION_10, DIMENSION_20]}
+def get_updated_rankings(data_files: list[LocalFile], db: Session):
+    averages = {dimension: {} for dimension in ALL_DIMENSIONS}
+    medians = {dimension: {} for dimension in ALL_DIMENSIONS}
+    cec2022 = {dimension: {} for dimension in ALL_DIMENSIONS}
     for file in data_files:
         results_matrix = parse_file_to_numpy_array(file)
         averages[file.dimension][file.algorithm_name] = np.average(results_matrix[FINAL_ERROR_INDEX])
         medians[file.dimension][file.algorithm_name] = np.median(results_matrix[FINAL_ERROR_INDEX])
-        cec2022[file.dimension][file.algorithm_name] = 0
-    return medians, averages
+    # for dimension in ALL_DIMENSIONS:
+    for dimension in [DIMENSION_10]:
+        cec2022[dimension] = extensions.calculate_cec2022_score(
+            get_final_error_and_fes_for_filesV2(
+                get_files_for_dimension(db, DIMENSION_10)
+            )
+        )
+    return medians, averages, cec2022

@@ -12,9 +12,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def get_file(db: Session, file_id: int):
     return db.query(models.LocalFile).filter(models.LocalFile.id == file_id).first()
 
+
 def get_all_algorithm_names_for_dimension(db: Session, dimension: int):
     rows = db.query(distinct(models.LocalFile.algorithm_name)).filter(models.LocalFile.dimension == dimension).all()
     return [row[0] for row in rows]
+
+
 def get_files_for_dimension(db: Session, dimension: int):
     return db.query(models.LocalFile).filter(models.LocalFile.dimension == dimension).all()
 
