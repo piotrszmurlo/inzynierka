@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
+#include <pybind11/stl.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -12,6 +12,7 @@
 
 using namespace std;
 
+
 struct FunctionAlgorithmTrial {
     FunctionAlgorithmTrial(const string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
         algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
@@ -20,20 +21,46 @@ struct FunctionAlgorithmTrial {
     int trialNumber;
     double finalError;
     int numberOfEvaluations;
+    int rank;
 };
 
-double calculate_average(string input) {
-    Eigen::MatrixXd m(2,2);
-    return 2.33;
-}
 
-Eigen::MatrixXd scale_by_2(Eigen::MatrixXd v) {
-    v *= 2;
-    return v;
-}
+bool operator==(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
+    return a.finalError == b.finalError && a.numberOfEvaluations == b.numberOfEvaluations;}
 
-int calculate_cec2022_score(vector<FunctionAlgorithmTrial> input) {
-    
+
+unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgorithmTrial>> input) {
+    unordered_map<string, float> scores;
+    for (auto trial : input) {
+        sort(trial.begin(), trial.end(), [](FunctionAlgorithmTrial a, FunctionAlgorithmTrial b) {
+            if (a.finalError != b.finalError) {
+                return a.finalError < b.finalError;
+            } else {
+                return a.numberOfEvaluations > b.numberOfEvaluations;
+            }
+        });
+
+        int equalValuesCount = 1;
+        for (auto j = 0; j < trial.size(); j++) {
+            if (trial[j] == trial[j + 1]) {
+                ++equalValuesCount;
+            } else {
+                for (int k = 0; k < equalValuesCount; k++) {
+                    if (scores.find(trial[j + k].algorithmName) != scores.end()) {
+                        scores[trial[j + k].algorithmName] += j / float(equalValuesCount);
+                    } else {
+                        scores[trial[j + k].algorithmName] = j / float(equalValuesCount);
+                    }
+                    equalValuesCount = 1;
+                }
+            }
+        }
+    }
+    // correction term n(n-1)/2
+    for (auto& it: scores) {
+        it.second -= 30*(30 - 1)/2*5;
+    }
+    return scores;
 }
 
 string parse_results(string input) {
@@ -83,16 +110,23 @@ PYBIND11_MODULE(python_extensions, m) {
         Parse results file content
     )pbdoc");
 
-    m.def("calculate_average", &calculate_average, R"pbdoc(
-        calculate average from file content
+    m.def("calculate_cec2022_score", &calculate_cec2022_score, R"pbdoc(
+        Calculate score
     )pbdoc");
 
-    m.def("scale_by_2", &scale_by_2, R"pbdoc(
-        calculate average from file dcontent
-    )pbdoc");
-    
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
-        .def(py::init<const string&, const int&, const double&, const int&>());
+        .def(py::init<const string&, const int&, const int&, const double&, const int&>())
+        .def("__repr__",
+            [](const FunctionAlgorithmTrial &trial) {
+                return "<extensions.FunctionAlgorithmTrial "
+                + trial.algorithmName + " " 
+                + to_string(trial.functionNumber) + " " 
+                + to_string(trial.trialNumber) + " "
+                + to_string(trial.finalError) + " "
+                + to_string(trial.numberOfEvaluations) + " "
+                 + ">";
+            }
+        );
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

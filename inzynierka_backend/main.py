@@ -12,8 +12,7 @@ import python_extensions as extensions
 from src import models
 from src.dbaccess import engine, SessionLocal
 from src.models import RemoteDataFile, ParseError, LocalFile
-from src.parser import parse_remote_results_file, get_updated_rankings, parse_remote_file_name, get_final_error_and_fes, \
-    parse_file_to_numpy_array, get_final_error_and_fes_for_files, calculate_cec_ranking
+from src.parser import get_updated_rankings, get_final_error_and_fes_for_filesV2
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -52,7 +51,9 @@ async def get_rankings(db: Session = Depends(get_db)):
     medians, averages = get_updated_rankings(get_all_files(db))
     listings = get_all_files(db).order_by(LocalFile.algorithm_name).all()
     key_listings = {k: list(g) for k, g in groupby(listings, attrgetter('algorithm_name'))}
-    calculate_cec_ranking(get_final_error_and_fes_for_files(key_listings))
+    # calculate_cec_ranking(get_final_error_and_fes_for_files(key_listings))
+    a = get_final_error_and_fes_for_filesV2(get_all_files(db))
+    print(extensions.calculate_cec2022_score(a))
     return {
         "average": averages,
         "medians": medians

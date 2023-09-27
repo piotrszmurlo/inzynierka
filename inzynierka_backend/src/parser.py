@@ -2,8 +2,6 @@ import base64
 
 import numpy as np
 
-from src import models
-from src.dbaccess import get_all_algorithm_names_for_dimension
 from src.models import RemoteDataFile, LocalFile, ParseError
 import python_extensions as extensions
 
@@ -48,45 +46,21 @@ def parse_file_to_numpy_array(data_file: LocalFile):
     return results_matrix
 
 
-def get_final_error_and_fes(data_file: LocalFile):
-    rows = data_file.contents.split("\n")
-    final_results = np.zeros((2, 30))
-    final_results[0] = rows[FINAL_ERROR_INDEX].split()
-    final_results[1] = rows[FINAL_FES_INDEX].split()
-    return final_results
-
-
 def get_final_error_and_fesV2(data_file: LocalFile):
     rows = data_file.contents.split("\n")
     evaluations = rows[FINAL_FES_INDEX].split()
     results = []
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
-        results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i, final_error, evaluations[i]))
+        results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i, float(final_error), int(evaluations[i].split(".")[0])))
     return results
 
-## final_results[function_number-1][algorithm name (index sorted)][0 -> final error, 1 -> FES][try number 0-29]
-def get_final_error_and_fes_for_files(algorithm_files):
-    number_of_algorithms = len(algorithm_files.keys())
-    final_results = np.zeros((FUNCTIONS_COUNT, number_of_algorithms, 2, 30))
-    for i, algorithm in enumerate(algorithm_files):
-        for result_file in algorithm_files[algorithm]:
-            final_results[result_file.function_number - 1][i] = get_final_error_and_fes(result_file)
-    return final_results
 
-def calculate_cec_ranking(final_results):
-    for function in final_results:
-        print(np.argsort(function))
-        # print(np.sort(function))
-
-
-## final_results[algorithm name (index sorted)][function number-1][0 -> final error, 1 -> FES][try number 0-29]
-# def get_final_error_and_fes_for_files(algorithm_files):
-#     number_of_algorithms = len(algorithm_files.keys())
-#     final_results = np.zeros((number_of_algorithms, FUNCTIONS_COUNT, 2, 30))
-#     for i, algorithm in enumerate(algorithm_files):
-#         for result_file in algorithm_files[algorithm]:
-#             final_results[i][result_file.function_number - 1] = get_final_error_and_fes(result_file)
-#     return final_results
+# results[function_number - 1]
+def get_final_error_and_fes_for_filesV2(data_files: list[LocalFile]):
+    results = [[] for _ in range(FUNCTIONS_COUNT)]
+    for data_file in data_files:
+        results[data_file.function_number - 1] += get_final_error_and_fesV2(data_file)
+    return results
 
 
 def get_updated_rankings(data_files: list[LocalFile]):
