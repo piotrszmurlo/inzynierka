@@ -43,7 +43,7 @@ namespace py = pybind11;
 
 unordered_map<string, float> calculate_cec2022_score(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
     unordered_map<string, float> scores;
-    for (auto trial : input) {
+    for (auto& trial : input) {
         sort(trial.begin(), trial.end());
 
         // rank trials
@@ -68,6 +68,25 @@ unordered_map<string, float> calculate_cec2022_score(const int& totalNumberOfFun
     int correctionTerm = numberOfTrials * (numberOfTrials - 1) / 2 * totalNumberOfFunctions;
     for (auto& it: scores) {
         it.second -= correctionTerm;
+    }
+    return scores;
+}
+
+unordered_map<string, float> calculate_average(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
+    unordered_map<string, float> scores;
+    for (auto trials : input) {
+        for (auto trial : trials) {
+            if (scores.find(trial.algorithmName) != scores.end()) {
+                scores[trial.algorithmName] += trial.finalError;
+            } else {
+                scores[trial.algorithmName] = trial.finalError;
+            }
+        }
+    }
+
+    int totalTrials = totalNumberOfFunctions*numberOfTrials;
+    for (auto& it: scores) {
+        it.second /= totalTrials;
     }
     return scores;
 }
@@ -107,6 +126,7 @@ PYBIND11_MODULE(python_extensions, m) {
            :toctree: _generate
 
            parse_results
+           calculate_cec2022_score
            calculate_average
     )pbdoc";
 
@@ -116,6 +136,11 @@ PYBIND11_MODULE(python_extensions, m) {
 
     m.def("calculate_cec2022_score", &calculate_cec2022_score, R"pbdoc(
         Calculate score
+    )pbdoc");
+
+
+    m.def("calculate_average", &calculate_average, R"pbdoc(
+        Calculate average
     )pbdoc");
 
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")

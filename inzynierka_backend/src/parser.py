@@ -84,14 +84,12 @@ def get_updated_rankings(data_files: list[LocalFile], db: Session):
     cec2022 = {dimension: {} for dimension in ALL_DIMENSIONS}
     for file in data_files:
         results_matrix = parse_file_to_numpy_array(file)
-        averages[file.dimension][file.algorithm_name] = np.average(results_matrix[FINAL_ERROR_INDEX])
         medians[file.dimension][file.algorithm_name] = np.median(results_matrix[FINAL_ERROR_INDEX])
     # for dimension in ALL_DIMENSIONS:
     for dimension in [DIMENSION_10]:
-        cec2022[dimension] = extensions.calculate_cec2022_score(
-            FUNCTIONS_COUNT, TRIALS_COUNT,
-            get_final_error_and_evaluation_number_for_files(
-                get_files_for_dimension(db, DIMENSION_10),
-            )
+        results = get_final_error_and_evaluation_number_for_files(
+            get_files_for_dimension(db, DIMENSION_10)
         )
+        cec2022[dimension] = extensions.calculate_cec2022_score(FUNCTIONS_COUNT, TRIALS_COUNT, results)
+        averages[dimension] = extensions.calculate_average(FUNCTIONS_COUNT, TRIALS_COUNT, results)
     return medians, averages, cec2022
