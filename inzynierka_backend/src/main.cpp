@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/iostream.h>
+#include <pybind11/stl_bind.h>
 #include <iostream>
 #include <regex>
 #include <sstream>
@@ -11,13 +12,10 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
 
-using namespace std;
-namespace py = pybind11;
-
 struct FunctionAlgorithmTrial {
-    FunctionAlgorithmTrial(const string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
+    FunctionAlgorithmTrial(const std::string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
         algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
-    string algorithmName;
+    std::string algorithmName;
     int functionNumber;
     int trialNumber;
     double finalError;
@@ -35,9 +33,15 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
         return a.numberOfEvaluations > b.numberOfEvaluations;
     }
 }
+using TrialsVector = std::vector<FunctionAlgorithmTrial>;
+using FunctionTrialsVector = std::vector<TrialsVector>;
+PYBIND11_MAKE_OPAQUE(FunctionTrialsVector);
+PYBIND11_MAKE_OPAQUE(TrialsVector);
 
+using namespace std;
+namespace py = pybind11;
 
-unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgorithmTrial>> input, const int& totalNumberOfFunctions, const int& numberOfTrials) {
+unordered_map<string, float> calculate_cec2022_score(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
     unordered_map<string, float> scores;
     for (auto trial : input) {
         sort(trial.begin(), trial.end());
@@ -92,9 +96,6 @@ string parse_results(string input) {
     return result.str();
 }
 
-
-
-
 PYBIND11_MODULE(python_extensions, m) {
     m.doc() = R"pbdoc(
         Pybind11 C++ extensions
@@ -131,7 +132,8 @@ PYBIND11_MODULE(python_extensions, m) {
             }
         );
 
-    py::class_<vector>(m, "vector")
+    py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
+    py::bind_vector<TrialsVector>(m, "TrialsVector");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

@@ -50,20 +50,31 @@ def parse_file_to_numpy_array(data_file: LocalFile):
     return results_matrix
 
 
-def get_final_error_and_evaluations_number(data_file: LocalFile):
+def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.TrialsVector:
+    """
+    :param data_file: LocalFile with already preprocessed contents
+    :return: TrialsVector containing final results from the file in form of FunctionAlgorithmTrial
+    """
     rows = data_file.contents.split("\n")
     evaluations = rows[FINAL_FES_INDEX].split()
-    results = []
+    results = extensions.TrialsVector()
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
         results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i, float(final_error), int(evaluations[i].split(".")[0])))
     return results
 
 
 # results[function_number - 1]
-def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]):
-    results = [[] for _ in range(FUNCTIONS_COUNT)]
+def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
+    """
+    :param data_files: list of LocalFile(s) with already preprocessed contents
+    :return: FunctionTrialsVector[TrialsVector[FunctionAlgorithmTrial]] with all final results provided
+    """
+    results = extensions.FunctionTrialsVector()
+    for i in range(FUNCTIONS_COUNT):
+        results.append(extensions.TrialsVector())
     for data_file in data_files:
-        results[data_file.function_number - 1] += get_final_error_and_evaluations_number(data_file)
+        results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
+
     return results
 
 
@@ -78,8 +89,9 @@ def get_updated_rankings(data_files: list[LocalFile], db: Session):
     # for dimension in ALL_DIMENSIONS:
     for dimension in [DIMENSION_10]:
         cec2022[dimension] = extensions.calculate_cec2022_score(
+            FUNCTIONS_COUNT, TRIALS_COUNT,
             get_final_error_and_evaluation_number_for_files(
                 get_files_for_dimension(db, DIMENSION_10),
-            ), FUNCTIONS_COUNT, TRIALS_COUNT
+            )
         )
     return medians, averages, cec2022
