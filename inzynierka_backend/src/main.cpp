@@ -10,8 +10,6 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
-#define CORRECTION_TERM 
-
 
 using namespace std;
 namespace py = pybind11;
@@ -24,9 +22,7 @@ struct FunctionAlgorithmTrial {
     int trialNumber;
     double finalError;
     int numberOfEvaluations;
-    int rank;
 };
-
 
 bool operator==(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
     return a.finalError == b.finalError && a.numberOfEvaluations == b.numberOfEvaluations;
@@ -49,7 +45,7 @@ unordered_map<string, float> calculate_cec2022_score(vector<vector<FunctionAlgor
         // rank trials
         int equalValuesCount = 1;
         for (auto j = 0; j < trial.size(); j++) {
-            if (trial[j] == trial[j + 1]) { // 60?
+            if (j != trial.size() - 1 && trial[j] == trial[j + 1]) { // 60?
                 ++equalValuesCount;
             } else {
                 for (int k = 0; k < equalValuesCount; k++) {
@@ -83,9 +79,7 @@ string parse_results(string input) {
     while (ss >> word) {
 
         value = stod(word);
-        if (value < MIN_VALUE) {
-            value = MIN_VALUE;
-        }
+        if (value < MIN_VALUE) { value = MIN_VALUE; }
         if (++rowcount == 30) {
             result << value << "\n";
             rowcount = 0;
@@ -136,6 +130,8 @@ PYBIND11_MODULE(python_extensions, m) {
                  + ">";
             }
         );
+
+    py::class_<vector>(m, "vector")
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
