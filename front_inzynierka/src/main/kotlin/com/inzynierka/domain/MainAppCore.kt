@@ -1,6 +1,5 @@
 package com.inzynierka.domain
 
-import com.inzynierka.data.DomainError
 import io.kvision.redux.RAction
 import io.kvision.types.KFile
 import org.koin.core.component.KoinComponent
@@ -25,7 +24,7 @@ sealed class MainAppAction : RAction {
     object UploadFileSuccess : MainAppAction()
     object ErrorHandled : MainAppAction()
     data class UploadFormOnChangeHandler(val kFile: KFile?) : MainAppAction()
-    data class UploadFileFailed(val error: DomainError) : MainAppAction()
+    data class UploadFileFailed(val error: DomainError?) : MainAppAction()
     data class FetchDataSuccess(val data: List<Int>) : MainAppAction()
     data class FetchDataFailed(val error: DomainError) : MainAppAction()
     data class TabSelected(val tab: Tab) : MainAppAction()

@@ -1,10 +1,10 @@
 package com.inzynierka.data
 
-import com.github.michaelbull.result.Result
 import com.inzynierka.model.Data
 import io.kvision.types.KFile
 
 interface IDataRepository {
-    suspend fun getData(): Result<Data, DomainError>
-    suspend fun postFile(kFile: KFile): Result<Data, DomainError>
+    suspend fun getData(): Data
+    suspend fun postFile(kFile: KFile): Data
+    suspend fun postFiles(kFiles: List<KFile>): Data
 }

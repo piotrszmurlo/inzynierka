@@ -13,13 +13,17 @@ import io.kvision.toast.ToastContainer
 import io.kvision.toast.ToastContainerPosition
 
 fun Container.mainAppComponent(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
-    
+
     navBar(store)
 
     div().bind(store.sub(extractor = { state -> state.tab })) { tab ->
         when (tab) {
-            is Tab.Upload -> uploadFileForm(store, dataService)
-            is Tab.Results -> results(store)
+            is Tab.Upload -> {
+                uploadFileFormV2()
+                uploadFileForm(store, dataService)
+            }
+
+            is Tab.Results -> results(store, dataService)
         }
     }
 

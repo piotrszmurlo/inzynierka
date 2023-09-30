@@ -1,15 +1,15 @@
 package com.inzynierka
 
-import com.github.michaelbull.result.onFailure
-import com.github.michaelbull.result.onSuccess
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
+import com.inzynierka.domain.Result
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.onChangeLaunch
 import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
+import io.kvision.form.upload.BootstrapUpload
 import io.kvision.form.upload.upload
 import io.kvision.html.button
 import io.kvision.html.div
@@ -29,6 +29,26 @@ data class UploadFileForm(
     val fileToUpload: List<KFile>? = null
 )
 
+@Serializable
+data class UploadFileFormV2(
+    val fileToUpload: KFile? = null
+)
+
+fun Container.uploadFileFormV2() {
+    formPanel<UploadFileForm> {
+        add(
+            UploadFileForm::fileToUpload, BootstrapUpload(
+                uploadUrl = "http://127.0.0.1:8000/filev2",
+                multiple = true,
+                label = "gowno"
+            ).apply {
+                explorerTheme = true
+                allowedFileExtensions = setOf("txt")
+            }
+        )
+    }
+}
+
 fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
     vPanel(alignItems = AlignItems.CENTER) {
         div {
@@ -45,7 +65,7 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
                     )
                 }
             }
-            add(UploadFileForm::fileToUpload, upload { })
+            add(UploadFileForm::fileToUpload, upload(multiple = true))
         }
         val uploadFileButton = button("upload file").bind(store) { state ->
             disabled = state.uploadButtonDisabled
@@ -55,18 +75,21 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
                 dispatch(MainAppAction.UploadFileStarted)
                 CoroutineScope(Dispatchers.Default).launch {
                     uploadFileForm.form.getDataWithFileContent().fileToUpload?.get(0)?.let { file ->
-                        dataService.postFile(file)
-                            .onSuccess {
+                        when (val result = dataService.postFile(file)) {
+                            is Result.Success -> {
                                 Toast.info("File upload completed")
                                 dispatch(MainAppAction.UploadFileSuccess)
                             }
-                            .onFailure {
-                                dispatch(MainAppAction.UploadFileFailed(it))
+
+                            is Result.Error -> {
+                                dispatch(MainAppAction.UploadFileFailed(result.domainError))
                                 Toast.info("File upload failed")
                             }
+                        }
                     }
                 }
             }
         }
+
     }
 }

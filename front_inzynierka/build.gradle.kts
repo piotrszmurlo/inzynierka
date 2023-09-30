@@ -20,6 +20,7 @@ repositories {
 val kotlinVersion: String by System.getProperties()
 val kvisionVersion: String by System.getProperties()
 val koinVersion: String by System.getProperties()
+val ktorVersion: String by System.getProperties()
 
 val webDir = file("src/main/web")
 
@@ -60,7 +61,10 @@ kotlin {
         implementation("io.kvision:kvision-toastify:$kvisionVersion")
         implementation("io.kvision:kvision-state:$kvisionVersion")
         implementation("io.insert-koin:koin-core:$koinVersion")
-        implementation("com.michael-bull.kotlin-result:kotlin-result:1.1.17")
+        implementation("io.ktor:ktor-client-core-js:$ktorVersion")
+        implementation("io.ktor:ktor-client-js:$ktorVersion")
+        implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+        implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     }
     sourceSets["test"].dependencies {
         implementation(kotlin("test-js"))

@@ -1,34 +1,30 @@
 package com.inzynierka.data
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
 import com.inzynierka.model.Data
-import io.kvision.rest.RestClient
-import io.kvision.rest.call
-import io.kvision.rest.post
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
 import io.kvision.types.KFile
-import kotlinx.coroutines.await
 
 const val API_URL = "http://127.0.0.1:8000"
 
-class DataRepository(private val restClient: RestClient) : IDataRepository {
-    override suspend fun getData(): Result<Data, DomainError> {
-        var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
-        restClient.call<Data>("$API_URL/data")
-            .then { result = Ok(it) }
-            .catch { result = Err(DomainError.NetworkError(it.message)) }
-            .await()
-        return result
+class DataRepository(private val client: HttpClient) : IDataRepository {
+    override suspend fun getData(): Data {
+        return client.get("$API_URL/data").body()
     }
 
-    override suspend fun postFile(kFile: KFile): Result<Data, DomainError> {
-        val kFileContentOnly = KFile(kFile.name, kFile.size, kFile.actualFileContentOnly)
-        var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
-        restClient.post<Data, KFile>("$API_URL/file", kFileContentOnly)
-            .then { result = Ok(it) }
-            .catch { result = Err(DomainError.NetworkError(it.message)) }
-            .await()
-        return result
+    override suspend fun postFile(kFile: KFile): Data {
+        TODO("Not yet implemented")
+//        val kFileContentOnly = KFile(kFile.name, kFile.size, kFile.actualFileContentOnly)
+//        var result: Result<Data, DomainError> = Err(DomainError.NetworkError("Unknown error"))
+//        client.post<Data, KFile>("$API_URL/file", kFileContentOnly)
+//            .then { result = Ok(it) }
+//            .catch { result = Err(DomainError.NetworkError(it.message)) }
+//            .await()
+//        return result
+    }
+
+    override suspend fun postFiles(kFiles: List<KFile>): Data {
+        TODO("Not yet implemented")
     }
 }

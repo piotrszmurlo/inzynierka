@@ -3,7 +3,7 @@ from operator import attrgetter
 from pprint import pprint
 
 import numpy as np
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
@@ -44,6 +44,10 @@ app.add_middleware(
 async def root():
     return {"message": f"Hello {13}"}
 
+@app.get("/data")
+async def root():
+    return { "data": [44, 44, 44, 44] }
+
 
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
@@ -69,3 +73,10 @@ async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_
     except ParseError as e:
         raise HTTPException(422, detail=str(e))
     return {"data": [4, 3, 2, 10]}
+
+
+@app.post("/filev2")
+async def post_file_v2(files: list[UploadFile]):
+    # for file in files:
+    #     print(file.filename)
+    return {"data": [1, 2, 3]}
