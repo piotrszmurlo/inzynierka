@@ -1,3 +1,4 @@
+import base64
 from itertools import groupby
 from operator import attrgetter
 from pprint import pprint
@@ -12,7 +13,8 @@ import python_extensions as extensions
 from src import models
 from src.dbaccess import engine, SessionLocal
 from src.models import RemoteDataFile, ParseError, LocalFile
-from src.parser import get_updated_rankings, get_final_error_and_evaluation_number_for_files
+from src.parser import get_updated_rankings, get_final_error_and_evaluation_number_for_files, \
+    parse_remote_results_fileV2
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -61,18 +63,21 @@ async def get_rankings(db: Session = Depends(get_db)):
 
 
 @app.post("/file")
-async def post_file(remote_data_file: RemoteDataFile, db: Session = Depends(get_db)):
-    try:
-        print()
-        # print(parse_remote_file_name(remote_data_file.name))
-        # print(parse_remote_results_file(remote_data_file)[3])
-        # file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
-        # update_rankings([file])
-    except IntegrityError:
-        raise HTTPException(409, detail='File already exists')
-    except ParseError as e:
-        raise HTTPException(422, detail=str(e))
+async def post_file(file: UploadFile):
+    algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_fileV2(file)
+    print(algorithm_name, function_number, dimension, parsed_contents)
     return {"data": [4, 3, 2, 10]}
+    # try:
+    #     print()
+    #     # print(parse_remote_file_name(remote_data_file.name))
+    #     print(parse_remote_results_file(remote_data_file)[3])
+    #     # file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
+    #     # update_rankings([file])
+    # except IntegrityError:
+    #     raise HTTPException(409, detail='File already exists')
+    # except ParseError as e:
+    #     raise HTTPException(422, detail=str(e))
+    # return {"data": [4, 3, 2, 10]}
 
 
 @app.post("/filev2")

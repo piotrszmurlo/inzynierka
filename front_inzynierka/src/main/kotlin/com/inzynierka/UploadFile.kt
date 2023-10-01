@@ -65,7 +65,7 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
                     )
                 }
             }
-            add(UploadFileForm::fileToUpload, upload(multiple = true))
+            add(UploadFileForm::fileToUpload, upload(multiple = false))
         }
         val uploadFileButton = button("upload file").bind(store) { state ->
             disabled = state.uploadButtonDisabled

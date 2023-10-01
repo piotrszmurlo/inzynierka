@@ -1,6 +1,7 @@
 import base64
 
 import numpy as np
+from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 from src.dbaccess import get_files_for_dimension
@@ -23,6 +24,12 @@ def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, in
     parsed_contents = extensions.parse_results(raw_contents)
     return algorithm_name, function_number, dimension, parsed_contents
 
+
+def parse_remote_results_fileV2(upload_file: UploadFile) -> tuple[str, int, int, str]:
+    algorithm_name, function_number, dimension = parse_remote_file_name(upload_file.filename)
+    raw_contents = base64.b64decode(upload_file.file.read()).decode('utf-8')
+    parsed_contents = extensions.parse_results(raw_contents)
+    return algorithm_name, function_number, dimension, parsed_contents
 
 def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
     try:
