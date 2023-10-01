@@ -6,11 +6,10 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.kvision.types.KFile
 
-const val API_URL = "http://127.0.0.1:8000"
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
     override suspend fun getData(): Data {
-        return client.get("$API_URL/data").body()
+        return client.get("data").body()
     }
 
     override suspend fun postFile(kFile: KFile): Data {
