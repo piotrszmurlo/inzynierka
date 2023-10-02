@@ -17,15 +17,6 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun postFile(kFile: KFile): Result<Data> {
-        return try {
-            val result = dataRepository.postFile(kFile)
-            Result.Success(result)
-        } catch (a: Exception) {
-            Result.Error(DomainError.FileUploadError("err"))
-        }
-    }
-
     override suspend fun postFiles(kFiles: List<KFile>): Result<Data> {
         return try {
             val result = dataRepository.postFiles(kFiles)

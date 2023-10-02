@@ -46,9 +46,10 @@ app.add_middleware(
 async def root():
     return {"message": f"Hello {13}"}
 
+
 @app.get("/data")
 async def root():
-    return { "data": [44, 44, 44, 44] }
+    return {"data": [44, 44, 44, 44]}
 
 
 @app.get("/rankings")
@@ -63,25 +64,12 @@ async def get_rankings(db: Session = Depends(get_db)):
 
 
 @app.post("/file")
-async def post_file(file: UploadFile):
-    algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_fileV2(file)
-    print(algorithm_name, function_number, dimension, parsed_contents)
-    return {"data": [4, 3, 2, 10]}
-    # try:
-    #     print()
-    #     # print(parse_remote_file_name(remote_data_file.name))
-    #     print(parse_remote_results_file(remote_data_file)[3])
-    #     # file = create_file(db, algorithm_name, dimension, function_number, parsed_content)
-    #     # update_rankings([file])
-    # except IntegrityError:
-    #     raise HTTPException(409, detail='File already exists')
-    # except ParseError as e:
-    #     raise HTTPException(422, detail=str(e))
-    # return {"data": [4, 3, 2, 10]}
-
-
-@app.post("/filev2")
-async def post_file_v2(files: list[UploadFile]):
-    # for file in files:
-    #     print(file.filename)
+async def post_file(files: list[UploadFile]):
+    try:
+        for file in files:
+            print(file.filename)
+    except IntegrityError:
+        raise HTTPException(409, detail='File already exists')
+    except ParseError as e:
+        raise HTTPException(422, detail=str(e))
     return {"data": [1, 2, 3]}

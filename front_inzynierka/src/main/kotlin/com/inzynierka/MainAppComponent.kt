@@ -19,7 +19,6 @@ fun Container.mainAppComponent(store: ReduxStore<MainAppState, MainAppAction>, d
     div().bind(store.sub(extractor = { state -> state.tab })) { tab ->
         when (tab) {
             is Tab.Upload -> {
-                uploadFileFormV2()
                 uploadFileForm(store, dataService)
             }
 
