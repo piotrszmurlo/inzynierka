@@ -35,19 +35,18 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
     }
 }
 
-double median(std::vector<double> &input)
-{
+double median(std::vector<double> &input) {
   if (input.empty()) {
     throw std::invalid_argument("empty vector");
   }
   auto n = input.size() / 2;
-  nth_element(input.begin(), input.begin()+n, input.end());
+  nth_element(input.begin(), input.begin() + n, input.end());
   auto median = input[n];
-  if(!(input.size() & 1)) { //If the set size is even
-    auto max_it = max_element(input.begin(), input.begin()+n);
+  if (!(input.size() % 2)) {
+    auto max_it = max_element(input.begin(), input.begin() + n);
     median = (*max_it + median) / 2.0;
   }
-  return median;    
+  return median;
 }
 
 std::unordered_map<std::string, float> calculate_cec2022_score(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
