@@ -35,16 +35,16 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
     }
 }
 
-double median(std::vector<double> &v)
+double median(std::vector<double> &input)
 {
-  if(v.empty()) {
+  if (input.empty()) {
     throw std::invalid_argument("empty vector");
   }
-  auto n = v.size() / 2;
-  nth_element(v.begin(), v.begin()+n, v.end());
-  auto median = v[n];
-  if(!(v.size() & 1)) { //If the set size is even
-    auto max_it = max_element(v.begin(), v.begin()+n);
+  auto n = input.size() / 2;
+  nth_element(input.begin(), input.begin()+n, input.end());
+  auto median = input[n];
+  if(!(input.size() & 1)) { //If the set size is even
+    auto max_it = max_element(input.begin(), input.begin()+n);
     median = (*max_it + median) / 2.0;
   }
   return median;    
