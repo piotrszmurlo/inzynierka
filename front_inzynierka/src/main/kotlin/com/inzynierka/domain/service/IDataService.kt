@@ -16,5 +16,5 @@ interface IDataService {
      * uploads [kFiles] to the server
      * @return [Result] containing mock data, or DomainError if an error occurred
      **/
-    suspend fun postFiles(kFiles: List<KFile>): Result<Data>
+    suspend fun postFiles(kFiles: List<KFile>): Result<Unit>
 }

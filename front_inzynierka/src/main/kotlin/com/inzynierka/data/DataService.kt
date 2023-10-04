@@ -12,17 +12,17 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getData()
             Result.Success(result)
-        } catch (a: IllegalArgumentException) {
-            Result.Error(DomainError.NetworkError("123"))
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
         }
     }
 
-    override suspend fun postFiles(kFiles: List<KFile>): Result<Data> {
+    override suspend fun postFiles(kFiles: List<KFile>): Result<Unit> {
         return try {
             val result = dataRepository.postFiles(kFiles)
             Result.Success(result)
-        } catch (a: Exception) {
-            Result.Error(DomainError.FileUploadError("err"))
+        } catch (e: Exception) {
+            Result.Error(DomainError.FileUploadError(e.message))
         }
     }
 }

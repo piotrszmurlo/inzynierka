@@ -22,7 +22,8 @@ class App : Application(), KoinComponent {
 
     init {
         require("css/kvapp.css")
-        val initialMainAppState = MainAppState(listOf(1, 2, 3, 4), tab = Tab.Results, isFetching = false, false, null)
+        val initialMainAppState =
+            MainAppState(listOf(1, 2, 3, 4), tab = Tab.Results, isFetching = false, success = false, error = null)
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 
@@ -35,41 +36,9 @@ class App : Application(), KoinComponent {
 }
 
 fun main() {
-
     startKoin {
         modules(appModule)
     }
 
     startApplication(::App, module.hot, BootstrapModule, BootstrapCssModule, CoreModule, ChartModule, ReduxModule)
 }
-
-
-//            div().bind(store) { state ->
-//                div("example: " + state.data)
-//            }
-//            div().bind(store) { state ->
-//                div("started: " + state.isFetching.toString())
-//            }
-//            div().bind(store) { state ->
-//                div("success: " + state.success.toString())
-//            }
-//            div().bind(store) { state ->
-//                div("error: " + state.error as? DomainError.NetworkError)
-//            }
-//            button("Fetch data").onClick {
-//                store.dispatch { dispatch, _ ->
-//                    dispatch(MainAppAction.FetchDataStarted)
-//                    CoroutineScope(Dispatchers.Default).launch {
-//                        dataService.getData()
-//
-//                            .onSuccess {
-//                                dispatch(MainAppAction.FetchDataSuccess(it.data))
-//                                Toast.info("Data fetch completed")
-//                            }
-//                            .onFailure { dispatch(MainAppAction.FetchDataFailed(it)) }
-//                    }
-//                }
-//            }
-//            button("Mock fetch data error").onClick {
-//                store.dispatch(MainAppAction.FetchDataFailed(DomainError.NetworkError("Mock error")))
-//            }

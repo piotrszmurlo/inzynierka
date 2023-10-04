@@ -10,11 +10,12 @@ import io.kvision.types.KFile
 
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
+
     override suspend fun getData(): Data {
         return client.get(urlString = "data").body()
     }
-    
-    override suspend fun postFiles(kFiles: List<KFile>): Data {
+
+    override suspend fun postFiles(kFiles: List<KFile>) {
         client.submitFormWithBinaryData(
             url = "file",
             formData = formData {
@@ -26,6 +27,5 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
                 }
             }
         )
-        return Data(listOf(69, 1, 69, 1))
     }
 }

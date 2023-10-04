@@ -6,6 +6,7 @@
 #include <regex>
 #include <sstream>
 #include <iomanip>
+#include <stdexcept>
 #include <vector>
 
 #define STRINGIFY(x) #x
@@ -33,6 +34,23 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
         return a.numberOfEvaluations > b.numberOfEvaluations;
     }
 }
+
+double median(std::vector<double> &v)
+{
+  if(v.empty()) {
+    throw std::invalid_argument("empty vector");
+  }
+  auto n = v.size() / 2;
+  nth_element(v.begin(), v.begin()+n, v.end());
+  auto median = v[n];
+  if(!(v.size() & 1)) { //If the set size is even
+    auto max_it = max_element(v.begin(), v.begin()+n);
+    median = (*max_it + median) / 2.0;
+  }
+  return median;    
+}
+
+
 using TrialsVector = std::vector<FunctionAlgorithmTrial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;
 PYBIND11_MAKE_OPAQUE(FunctionTrialsVector);
@@ -73,22 +91,40 @@ unordered_map<string, float> calculate_cec2022_score(const int& totalNumberOfFun
 }
 
 unordered_map<string, float> calculate_average(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
-    unordered_map<string, float> scores;
+    unordered_map<string, float> averages;
     for (auto trials : input) {
         for (auto trial : trials) {
-            if (scores.find(trial.algorithmName) != scores.end()) {
-                scores[trial.algorithmName] += trial.finalError;
+            if (averages.find(trial.algorithmName) != averages.end()) {
+                averages[trial.algorithmName] += trial.finalError;
             } else {
-                scores[trial.algorithmName] = trial.finalError;
+                averages[trial.algorithmName] = trial.finalError;
             }
         }
     }
 
     int totalTrials = totalNumberOfFunctions*numberOfTrials;
-    for (auto& it: scores) {
+    for (auto& it: averages) {
         it.second /= totalTrials;
     }
-    return scores;
+    return averages;
+}
+
+unordered_map<string, double> calculate_median(FunctionTrialsVector& input) {
+    unordered_map<string, double> medians;
+    unordered_map<string, std::vector<double>> algorithmTrials;
+    for (auto& trials : input) {
+        for (auto& trial : trials) {
+            // if (algorithmTrials.find(trial.algorithmName) != algorithmTrials.end()) {
+                algorithmTrials[trial.algorithmName].push_back(trial.finalError);
+            // } else {
+                // algorithmTrials[trial.algorithmName] = TrialsVector().push_back(trial);
+            // }
+        }
+    }
+    for (auto& results : algorithmTrials) {
+        medians[results.first] = median(results.second);
+    }
+    return medians;
 }
 
 string parse_results(string input) {
@@ -141,6 +177,10 @@ PYBIND11_MODULE(python_extensions, m) {
 
     m.def("calculate_average", &calculate_average, R"pbdoc(
         Calculate average
+    )pbdoc");
+
+    m.def("calculate_median", &calculate_median, R"pbdoc(
+        Calculate median
     )pbdoc");
 
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
