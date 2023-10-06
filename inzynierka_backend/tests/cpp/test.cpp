@@ -7,7 +7,7 @@
 #include <cstdint>
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <catch2/catch.hpp>
-#include "../src/funcs.cpp"
+#include "../../src/cpp/funcs.cpp"
 
 TEST_CASE("median_calculate uneven vector size", "[median]") {
     std::vector<double> vector;

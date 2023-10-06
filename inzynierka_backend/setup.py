@@ -18,8 +18,7 @@ __version__ = "0.0.5"
 
 ext_modules = [
     Pybind11Extension("python_extensions",
-        ["src/main.cpp"],
-        include_dirs=["/Users/pszmurlo/Documents/inzynierka/app/extern/eigen"],
+        ["src/cpp/bindings.cpp"],
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
         ),
