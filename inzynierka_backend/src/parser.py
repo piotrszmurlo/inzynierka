@@ -1,11 +1,10 @@
 import base64
 
-import numpy as np
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 from src.dbaccess import get_files_for_dimension
-from src.models import RemoteDataFile, LocalFile, ParseError
+from src.models import LocalFile, ParseError
 import python_extensions as extensions
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
@@ -15,21 +14,16 @@ FUNCTIONS_COUNT = 5
 TRIALS_COUNT = 30
 DIMENSION_10 = 10
 DIMENSION_20 = 20
-ALL_DIMENSIONS = [DIMENSION_10, DIMENSION_20]
+ALL_DIMENSIONS = [DIMENSION_10]
+NUMBER_OF_STATISTICS = 4
 
 
-def parse_remote_results_file(remote_data_file: RemoteDataFile) -> tuple[str, int, int, str]:
-    algorithm_name, function_number, dimension = parse_remote_file_name(remote_data_file.name)
-    raw_contents = base64.b64decode(remote_data_file.content).decode('utf-8')
-    parsed_contents = extensions.parse_results(raw_contents)
-    return algorithm_name, function_number, dimension, parsed_contents
-
-
-def parse_remote_results_fileV2(upload_file: UploadFile) -> tuple[str, int, int, str]:
+def parse_remote_results_file(upload_file: UploadFile) -> tuple[str, int, int, str]:
     algorithm_name, function_number, dimension = parse_remote_file_name(upload_file.filename)
     raw_contents = base64.b64decode(upload_file.file.read()).decode('utf-8')
     parsed_contents = extensions.parse_results(raw_contents)
     return algorithm_name, function_number, dimension, parsed_contents
+
 
 def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
     try:
@@ -45,16 +39,6 @@ def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
     except ValueError:
         raise ParseError(f"Unable to parse file name")
     return algorithm_name, function_number, dimension
-
-
-def parse_file_to_numpy_array(data_file: LocalFile):
-    rows = data_file.contents.split("\n")
-    results_matrix = np.zeros((17, 30))
-    for i, row in enumerate(rows):
-        values = row.split()
-        if values:
-            results_matrix[i] = values
-    return results_matrix
 
 
 def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.TrialsVector:
@@ -77,24 +61,22 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
     :return: FunctionTrialsVector[TrialsVector[FunctionAlgorithmTrial]] with all final results provided
     """
     results = extensions.FunctionTrialsVector()
-    for i in range(FUNCTIONS_COUNT):
+    for _ in range(FUNCTIONS_COUNT):
         results.append(extensions.TrialsVector())
     for data_file in data_files:
         results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
-
     return results
 
 
-def get_updated_rankings(data_files: list[LocalFile], db: Session):
-    averages = {dimension: {} for dimension in ALL_DIMENSIONS}
-    medians = {dimension: {} for dimension in ALL_DIMENSIONS}
-    cec2022 = {dimension: {} for dimension in ALL_DIMENSIONS}
-    # for dimension in ALL_DIMENSIONS:
-    for dimension in [DIMENSION_10]:
+def get_updated_rankings(db: Session):
+    averages, medians, cec2022, friedman = \
+        ({dimension: {} for dimension in ALL_DIMENSIONS} for _ in range(NUMBER_OF_STATISTICS))
+    for dimension in ALL_DIMENSIONS:
         results = get_final_error_and_evaluation_number_for_files(
             get_files_for_dimension(db, DIMENSION_10)
         )
         cec2022[dimension] = extensions.calculate_cec2022_score(FUNCTIONS_COUNT, TRIALS_COUNT, results)
         averages[dimension] = extensions.calculate_average(FUNCTIONS_COUNT, TRIALS_COUNT, results)
         medians[dimension] = extensions.calculate_median(results)
-    return medians, averages, cec2022
+        # friedman[dimension] = {}
+    return medians, averages, cec2022, friedman

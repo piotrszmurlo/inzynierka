@@ -1,4 +1,3 @@
-from pydantic import BaseModel
 from sqlalchemy import Column, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.dialects.mysql import VARCHAR
@@ -8,12 +7,6 @@ Base = declarative_base()
 
 class ParseError(Exception):
     pass
-
-
-class RemoteDataFile(BaseModel):
-    content: bytes
-    name: str
-    size: int
 
 
 class LocalFile(Base):

@@ -1,20 +1,13 @@
-import base64
-from itertools import groupby
-from operator import attrgetter
 from pprint import pprint
 
-import numpy as np
 from fastapi import FastAPI, Depends, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker, Session
-from src.dbaccess import create_file, get_file, get_all_files
-import python_extensions as extensions
+from sqlalchemy.orm import Session
 from src import models
 from src.dbaccess import engine, SessionLocal
-from src.models import RemoteDataFile, ParseError, LocalFile
-from src.parser import get_updated_rankings, get_final_error_and_evaluation_number_for_files, \
-    parse_remote_results_fileV2
+from src.models import ParseError
+from src.parser import get_updated_rankings, parse_remote_results_file
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -54,12 +47,12 @@ async def root():
 
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
-    # calculate_cec_ranking(db)
-    medians, averages, cec2022 = get_updated_rankings(get_all_files(db), db)
+    medians, averages, cec2022, friedman = get_updated_rankings(db)
     return {
         "average": averages,
         "medians": medians,
-        "cec2022": cec2022
+        "cec2022": cec2022,
+        "friedman": friedman
     }
 
 
@@ -67,7 +60,7 @@ async def get_rankings(db: Session = Depends(get_db)):
 async def post_file(files: list[UploadFile]):
     try:
         for file in files:
-            print(file.filename)
+            pprint(parse_remote_results_file(file))
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
