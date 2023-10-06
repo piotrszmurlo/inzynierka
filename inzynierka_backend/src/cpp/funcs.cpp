@@ -37,14 +37,14 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
 
 double median(std::vector<double> &input) {
   if (input.empty()) {
-    throw std::invalid_argument("empty vector");
+    throw std::invalid_argument("Input vector is empty");
   }
   auto n = input.size() / 2;
   nth_element(input.begin(), input.begin() + n, input.end());
   auto median = input[n];
   if (!(input.size() % 2)) {
-    auto max_it = max_element(input.begin(), input.begin() + n);
-    median = (*max_it + median) / 2.0;
+    auto max = max_element(input.begin(), input.begin() + n);
+    median = (*max + median) * 0.5;
   }
   return median;
 }
