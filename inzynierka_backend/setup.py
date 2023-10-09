@@ -6,6 +6,8 @@ from setuptools import setup
 
 __version__ = "0.0.5"
 
+from setuptools.glob import glob
+
 # The main interface is through Pybind11Extension.
 # * You can add cxx_std=11/14/17, and then build_ext can be removed.
 # * You can set include_pybind11=false to add the include directory yourself,
@@ -18,10 +20,10 @@ __version__ = "0.0.5"
 
 ext_modules = [
     Pybind11Extension("python_extensions",
-        ["src/cpp/bindings.cpp"],
-        # Example: passing in the version to the compiled code
-        define_macros = [('VERSION_INFO', __version__)],
-        ),
+                      ["src/cpp/bindings.cpp"],
+                      # Example: passing in the version to the compiled code
+                      define_macros=[('VERSION_INFO', __version__)],
+                      ),
 ]
 
 setup(

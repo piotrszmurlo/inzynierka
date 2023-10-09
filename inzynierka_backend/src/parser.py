@@ -1,10 +1,9 @@
 import base64
 
-from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
-from src.dbaccess import get_files_for_dimension
 from src.models import LocalFile, ParseError
+from src.dbaccess import get_files_for_dimension
 import python_extensions as extensions
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
@@ -18,10 +17,13 @@ ALL_DIMENSIONS = [DIMENSION_10]
 NUMBER_OF_STATISTICS = 4
 
 
-def parse_remote_results_file(upload_file: UploadFile) -> tuple[str, int, int, str]:
-    algorithm_name, function_number, dimension = parse_remote_file_name(upload_file.filename)
-    raw_contents = base64.b64decode(upload_file.file.read()).decode('utf-8')
-    parsed_contents = extensions.parse_results(raw_contents)
+def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int, int, str]:
+    algorithm_name, function_number, dimension = parse_remote_file_name(filename)
+    raw_contents = base64.b64decode(contents).decode('utf-8')
+    try:
+        parsed_contents = extensions.parse_results(raw_contents)
+    except ValueError as e:
+        raise ParseError(e.args[0])
     return algorithm_name, function_number, dimension, parsed_contents
 
 
@@ -38,7 +40,7 @@ def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
             raise ParseError("File name must contain function number and dimension")
     except ValueError:
         raise ParseError(f"Unable to parse file name")
-    return algorithm_name, function_number, dimension
+    return algorithm_name, int(function_number), int(dimension)
 
 
 def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.TrialsVector:

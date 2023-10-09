@@ -1,3 +1,4 @@
+import os
 from pprint import pprint
 
 from fastapi import FastAPI, Depends, HTTPException, UploadFile
@@ -11,6 +12,7 @@ from src.parser import get_updated_rankings, parse_remote_results_file
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_db():
@@ -60,7 +62,7 @@ async def get_rankings(db: Session = Depends(get_db)):
 async def post_file(files: list[UploadFile]):
     try:
         for file in files:
-            pprint(parse_remote_results_file(file))
+            print(parse_remote_results_file(file.filename, await file.read())[-1])
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:

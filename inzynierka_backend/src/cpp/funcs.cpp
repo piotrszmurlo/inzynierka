@@ -40,7 +40,7 @@ double median(std::vector<double> &input) {
     throw std::invalid_argument("Input vector is empty");
   }
   auto n = input.size() / 2;
-  nth_element(input.begin(), input.begin() + n, input.end());
+  std::nth_element(input.begin(), input.begin() + n, input.end());
   auto median = input[n];
   if (!(input.size() % 2)) {
     auto max = max_element(input.begin(), input.begin() + n);
@@ -117,6 +117,13 @@ std::unordered_map<std::string, double> calculate_median(FunctionTrialsVector& i
     return medians;
 }
 
+double strict_stod(const std::string& s) {
+    std::size_t pos;
+    const auto result = std::stod(s, &pos);
+    if (pos != s.size()) throw std::invalid_argument("Invalid input arguments for std::stod()");
+    return result;
+}
+
 std::string parse_results(std::string input) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
@@ -126,8 +133,7 @@ std::string parse_results(std::string input) {
     double value;
     int rowcount = 0;
     while (ss >> word) {
-
-        value = stod(word);
+        value = strict_stod(word);
         if (value < MIN_VALUE) { value = MIN_VALUE; }
         if (++rowcount == 30) {
             result << value << "\n";
@@ -135,7 +141,6 @@ std::string parse_results(std::string input) {
         } else {
             result << value << " ";
         }
-
     }
 
     return result.str();
