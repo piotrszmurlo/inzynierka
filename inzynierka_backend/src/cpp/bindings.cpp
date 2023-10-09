@@ -10,8 +10,6 @@
 #include <vector>
 #include "funcs.cpp"
 
-using TrialsVector = std::vector<FunctionAlgorithmTrial>;
-using FunctionTrialsVector = std::vector<TrialsVector>;
 PYBIND11_MAKE_OPAQUE(FunctionTrialsVector);
 PYBIND11_MAKE_OPAQUE(TrialsVector);
 

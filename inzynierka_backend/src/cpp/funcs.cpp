@@ -4,12 +4,6 @@
 #include <iomanip>
 #include <stdexcept>
 #include <vector>
-
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/iostream.h>
-#include <pybind11/stl_bind.h>
-
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
@@ -23,22 +17,22 @@ struct FunctionAlgorithmTrial {
     int trialNumber;
     double finalError;
     int numberOfEvaluations;
+
+    bool operator==(const FunctionAlgorithmTrial &other) const {
+        return finalError == other.finalError && numberOfEvaluations == other.numberOfEvaluations;
+    }
+
+    bool operator<(const FunctionAlgorithmTrial &other) const {
+        if (finalError != other.finalError) {
+            return finalError > other.finalError;
+        } else {
+            return numberOfEvaluations > other.numberOfEvaluations;
+        }
+    }
 };
 
 using TrialsVector = std::vector<FunctionAlgorithmTrial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;
-
-bool operator==(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
-    return a.finalError == b.finalError && a.numberOfEvaluations == b.numberOfEvaluations;
-}
-
-bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b) {
-    if (a.finalError != b.finalError) {
-        return a.finalError < b.finalError;
-    } else {
-        return a.numberOfEvaluations > b.numberOfEvaluations;
-    }
-}
 
 double median(std::vector<double> &input) {
   if (input.empty()) {
@@ -54,26 +48,27 @@ double median(std::vector<double> &input) {
   return median;
 }
 
-std::unordered_map<std::string, float> calculate_cec2022_score(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<std::string, double> calculate_cec2022_score(const int& numberOfTrials, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
-    std::unordered_map<std::string, float> scores;
+    std::unordered_map<std::string, double> scores;
     for (auto& trial : input) {
         std::sort(trial.begin(), trial.end());
 
         // rank trials
         int equalValuesCount = 1;
         for (auto j = 0; j < trial.size(); j++) {
-            if (j != trial.size() - 1 && trial[j] == trial[j + 1]) { // 60?
+            if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
                 ++equalValuesCount;
             } else {
+                double score = (2 * j + 3 - equalValuesCount) / double(2);
                 for (int k = 0; k < equalValuesCount; k++) {
-                    if (scores.find(trial[j + k].algorithmName) != scores.end()) {
-                        scores[trial[j + k].algorithmName] += j / float(equalValuesCount);
+                    if (scores.find(trial[j - k].algorithmName) != scores.end()) {
+                        scores[trial[j - k].algorithmName] += score;
                     } else {
-                        scores[trial[j + k].algorithmName] = j / float(equalValuesCount);
+                        scores[trial[j - k].algorithmName] = score;
                     }
-                    equalValuesCount = 1;
                 }
+                equalValuesCount = 1;
             }
         }
     }

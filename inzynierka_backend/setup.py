@@ -23,6 +23,7 @@ ext_modules = [
                       ["src/cpp/bindings.cpp"],
                       # Example: passing in the version to the compiled code
                       define_macros=[('VERSION_INFO', __version__)],
+                      cxx_std=20,
                       ),
 ]
 

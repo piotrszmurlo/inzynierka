@@ -160,11 +160,143 @@ TEST_CASE("strict_stod scientific notation input", "[utils]") {
 
 TEST_CASE("strict_stod scientific notation input 2", "[utils]") {
     std::string input = "8.1118969e-09";
-    REQUIRE(strict_stod(input) == 0.0000000081118969 );
+    REQUIRE(strict_stod(input) == 0.0000000081118969);
 }
 
 TEST_CASE("strict_stod scientific notation input 3", "[utils]") {
     std::string input = "4.7216000e+05";
-    REQUIRE(strict_stod(input) == 472160.0 );
+    REQUIRE(strict_stod(input) == 472160.0);
 }
 
+TEST_CASE("FunctionAlgorithmTrial operator== same arguments", "[utils]") {
+    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    REQUIRE(a == b);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator== both different", "[utils]") {
+    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1, 100);
+    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 211);
+    REQUIRE_FALSE(a == b);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator== both equal", "[utils]") {
+    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
+    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 100);
+    REQUIRE(a == b);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator== same error different fes", "[utils]") {
+    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
+    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 211);
+    REQUIRE_FALSE(a == b);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator== different error same fes", "[utils]") {
+    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
+    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1, 100);
+    REQUIRE_FALSE(a == b);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator< same arguments", "[utils]") {
+    FunctionAlgorithmTrial same1 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    FunctionAlgorithmTrial same2 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    REQUIRE_FALSE(same1 < same2);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator< same error different fes", "[utils]") {
+    FunctionAlgorithmTrial better = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    FunctionAlgorithmTrial worse = FunctionAlgorithmTrial("alg2", 1, 1, 5, 200);
+    REQUIRE_FALSE(better < worse);
+    REQUIRE(worse < better);
+}
+
+TEST_CASE("FunctionAlgorithmTrial operator< different error same fes", "[utils]") {
+    FunctionAlgorithmTrial better = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    FunctionAlgorithmTrial worse = FunctionAlgorithmTrial("alg2", 1, 1, 5.1, 100);
+    REQUIRE_FALSE(better < worse);
+    REQUIRE(worse < better);
+}
+
+
+TEST_CASE("FunctionAlgorithmTrial operator< same error same fes", "[utils]") {
+    FunctionAlgorithmTrial same1 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+    FunctionAlgorithmTrial same2 = FunctionAlgorithmTrial("alg2", 1, 1, 5, 100);
+    REQUIRE_FALSE(same1 < same2);
+}
+
+TEST_CASE("calculate cec2022 without equal trials", "[cec2022]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 5, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 2, 100));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 6, 150));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 50));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 7);
+    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 8);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+TEST_CASE("calculate cec2022 only equal trials", "[cec2022]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 100));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 100));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 7.5);
+    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 7.5);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+TEST_CASE("calculate cec2022 some equal trials in same algorithm", "[cec2022]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 2, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 9);
+    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 6);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec2022]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 8);
+    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 7);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
