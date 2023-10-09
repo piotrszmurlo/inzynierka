@@ -9,6 +9,8 @@
 #include <catch2/catch.hpp>
 #include "../../src/cpp/funcs.cpp"
 
+double EPSILON = 10e-8;
+
 TEST_CASE("median uneven vector size", "[median]") {
     std::vector<double> vector;
     vector.push_back(1.3);
@@ -98,6 +100,52 @@ TEST_CASE("median one element vector function algorithm", "[median]") {
 TEST_CASE("median empty vector function algorithm throws invalid argument exception", "[median]") {
     FunctionTrialsVector vector;
     REQUIRE_THROWS_AS(calculate_median(vector), std::invalid_argument);
+}
+
+
+TEST_CASE("average one element vector function algorithm", "[average]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 13.27, 200));
+    vector.push_back(trialsVector1);
+    std::unordered_map<std::string, double> expected;
+    expected["alg1"] = 13.27;
+    REQUIRE(calculate_average(1, 1, vector) == expected);
+}
+
+TEST_CASE("average many element vector function algorithm", "[average]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 22.22, 111));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 11.11, 222));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 33.33, 333));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 1, 11.11, 111));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 2, 12.22, 222));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 3, 10e-8, 333));
+    vector.push_back(trialsVector1);
+
+    TrialsVector trialsVector2;
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1.1, 111));
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 10e-8, 222));
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 10e-8, 333));
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 1, 10e-8, 111));
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 2, 10e-8, 222));
+    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 3, 10e-8, 333));
+    vector.push_back(trialsVector2);
+
+    std::unordered_map<std::string, double> expected;
+    expected["alg1"] = 14.99833335;
+    expected["alg2"] = 0.18333341666;
+    REQUIRE(fabs(calculate_average(2, 3, vector)["alg1"] - expected["alg1"]) < EPSILON);
+    REQUIRE(fabs(calculate_average(2, 3, vector)["alg2"] - expected["alg2"]) < EPSILON);
+    REQUIRE(expected.size() == 2);
+}
+
+
+TEST_CASE("average empty vector function algorithm throws invalid argument exception", "[average]") {
+    FunctionTrialsVector vector;
+    REQUIRE_THROWS_AS(calculate_average(1, 1, vector), std::invalid_argument);
+    REQUIRE_THROWS_AS(calculate_average(0, 0, vector), std::invalid_argument);
 }
 
 TEST_CASE("strict_stod double input", "[utils]") {

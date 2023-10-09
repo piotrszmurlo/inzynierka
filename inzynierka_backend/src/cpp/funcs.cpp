@@ -80,8 +80,11 @@ std::unordered_map<std::string, float> calculate_cec2022_score(const int& totalN
     return scores;
 }
 
-std::unordered_map<std::string, float> calculate_average(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
-    std::unordered_map<std::string, float> averages;
+std::unordered_map<std::string, double> calculate_average(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
+    if (input.empty()) {
+        throw std::invalid_argument("Input data is empty");
+    }
+    std::unordered_map<std::string, double> averages;
     for (auto trials : input) {
         for (auto trial : trials) {
             if (averages.find(trial.algorithmName) != averages.end()) {
