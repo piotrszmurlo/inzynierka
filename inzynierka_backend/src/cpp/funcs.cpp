@@ -120,7 +120,7 @@ std::unordered_map<std::string, double> calculate_median(FunctionTrialsVector& i
 double strict_stod(const std::string& s) {
     std::size_t pos;
     const auto result = std::stod(s, &pos);
-    if (pos != s.size()) throw std::invalid_argument("Invalid input arguments for std::stod()");
+    if (pos != s.size()) throw std::invalid_argument("Unexpected character found");
     return result;
 }
 

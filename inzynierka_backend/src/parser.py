@@ -18,6 +18,17 @@ NUMBER_OF_STATISTICS = 4
 
 
 def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int, int, str]:
+    """
+    Parses results file name and contents.
+
+    Raises:
+        ParseError - if the file cannot be parsed
+        UnicodeDecodeError - if the file cannot be decoded with utf-8
+        binascii.Error - is the padding for base64 is incorrect
+    :param filename: name of the file in format: [ALGORITHM_NAME]_[FUNCTION_NUMBER]_[DIMENSION].[EXTENSION]
+    :param contents: binary data encoded in base64
+    :return: algorithm_name, function number, dimension and corrected contents extracted to a tuple
+    """
     algorithm_name, function_number, dimension = parse_remote_file_name(filename)
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
@@ -27,9 +38,14 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     return algorithm_name, function_number, dimension, parsed_contents
 
 
-def parse_remote_file_name(file_name: str) -> tuple[str, int, int]:
+def parse_remote_file_name(filename: str) -> tuple[str, int, int]:
+    """
+    Parses file name and extracts necessary values to a tuple
+    :param filename: file name in format: [ALGORITHM_NAME]_[FUNCTION_NUMBER]_[DIMENSION].[EXTENSION]
+    :return: algorithm_name, function number and dimension extracted to a tuple
+    """
     try:
-        name, extension = file_name.rsplit(".", 1)
+        name, extension = filename.rsplit(".", 1)
         if extension not in ALLOWED_EXTENSIONS or "." in name:
             raise ParseError(f"Only {ALLOWED_EXTENSIONS} files allowed")
     except ValueError:
@@ -52,7 +68,8 @@ def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.T
     evaluations = rows[FINAL_FES_INDEX].split()
     results = extensions.TrialsVector()
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
-        results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i, float(final_error), int(evaluations[i].split(".")[0])))
+        results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i,
+                                                         float(final_error), int(evaluations[i].split(".")[0])))
     return results
 
 
