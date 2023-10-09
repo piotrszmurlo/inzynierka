@@ -37,7 +37,7 @@ bool operator<(const FunctionAlgorithmTrial &a, const FunctionAlgorithmTrial &b)
 
 double median(std::vector<double> &input) {
   if (input.empty()) {
-    throw std::invalid_argument("Input vector is empty");
+    throw std::invalid_argument("Input data is empty");
   }
   auto n = input.size() / 2;
   std::nth_element(input.begin(), input.begin() + n, input.end());
@@ -99,16 +99,15 @@ std::unordered_map<std::string, float> calculate_average(const int& totalNumberO
     return averages;
 }
 
-std::unordered_map<std::string, double> calculate_median(FunctionTrialsVector& input) {
+std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVector& input) {
+    if (input.empty()) {
+        throw std::invalid_argument("Input data is empty");
+    }
     std::unordered_map<std::string, double> medians;
     std::unordered_map<std::string, std::vector<double>> algorithmTrials;
-    for (auto& trials : input) {
-        for (auto& trial : trials) {
-            // if (algorithmTrials.find(trial.algorithmName) != algorithmTrials.end()) {
-                algorithmTrials[trial.algorithmName].push_back(trial.finalError);
-            // } else {
-                // algorithmTrials[trial.algorithmName] = TrialsVector().push_back(trial);
-            // }
+    for (const auto& trials : input) {
+        for (const auto& trial : trials) {
+            algorithmTrials[trial.algorithmName].push_back(trial.finalError);
         }
     }
     for (auto& results : algorithmTrials) {
@@ -120,7 +119,7 @@ std::unordered_map<std::string, double> calculate_median(FunctionTrialsVector& i
 double strict_stod(const std::string& s) {
     std::size_t pos;
     const auto result = std::stod(s, &pos);
-    if (pos != s.size()) throw std::invalid_argument("Unexpected character found");
+    if (pos != s.size()) throw std::invalid_argument("Unexpected character found in data");
     return result;
 }
 
