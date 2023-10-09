@@ -5,6 +5,11 @@
 #include <stdexcept>
 #include <vector>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/iostream.h>
+#include <pybind11/stl_bind.h>
+
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
@@ -49,7 +54,8 @@ double median(std::vector<double> &input) {
   return median;
 }
 
-std::unordered_map<std::string, float> calculate_cec2022_score(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<std::string, float> calculate_cec2022_score(const int& numberOfTrials, FunctionTrialsVector& input) {
+    const int totalNumberOfFunctions = input.size();
     std::unordered_map<std::string, float> scores;
     for (auto& trial : input) {
         std::sort(trial.begin(), trial.end());

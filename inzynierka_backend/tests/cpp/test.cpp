@@ -16,7 +16,7 @@ TEST_CASE("median uneven vector size", "[median]") {
     vector.push_back(1.3);
     vector.push_back(1.1);
     vector.push_back(1.5);
-    REQUIRE(median(vector) == 1.3 );
+    REQUIRE(median(vector) == 1.3);
 }
 
 TEST_CASE("median even vector size", "[median]") {
@@ -25,13 +25,13 @@ TEST_CASE("median even vector size", "[median]") {
     vector.push_back(1.1);
     vector.push_back(1.5);
     vector.push_back(1.6);
-    REQUIRE(median(vector) == 1.4 );
+    REQUIRE(median(vector) == 1.4);
 }
 
 TEST_CASE("median one element vector", "[median]") {
     std::vector<double> vector;
     vector.push_back(1.1);
-    REQUIRE(median(vector) == 1.1 );
+    REQUIRE(median(vector) == 1.1);
 }
 
 TEST_CASE("median empty vector throws invalid argument exception", "[median]") {
