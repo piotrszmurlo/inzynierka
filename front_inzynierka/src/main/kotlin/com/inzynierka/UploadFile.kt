@@ -69,6 +69,5 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
                 }
             }
         }
-
     }
 }

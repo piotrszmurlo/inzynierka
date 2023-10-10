@@ -29,6 +29,8 @@ PYBIND11_MODULE(python_extensions, m) {
            parse_results
            calculate_cec2022_score
            calculate_average
+           calculate_median
+           calculate_friedman_test_scores
     )pbdoc";
 
     m.def("parse_results", &parse_results, R"pbdoc(
@@ -46,6 +48,10 @@ PYBIND11_MODULE(python_extensions, m) {
 
     m.def("calculate_median", &calculate_median, R"pbdoc(
         Calculate median
+    )pbdoc");
+
+    m.def("calculate_friedman_test_scores", &calculate_friedman_test_scores, R"pbdoc(
+        Calculate friedman test scores
     )pbdoc");
 
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")

@@ -110,7 +110,7 @@ TEST_CASE("average one element vector function algorithm", "[average]") {
     vector.push_back(trialsVector1);
     std::unordered_map<std::string, double> expected;
     expected["alg1"] = 13.27;
-    REQUIRE(calculate_average(1, 1, vector) == expected);
+    REQUIRE(calculate_average(1, vector) == expected);
 }
 
 TEST_CASE("average many element vector function algorithm", "[average]") {
@@ -136,16 +136,16 @@ TEST_CASE("average many element vector function algorithm", "[average]") {
     std::unordered_map<std::string, double> expected;
     expected["alg1"] = 14.99833335;
     expected["alg2"] = 0.18333341666;
-    REQUIRE(fabs(calculate_average(2, 3, vector)["alg1"] - expected["alg1"]) < EPSILON);
-    REQUIRE(fabs(calculate_average(2, 3, vector)["alg2"] - expected["alg2"]) < EPSILON);
+    REQUIRE(fabs(calculate_average(3, vector)["alg1"] - expected["alg1"]) < EPSILON);
+    REQUIRE(fabs(calculate_average(3, vector)["alg2"] - expected["alg2"]) < EPSILON);
     REQUIRE(expected.size() == 2);
 }
 
 
 TEST_CASE("average empty vector function algorithm throws invalid argument exception", "[average]") {
     FunctionTrialsVector vector;
-    REQUIRE_THROWS_AS(calculate_average(1, 1, vector), std::invalid_argument);
-    REQUIRE_THROWS_AS(calculate_average(0, 0, vector), std::invalid_argument);
+    REQUIRE_THROWS_AS(calculate_average(1, vector), std::invalid_argument);
+    REQUIRE_THROWS_AS(calculate_average(0, vector), std::invalid_argument);
 }
 
 TEST_CASE("strict_stod double input", "[utils]") {
@@ -297,6 +297,125 @@ TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec202
 
     REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 8);
     REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 7);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+TEST_CASE("TrialsVector is properly sorted reverse", "[utils]") {
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 7, 1));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+
+    std::sort(trialsVector1.rbegin(), trialsVector1.rend());
+    REQUIRE(trialsVector1[0].finalError == 1);
+    REQUIRE(trialsVector1[0].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[1].finalError == 1);
+    REQUIRE(trialsVector1[1].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[2].finalError == 2);
+    REQUIRE(trialsVector1[2].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[3].finalError == 3);
+    REQUIRE(trialsVector1[3].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[4].finalError == 3);
+    REQUIRE(trialsVector1[4].numberOfEvaluations == 150);
+
+    REQUIRE(trialsVector1[5].finalError == 7);
+    REQUIRE(trialsVector1[5].numberOfEvaluations == 1);
+}
+
+TEST_CASE("TrialsVector is properly sorted", "[utils]") {
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 7, 1));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+
+    std::sort(trialsVector1.begin(), trialsVector1.end());
+
+    REQUIRE(trialsVector1[0].finalError == 7);
+    REQUIRE(trialsVector1[0].numberOfEvaluations == 1);
+
+    REQUIRE(trialsVector1[1].finalError == 3);
+    REQUIRE(trialsVector1[1].numberOfEvaluations == 150);
+    REQUIRE(trialsVector1[2].finalError == 3);
+    REQUIRE(trialsVector1[2].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[3].finalError == 2);
+    REQUIRE(trialsVector1[3].numberOfEvaluations == 100);
+
+    REQUIRE(trialsVector1[4].finalError == 1);
+    REQUIRE(trialsVector1[5].finalError == 1);
+
+    REQUIRE(trialsVector1[5].numberOfEvaluations == 100);
+    REQUIRE(trialsVector1[4].numberOfEvaluations == 100);
+
+}
+
+
+
+TEST_CASE("calculate friedman without equal trials", "[friedman]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 5, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 2, 100));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 6, 150));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 50));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] - (3 + 2/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] - (3 + 1/double(3)) < EPSILON);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+
+TEST_CASE("calculate friedman with equal only trials", "[friedman]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 100));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 100));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] == 3.5);
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] == 3.5);
+    REQUIRE(vector.size() == 1);
+    REQUIRE(trialsVector1.size() == 6);
+}
+
+TEST_CASE("calculate friedman with some equal trials in different algorithm", "[friedman]") {
+    FunctionTrialsVector vector;
+    TrialsVector trialsVector1;
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 1, 100));
+    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+
+    vector.push_back(trialsVector1);
+
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] - (3 + 1/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] - (3 + 2/double(3)) < EPSILON);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }

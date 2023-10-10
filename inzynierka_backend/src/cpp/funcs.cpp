@@ -22,6 +22,7 @@ struct FunctionAlgorithmTrial {
         return finalError == other.finalError && numberOfEvaluations == other.numberOfEvaluations;
     }
 
+    // std::sort will sort from worst trial to best trial
     bool operator<(const FunctionAlgorithmTrial &other) const {
         if (finalError != other.finalError) {
             return finalError > other.finalError;
@@ -81,10 +82,43 @@ std::unordered_map<std::string, double> calculate_cec2022_score(const int& numbe
     return scores;
 }
 
-std::unordered_map<std::string, double> calculate_average(const int& totalNumberOfFunctions, const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<std::string, double> calculate_friedman_test_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
+    const int totalNumberOfFunctions = input.size();
+    std::unordered_map<std::string, double> scores;
+        for (auto& trial : input) {
+        std::sort(trial.rbegin(), trial.rend());
+
+        // rank trials
+        int equalValuesCount = 1;
+        for (auto j = 0; j < trial.size(); j++) {
+            if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
+                ++equalValuesCount;
+            } else {
+                double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
+                for (int k = 0; k < equalValuesCount; k++) {
+                    if (scores.find(trial[j - k].algorithmName) != scores.end()) {
+                        scores[trial[j - k].algorithmName] += score;
+                    } else {
+                        scores[trial[j - k].algorithmName] = score;
+                    }
+                }
+                equalValuesCount = 1;
+            }
+        }
+    }
+
+    int totalTrials = totalNumberOfFunctions * numberOfTrials;
+    for (auto& it: scores) {
+        it.second /= totalTrials;
+    }
+    return scores;
+}
+
+std::unordered_map<std::string, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {
     if (input.empty()) {
         throw std::invalid_argument("Input data is empty");
     }
+    const int totalNumberOfFunctions = input.size();
     std::unordered_map<std::string, double> averages;
     for (auto trials : input) {
         for (auto trial : trials) {
@@ -96,7 +130,7 @@ std::unordered_map<std::string, double> calculate_average(const int& totalNumber
         }
     }
 
-    int totalTrials = totalNumberOfFunctions*numberOfTrials;
+    int totalTrials = totalNumberOfFunctions * numberOfTrials;
     for (auto& it: averages) {
         it.second /= totalTrials;
     }

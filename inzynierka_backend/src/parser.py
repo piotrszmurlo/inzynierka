@@ -95,7 +95,7 @@ def get_updated_rankings(db: Session):
             get_files_for_dimension(db, DIMENSION_10)
         )
         cec2022[dimension] = extensions.calculate_cec2022_score(TRIALS_COUNT, results)
-        averages[dimension] = extensions.calculate_average(FUNCTIONS_COUNT, TRIALS_COUNT, results)
+        averages[dimension] = extensions.calculate_average(TRIALS_COUNT, results)
         medians[dimension] = extensions.calculate_median(results)
-        # friedman[dimension] = {}
+        friedman[dimension] = extensions.calculate_friedman_test_scores(TRIALS_COUNT, results)
     return medians, averages, cec2022, friedman
