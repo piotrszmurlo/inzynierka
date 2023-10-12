@@ -1,6 +1,7 @@
 import os
 from pprint import pprint
 
+import python_extensions
 from fastapi import FastAPI, Depends, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
@@ -49,6 +50,8 @@ async def root():
 
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
+
+
     medians, averages, cec2022, friedman = get_updated_rankings(db)
     return {
         "average": averages,

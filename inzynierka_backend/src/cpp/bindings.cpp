@@ -54,6 +54,10 @@ PYBIND11_MODULE(python_extensions, m) {
         Calculate friedman test scores
     )pbdoc");
 
+    m.def("calculate_example", &calculate_example, R"pbdoc(
+        Calculate example
+    )pbdoc");
+    
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
         .def(py::init<const std::string&, const int&, const int&, const double&, const int&>())
         .def("__repr__",
