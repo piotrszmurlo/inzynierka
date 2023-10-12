@@ -1,4 +1,5 @@
 import base64
+from pprint import pprint
 
 from sqlalchemy.orm import Session
 
@@ -86,6 +87,21 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
         results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
     return results
 
+# results[function_number - 1]["algorithm_name]
+# def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
+#     """
+#     :param data_files: list of LocalFile(s) with already preprocessed contents
+#     :return: FunctionTrialsVector[TrialsVector[FunctionAlgorithmTrial]] with all final results provided
+#     """
+#     results = extensions.BasicRankingInput()
+#     results_for_function = {}
+#     for _ in range(FUNCTIONS_COUNT):
+#         results.append({})
+#         # results.append(extensions.TrialsVector())
+#     for data_file in data_files:
+#         results[data_file.function_number - 1] =
+#     return results
+
 
 def get_updated_rankings(db: Session):
     averages, medians, cec2022, friedman = \
@@ -98,6 +114,6 @@ def get_updated_rankings(db: Session):
         averages[dimension] = extensions.calculate_average(TRIALS_COUNT, results)
         medians[dimension] = extensions.calculate_median(results)
         friedman[dimension] = extensions.calculate_friedman_test_scores(TRIALS_COUNT, results)
-        print(extensions.calculate_example(results))
+        pprint(extensions.calculate_example(results))
 
     return medians, averages, cec2022, friedman

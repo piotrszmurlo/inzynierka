@@ -12,6 +12,7 @@
 
 PYBIND11_MAKE_OPAQUE(FunctionTrialsVector);
 PYBIND11_MAKE_OPAQUE(TrialsVector);
+PYBIND11_MAKE_OPAQUE(BasicRankingInput);
 
 namespace py = pybind11;
 
@@ -54,10 +55,13 @@ PYBIND11_MODULE(python_extensions, m) {
         Calculate friedman test scores
     )pbdoc");
 
-    m.def("calculate_example", &calculate_example, R"pbdoc(
-        Calculate example
+    m.def("calculate_basic_ranking", &calculate_basic_ranking, R"pbdoc(
+        Calculate basic ranking
     )pbdoc");
-    
+
+    m.def("calculate_example", &calculate_example, R"pbdoc(
+        Calculate basic rankicalculate_exampleng
+    )pbdoc");
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
         .def(py::init<const std::string&, const int&, const int&, const double&, const int&>())
         .def("__repr__",
@@ -74,6 +78,7 @@ PYBIND11_MODULE(python_extensions, m) {
 
     py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
     py::bind_vector<TrialsVector>(m, "TrialsVector");
+    py::bind_vector<BasicRankingInput>(m, "BasicRankingInput");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

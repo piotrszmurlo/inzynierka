@@ -154,6 +154,7 @@ std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVec
     return medians;
 }
 
+
 double strict_stod(const std::string& s) {
     std::size_t pos;
     const auto result = std::stod(s, &pos);
@@ -182,47 +183,73 @@ std::string parse_results(std::string input) {
 
     return result.str();
 }
-using Statistics2ValueMap = std::unordered_map<std::string, double>;
-using Function2StatisticsMap = std::unordered_map<std::string, Statistics2ValueMap>;
-using Algorithm2FunctionMap = std::unordered_map<std::string, Function2StatisticsMap>;
-using BasicRankingResultsMap = std::unordered_map<std::string, Algorithm2FunctionMap>;
 
-using InputResults = std::vector<std::map<std::string, std::map<std::string, TrialsVector>>>;
 
-BasicRankingResultsMap calculate_basic_ranking(const InputResults& input) {
-    BasicRankingResultsMap results;
-    // (auto& function : input
+using Statistic2Value = std::unordered_map<std::string, double>;
+using Algorithm2Statistic = std::unordered_map<std::string, Statistic2Value>;
+using Dimension2Algorithm = std::unordered_map<int, Algorithm2Statistic>;
+
+using BasicRankingInput = std::vector<std::map<int, std::map<std::string, TrialsVector>>>;
+
+Dimension2Algorithm calculate_basic_ranking(const BasicRankingInput& input) {
+    Dimension2Algorithm results;
+    std::unordered_map<int, std::unordered_map<std::string, std::unordered_map<std::string, std::vector<double>>>> accumulatedValues;
     for (size_t i = 0; i < input.size(); i++) {
         for (auto& dimension : input[i]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
-                results[std::to_string(i + 1)][dimension.first][algorithmName]["best"] = trialsVector.front().finalError;
-                results[std::to_string(i + 1)][dimension.first][algorithmName]["worst"] = trialsVector.back().finalError;
+                accumulatedValues[dimension.first][algorithmName]["best"].push_back(trialsVector.front().finalError);
+                accumulatedValues[dimension.first][algorithmName]["worst"].push_back(trialsVector.back().finalError);
+                int numberOfTrials = trialsVector.size();
+                if (numberOfTrials % 2 != 0) {
+                    accumulatedValues[dimension.first][algorithmName]["median"].push_back(trialsVector[numberOfTrials/2].finalError);
+                } else {
+                    double median = ((trialsVector[numberOfTrials/2].finalError) + (trialsVector[(numberOfTrials/2) - 1].finalError))/2;
+                    accumulatedValues[dimension.first][algorithmName]["median"].push_back(median);
+                }
+                // jeszcze mean policzyc
             }
         }
     }
     return results;
 }
 
-//primitive types are zero-initialized, so no need to check if map is empty
-BasicRankingResultsMap calculate_example(const FunctionTrialsVector& input) {
+
+std::unordered_map<std::string, double> calculate_medianV2(const TrialsVector& input) {
     if (input.empty()) {
         throw std::invalid_argument("Input data is empty");
     }
-    std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, double>>>> test;
+    for (auto& trial : input) {
 
-    std::unordered_map<std::string, double> stats;
-    stats["mean"] = 3.12;
-    std::unordered_map<std::string, std::unordered_map<std::string, double>> funcs;
-    funcs["function_1"] = stats;
+    }
+    std::unordered_map<std::string, double> medians;
+    std::unordered_map<std::string, std::vector<double>> algorithmTrials;
+    for (const auto& trial : input) {
+        algorithmTrials[trial.algorithmName].push_back(trial.finalError);
+    }
+    for (auto& results : algorithmTrials) {
+        medians[results.first] = median(results.second);
+    }
+    return medians;
+}
 
-    std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, double>>> dims;
-    dims["10"] = funcs;
-    test["algorithm_name"] = dims;
-    test["algorithm_name2"]["20"]["function_2"] = stats;
-    test["algorithm_name2"]["20"]["function_3"]["std"] += 1.5;
+// primitive types are zero-initialized, so no need to check if map is empty
+Dimension2Algorithm calculate_example(const FunctionTrialsVector& input) {
+    if (input.empty()) {
+        throw std::invalid_argument("Input data is empty");
+    }
+    Dimension2Algorithm test;
+    test[10]["algorithm_name_1"]["best"] = 1.69;
+    test[10]["algorithm_name_2"]["best"] = 1.69;
+    test[10]["algorithm_name_2"]["mean"] += 1.3;
+    test[10]["algorithm_name_1"]["mean"] += 1.3;
+
+    test[20]["algorithm_name_1"]["best"] = 1.69;
+    test[20]["algorithm_name_2"]["best"] = 1.69;
+    test[20]["algorithm_name_2"]["mean"] += 1.3;
+    test[20]["algorithm_name_1"]["mean"] += 1.3;
 
     return test;
 }
