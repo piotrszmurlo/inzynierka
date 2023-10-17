@@ -3,6 +3,7 @@ package com.inzynierka
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
 import com.inzynierka.domain.Tab
+import com.inzynierka.domain.loadCec2022Scores
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.rankings.cec2022
 import com.inzynierka.rankings.ecdf
@@ -15,7 +16,6 @@ import io.kvision.html.button
 import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.state.bind
-import io.kvision.state.sub
 import io.kvision.utils.px
 
 fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
@@ -24,10 +24,13 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
         flexPanel(direction = FlexDirection.ROW, justify = JustifyContent.CENTER, spacing = 8) {
             padding = 16.px
             paddingBottom = 32.px
-            
+
             button(text = "CEC 2022", style = ButtonStyle.OUTLINEPRIMARY)
                 .onClick {
                     store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.CEC2022))
+                    store.dispatch { dispatch, _ ->
+                        loadCec2022Scores(dispatch, dataService)
+                    }
                 }
             button(text = "Mean", style = ButtonStyle.OUTLINEPRIMARY)
                 .onClick {
@@ -51,10 +54,10 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 }
         }
 
-        flexPanel(justify = JustifyContent.CENTER).bind(store.sub(extractor = { state -> state.tab })) { tab ->
+        flexPanel(justify = JustifyContent.CENTER).bind(store) { state ->
             display = Display.FLEX
-            when (tab as? Tab.ResultsTab) {
-                is Tab.ResultsTab.CEC2022 -> cec2022(store, dataService)
+            when (state.tab as? Tab.ResultsTab) {
+                is Tab.ResultsTab.CEC2022 -> cec2022(state.rankingsData.cec2022Scores)
                 is Tab.ResultsTab.Friedman -> {}
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}

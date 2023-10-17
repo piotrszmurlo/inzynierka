@@ -1,7 +1,7 @@
 package com.inzynierka.data
 
-import com.inzynierka.model.CEC2022Data
 import com.inzynierka.model.Data
+import com.inzynierka.model.RemoteCEC2022Data
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -16,7 +16,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         return client.get(urlString = "data").body()
     }
 
-    override suspend fun getCEC2022Scores(): CEC2022Data {
+    override suspend fun getCEC2022Scores(): RemoteCEC2022Data {
         return client.get(urlString = "rankings/cec2022").body()
     }
 

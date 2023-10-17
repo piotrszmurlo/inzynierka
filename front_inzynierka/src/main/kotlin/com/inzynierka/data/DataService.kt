@@ -3,8 +3,8 @@ package com.inzynierka.data
 import com.inzynierka.domain.DomainError
 import com.inzynierka.domain.Result
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.model.CEC2022Data
 import com.inzynierka.model.Data
+import com.inzynierka.model.RemoteCEC2022Data
 import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
@@ -18,7 +18,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getCEC2022Scores(): Result<CEC2022Data> {
+    override suspend fun getCEC2022Scores(): Result<RemoteCEC2022Data> {
         return try {
             val result = dataRepository.getCEC2022Scores()
             console.log(result)

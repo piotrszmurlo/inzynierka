@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Data(val data: List<Int>)
 
 @Serializable
-data class CEC2022Data(val dimension: Map<String, List<ScoreEntry>>)
+data class RemoteCEC2022Data(val dimension: Map<Int, List<ScoreEntry>>)
 
 @Serializable
 data class ScoreEntry(val algorithmName: String, val score: Double)
