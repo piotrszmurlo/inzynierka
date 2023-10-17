@@ -6,7 +6,14 @@ import org.koin.core.component.KoinComponent
 
 sealed class Tab {
     object Upload : Tab()
-    object Results : Tab()
+    sealed class ResultsTab : Tab() {
+        object PairTest : ResultsTab()
+        object CEC2022 : ResultsTab()
+        object Friedman : ResultsTab()
+        object Median : ResultsTab()
+        object Mean : ResultsTab()
+        object ECDF : ResultsTab()
+    }
 }
 
 data class MainAppState(

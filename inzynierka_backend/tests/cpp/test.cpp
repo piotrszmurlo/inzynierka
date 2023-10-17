@@ -238,8 +238,8 @@ TEST_CASE("calculate cec2022 without equal trials", "[cec2022]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 7);
-    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 8);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 7);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 8);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -257,8 +257,8 @@ TEST_CASE("calculate cec2022 only equal trials", "[cec2022]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 7.5);
-    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 7.5);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 7.5);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 7.5);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -276,8 +276,8 @@ TEST_CASE("calculate cec2022 some equal trials in same algorithm", "[cec2022]") 
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 9);
-    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 6);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 9);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 6);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -295,8 +295,8 @@ TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec202
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_score(3, vector)["alg1"] == 8);
-    REQUIRE(calculate_cec2022_score(3, vector)["alg2"] == 7);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 8);
+    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 7);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -375,8 +375,8 @@ TEST_CASE("calculate friedman without equal trials", "[friedman]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] - (3 + 2/double(3)) < EPSILON);
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] - (3 + 1/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] - (3 + 2/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] - (3 + 1/double(3)) < EPSILON);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -395,8 +395,8 @@ TEST_CASE("calculate friedman with equal only trials", "[friedman]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] == 3.5);
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] == 3.5);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] == 3.5);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] == 3.5);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -414,8 +414,8 @@ TEST_CASE("calculate friedman with some equal trials in different algorithm", "[
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg1"] - (3 + 1/double(3)) < EPSILON);
-    REQUIRE(calculate_friedman_test_scores(3, vector)["alg2"] - (3 + 2/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] - (3 + 1/double(3)) < EPSILON);
+    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] - (3 + 2/double(3)) < EPSILON);
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }

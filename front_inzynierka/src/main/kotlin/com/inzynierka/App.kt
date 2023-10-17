@@ -23,7 +23,7 @@ class App : Application(), KoinComponent {
     init {
         require("css/kvapp.css")
         val initialMainAppState =
-            MainAppState(listOf(1, 2, 3, 4), tab = Tab.Results, isFetching = false, success = false, error = null)
+            MainAppState(listOf(1, 2, 3, 4), tab = Tab.Upload, isFetching = false, success = false, error = null)
         store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 

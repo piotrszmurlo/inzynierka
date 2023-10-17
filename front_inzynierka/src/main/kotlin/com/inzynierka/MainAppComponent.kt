@@ -5,7 +5,10 @@ import com.inzynierka.domain.MainAppState
 import com.inzynierka.domain.Tab
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.Container
+import io.kvision.core.Display
+import io.kvision.core.JustifyContent
 import io.kvision.html.div
+import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.state.bind
 import io.kvision.state.sub
@@ -15,15 +18,15 @@ import io.kvision.toast.ToastContainerPosition
 fun Container.mainAppComponent(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
 
     navBar(store)
-
-    div().bind(store.sub(extractor = { state -> state.tab })) { tab ->
+    flexPanel(
+        justify = JustifyContent.CENTER
+    ).bind(store.sub(extractor = { state -> state.tab })) { tab ->
+        display = Display.FLEX
         when (tab) {
-            is Tab.Upload -> {
-                uploadFileForm(store, dataService)
-            }
-
-            is Tab.Results -> results(store, dataService)
+            is Tab.Upload -> uploadFileForm(store, dataService)
+            is Tab.ResultsTab -> rankings(store, dataService)
         }
+
     }
 
     div().bind(store) { state ->

@@ -49,7 +49,7 @@ double median(std::vector<double> &input) {
   return median;
 }
 
-std::unordered_map<std::string, double> calculate_cec2022_score(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<std::string, double> calculate_cec2022_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
     std::unordered_map<std::string, double> scores;
     for (auto& trial : input) {
@@ -82,7 +82,7 @@ std::unordered_map<std::string, double> calculate_cec2022_score(const int& numbe
     return scores;
 }
 
-std::unordered_map<std::string, double> calculate_friedman_test_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<std::string, double> calculate_friedman_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
     std::unordered_map<std::string, double> scores;
         for (auto& trial : input) {

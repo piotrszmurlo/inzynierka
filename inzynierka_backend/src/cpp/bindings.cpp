@@ -28,17 +28,17 @@ PYBIND11_MODULE(python_extensions, m) {
            :toctree: _generate
 
            parse_results
-           calculate_cec2022_score
+           calculate_cec2022_scores
            calculate_average
            calculate_median
-           calculate_friedman_test_scores
+           calculate_friedman_scores
     )pbdoc";
 
     m.def("parse_results", &parse_results, R"pbdoc(
         Parse results file content
     )pbdoc");
 
-    m.def("calculate_cec2022_score", &calculate_cec2022_score, R"pbdoc(
+    m.def("calculate_cec2022_scores", &calculate_cec2022_scores, R"pbdoc(
         Calculate score
     )pbdoc");
 
@@ -51,8 +51,8 @@ PYBIND11_MODULE(python_extensions, m) {
         Calculate median
     )pbdoc");
 
-    m.def("calculate_friedman_test_scores", &calculate_friedman_test_scores, R"pbdoc(
-        Calculate friedman test scores
+    m.def("calculate_friedman_scores", &calculate_friedman_scores, R"pbdoc(
+        Calculate friedman scores
     )pbdoc");
 
     m.def("calculate_basic_ranking", &calculate_basic_ranking, R"pbdoc(

@@ -1,15 +1,16 @@
 import os
 from pprint import pprint
 
-import python_extensions
+import python_extensions as extensions
 from fastapi import FastAPI, Depends, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src import models
-from src.dbaccess import engine, SessionLocal
+from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names
 from src.models import ParseError
-from src.parser import get_updated_rankings, parse_remote_results_file
+from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
+    ALL_DIMENSIONS, TRIALS_COUNT
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -50,8 +51,6 @@ async def root():
 
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
-
-
     medians, averages, cec2022, friedman = get_updated_rankings(db)
     return {
         "average": averages,
@@ -59,6 +58,37 @@ async def get_rankings(db: Session = Depends(get_db)):
         "cec2022": cec2022,
         "friedman": friedman
     }
+
+
+@app.get("/algorithms")
+async def get_available_algorithms(db: Session = Depends(get_db)):
+    return get_all_algorithm_names(db)
+
+
+@app.get("/rankings/cec2022")
+async def get_cec2022_ranking(db: Session = Depends(get_db)):
+    response = {"dimension": {}}
+    for dimension in ALL_DIMENSIONS:
+        errors = get_final_error_and_evaluation_number_for_files(
+            get_files_for_dimension(db, dimension)
+        )
+        scores = extensions.calculate_cec2022_scores(
+            TRIALS_COUNT, errors
+        )
+        response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
+    return response
+
+
+@app.get("/rankings/friedman")
+async def get_friedman_ranking(db: Session = Depends(get_db)):
+    friedman = {}
+    for dimension in ALL_DIMENSIONS:
+        results = get_final_error_and_evaluation_number_for_files(
+            get_files_for_dimension(db, dimension)
+        )
+        friedman[dimension] = extensions.calculate_friedman_scores(
+            TRIALS_COUNT, results)
+    return friedman
 
 
 @app.post("/file")

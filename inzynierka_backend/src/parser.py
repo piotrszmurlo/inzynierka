@@ -30,7 +30,8 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     :param contents: binary data encoded in base64
     :return: algorithm_name, function number, dimension and corrected contents extracted to a tuple
     """
-    algorithm_name, function_number, dimension = parse_remote_file_name(filename)
+    algorithm_name, function_number, dimension = parse_remote_file_name(
+        filename)
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
         parsed_contents = extensions.parse_results(raw_contents)
@@ -54,7 +55,8 @@ def parse_remote_file_name(filename: str) -> tuple[str, int, int]:
     try:
         algorithm_name, function_number, dimension = name.rsplit("_", 2)
         if not function_number.isdigit() or not dimension.isdigit():
-            raise ParseError("File name must contain function number and dimension")
+            raise ParseError(
+                "File name must contain function number and dimension")
     except ValueError:
         raise ParseError(f"Unable to parse file name")
     return algorithm_name, int(function_number), int(dimension)
@@ -84,7 +86,8 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
     for _ in range(FUNCTIONS_COUNT):
         results.append(extensions.TrialsVector())
     for data_file in data_files:
-        results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
+        results[data_file.function_number -
+                1].extend(get_final_error_and_evaluations_number(data_file))
     return results
 
 # results[function_number - 1]["algorithm_name]
@@ -105,15 +108,19 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
 
 def get_updated_rankings(db: Session):
     averages, medians, cec2022, friedman = \
-        ({dimension: {} for dimension in ALL_DIMENSIONS} for _ in range(NUMBER_OF_STATISTICS))
+        ({dimension: {} for dimension in ALL_DIMENSIONS}
+         for _ in range(NUMBER_OF_STATISTICS))
     for dimension in ALL_DIMENSIONS:
         results = get_final_error_and_evaluation_number_for_files(
             get_files_for_dimension(db, DIMENSION_10)
         )
-        cec2022[dimension] = extensions.calculate_cec2022_score(TRIALS_COUNT, results)
-        averages[dimension] = extensions.calculate_average(TRIALS_COUNT, results)
+        cec2022[dimension] = extensions.calculate_cec2022_scores(
+            TRIALS_COUNT, results)
+        averages[dimension] = extensions.calculate_average(
+            TRIALS_COUNT, results)
         medians[dimension] = extensions.calculate_median(results)
-        friedman[dimension] = extensions.calculate_friedman_test_scores(TRIALS_COUNT, results)
+        friedman[dimension] = extensions.calculate_friedman_scores(
+            TRIALS_COUNT, results)
         pprint(extensions.calculate_example(results))
 
     return medians, averages, cec2022, friedman
