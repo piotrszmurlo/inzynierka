@@ -32,12 +32,11 @@ data class MainAppState(
     val rankingsData: RankingsData = RankingsData()
 ) : KoinComponent
 
-data class RankingsData(
-    val cec2022Scores: Scores? = null
-)
+typealias Scores = Map<Int, List<Score>>
 
-data class Scores(
-    val score: Map<Int, List<Score>>
+data class RankingsData(
+    val cec2022Scores: Scores? = null,
+    val cec2022ScoresCombined: List<Score>? = null
 )
 
 data class Score(
@@ -117,7 +116,24 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
                     Score(rank = index + 1, algorithmName = scoreEntry.algorithmName, score = scoreEntry.score)
                 }
         }
-        state.copy(rankingsData = state.rankingsData.copy(cec2022Scores = Scores(scores)))
+        val combinedScores = scores.values.toMutableList()
+            .reduce { acc, next -> acc + next }
+            .groupingBy { score -> score.algorithmName }
+            .reduce { _, acc, next ->
+                acc.copy(score = acc.score + next.score)
+            }
+            .values
+            .sortedByDescending { score -> score.score }
+            .mapIndexed { index, score ->
+                score.copy(rank = index + 1)
+            }
+
+        state.copy(
+            rankingsData = state.rankingsData.copy(
+                cec2022Scores = scores,
+                cec2022ScoresCombined = combinedScores
+            )
+        )
     }
 }
 

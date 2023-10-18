@@ -53,11 +53,20 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
                 }
         }
-
+//        react {
+//            Spinner {
+//                loading = true
+//                size = 20
+//            }
+//        }
         flexPanel(justify = JustifyContent.CENTER).bind(store) { state ->
             display = Display.FLEX
             when (state.tab as? Tab.ResultsTab) {
-                is Tab.ResultsTab.CEC2022 -> cec2022(state.rankingsData.cec2022Scores)
+                is Tab.ResultsTab.CEC2022 -> cec2022(
+                    state.rankingsData.cec2022Scores,
+                    state.rankingsData.cec2022ScoresCombined
+                )
+
                 is Tab.ResultsTab.Friedman -> {}
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}

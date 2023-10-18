@@ -65,6 +65,8 @@ kotlin {
         implementation("io.ktor:ktor-client-js:$ktorVersion")
         implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
         implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+        implementation("io.kvision:kvision-react:$kvisionVersion")
+        implementation(npm("react-spinners", "0.13.8"))
     }
     sourceSets["test"].dependencies {
         implementation(kotlin("test-js"))
