@@ -110,18 +110,14 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
     is MainAppAction.FetchCEC2022ScoresStarted -> state
 
     is MainAppAction.FetchCEC2022ScoresSuccess -> {
-        val helper: MutableMap<Int, List<Score>> = mutableMapOf()
-        action.scores.dimension.forEach { entry ->
-            val scores: MutableList<Score> = mutableListOf()
-            val sortedScores = entry.value.sortedByDescending { it.score }
-            sortedScores.forEachIndexed { index, scoreEntry ->
-                scores.add(Score(rank = index + 1, algorithmName = scoreEntry.algorithmName, score = scoreEntry.score))
-            }
-            helper[entry.key] = scores
+        val scores = action.scores.dimension.entries.associate { entry ->
+            entry.key to entry.value
+                .sortedByDescending { it.score }
+                .mapIndexed { index, scoreEntry ->
+                    Score(rank = index + 1, algorithmName = scoreEntry.algorithmName, score = scoreEntry.score)
+                }
         }
-        val rankedScores = Scores(helper)
-
-        state.copy(rankingsData = state.rankingsData.copy(cec2022Scores = rankedScores))
+        state.copy(rankingsData = state.rankingsData.copy(cec2022Scores = Scores(scores)))
     }
 }
 
