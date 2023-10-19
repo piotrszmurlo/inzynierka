@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, distinct
+from sqlalchemy import create_engine, distinct, and_
 from sqlalchemy.orm import Session, sessionmaker
 
 from src import models
@@ -9,8 +9,12 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_file(db: Session, file_id: int):
-    return db.query(models.LocalFile).filter(models.LocalFile.id == file_id).first()
+def get_file(db: Session, algorithm_name: str, dimension: int):
+    return db.query(models.LocalFile).filter(
+        and_(
+            models.LocalFile.algorithm_name == algorithm_name,
+            models.LocalFile.dimension == dimension
+        )).first()
 
 
 def get_all_algorithm_names(db: Session):
@@ -19,7 +23,7 @@ def get_all_algorithm_names(db: Session):
 
 
 def get_files_for_dimension(db: Session, dimension: int):
-    return db.query(models.LocalFile).filter(models.LocalFile.dimension == dimension).all()
+    return db.query(models.LocalFile).filter_by(dimension = dimension).all()
 
 
 def get_all_files(db: Session):

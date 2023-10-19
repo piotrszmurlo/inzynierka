@@ -1,12 +1,10 @@
 package com.inzynierka
 
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.Tab
-import com.inzynierka.domain.loadCec2022Scores
+import com.inzynierka.domain.*
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.rankings.cec2022
 import com.inzynierka.rankings.ecdf
+import com.inzynierka.rankings.pairTest
 import io.kvision.core.Container
 import io.kvision.core.Display
 import io.kvision.core.FlexDirection
@@ -51,6 +49,9 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
             button("Compare two algorithms", style = ButtonStyle.OUTLINEPRIMARY)
                 .onClick {
                     store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
+                    store.dispatch { dispatch, _ ->
+                        loadAvailableAlgorithms(dispatch, dataService)
+                    }
                 }
         }
 //        react {
@@ -70,7 +71,10 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 is Tab.ResultsTab.Friedman -> {}
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}
-                is Tab.ResultsTab.PairTest -> {}
+                is Tab.ResultsTab.PairTest -> {
+                    pairTest(state.availableAlgorithms, listOf(10, 20))
+                }
+
                 is Tab.ResultsTab.ECDF -> ecdf(store, dataService)
                 null -> {}
             }

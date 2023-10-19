@@ -20,6 +20,14 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         return client.get(urlString = "rankings/cec2022").body()
     }
 
+    override suspend fun getAvailableAlgorithms(): List<String> {
+        return client.get(urlString = "algorithms").body()
+    }
+
+    override suspend fun getAvailableDimensions(): List<Int> {
+        return listOf(1, 2)
+    }
+
     override suspend fun postFiles(kFiles: List<KFile>) {
         client.submitFormWithBinaryData(
             url = "file",

@@ -12,6 +12,8 @@ interface IDataService {
      * @return [Result] containing the data, or DomainError if an error occurred
      **/
     suspend fun getData(): Result<Data>
+    suspend fun getAvailableAlgorithms(): Result<List<String>>
+    suspend fun getAvailableDimensions(): Result<List<Int>>
 
     suspend fun getCEC2022Scores(): Result<RemoteCEC2022Data>
 

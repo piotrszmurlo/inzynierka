@@ -7,5 +7,8 @@ import io.kvision.types.KFile
 interface IDataRepository {
     suspend fun getData(): Data
     suspend fun getCEC2022Scores(): RemoteCEC2022Data
+
+    suspend fun getAvailableAlgorithms(): List<String>
+    suspend fun getAvailableDimensions(): List<Int>
     suspend fun postFiles(kFiles: List<KFile>)
 }

@@ -18,10 +18,27 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
+    override suspend fun getAvailableAlgorithms(): Result<List<String>> {
+        return try {
+            val result = dataRepository.getAvailableAlgorithms()
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
+    override suspend fun getAvailableDimensions(): Result<List<Int>> {
+        return try {
+            val result = dataRepository.getAvailableDimensions()
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
     override suspend fun getCEC2022Scores(): Result<RemoteCEC2022Data> {
         return try {
             val result = dataRepository.getCEC2022Scores()
-            console.log(result)
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

@@ -29,7 +29,9 @@ data class MainAppState(
     val success: Boolean,
     val error: DomainError?,
     val uploadButtonDisabled: Boolean = true,
-    val rankingsData: RankingsData = RankingsData()
+    val rankingsData: RankingsData = RankingsData(),
+    val availableAlgorithms: List<String> = listOf(),
+    val availableDimensions: List<Int> = listOf()
 ) : KoinComponent
 
 typealias Scores = Map<Int, List<Score>>
@@ -50,6 +52,9 @@ sealed class MainAppAction : RAction {
     object FetchCEC2022ScoresStarted : MainAppAction()
     data class FetchCEC2022ScoresSuccess(val scores: RemoteCEC2022Data) : MainAppAction()
     data class FetchCEC2022ScoresFailed(val error: DomainError?) : MainAppAction()
+    object FetchAlgorithmNamesStarted : MainAppAction()
+    data class FetchAlgorithmNamesSuccess(val names: List<String>) : MainAppAction()
+    data class FetchAlgorithmNamesFailed(val error: DomainError?) : MainAppAction()
     object UploadFileStarted : MainAppAction()
     object UploadFileSuccess : MainAppAction()
     object ErrorHandled : MainAppAction()
@@ -135,6 +140,12 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
             )
         )
     }
+
+    MainAppAction.FetchAlgorithmNamesStarted -> state
+    is MainAppAction.FetchAlgorithmNamesFailed -> state
+    is MainAppAction.FetchAlgorithmNamesSuccess -> {
+        state.copy(availableAlgorithms = action.names)
+    }
 }
 
 fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
@@ -143,6 +154,17 @@ fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataServi
         when (val result = dataService.getCEC2022Scores()) {
             is Result.Success -> dispatch(MainAppAction.FetchCEC2022ScoresSuccess(result.data))
             is Result.Error -> dispatch(MainAppAction.FetchCEC2022ScoresFailed(result.domainError))
+        }
+    }
+}
+
+fun loadAvailableAlgorithms(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
+    console.log("GOWNO")
+    CoroutineScope(Dispatchers.Default).launch {
+        dispatch(MainAppAction.FetchAlgorithmNamesStarted)
+        when (val result = dataService.getAvailableAlgorithms()) {
+            is Result.Success -> dispatch(MainAppAction.FetchAlgorithmNamesSuccess(result.data))
+            is Result.Error -> dispatch(MainAppAction.FetchAlgorithmNamesFailed(result.domainError))
         }
     }
 }

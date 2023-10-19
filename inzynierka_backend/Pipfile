@@ -12,6 +12,7 @@ sqlalchemy = "*"
 pymysql = "*"
 pytest-cov = "*"
 python-multipart = "*"
+scipy = "*"
 
 [dev-packages]
 

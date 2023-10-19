@@ -1,16 +1,19 @@
 import os
 from pprint import pprint
+from typing import Annotated
 
 import python_extensions as extensions
-from fastapi import FastAPI, Depends, HTTPException, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src import models
-from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names
+from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file
 from src.models import ParseError
 from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
     ALL_DIMENSIONS, TRIALS_COUNT
+from scipy.stats import wilcoxon
+
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -65,6 +68,13 @@ async def get_available_algorithms(db: Session = Depends(get_db)):
     return get_all_algorithm_names(db)
 
 
+@app.post("/rankings/wilcoxon")
+async def get_wilcoxon_test(algorithm_name: Annotated[str, Form()], dimension: Annotated[int, Form()], db: Session = Depends(get_db)):
+    file = get_file(db, algorithm_name=algorithm_name, dimension=dimension)
+    print(file.algorithm_name)
+    return {}
+
+
 @app.get("/rankings/cec2022")
 async def get_cec2022_ranking(db: Session = Depends(get_db)):
     response = {"dimension": {}}
@@ -92,10 +102,12 @@ async def get_friedman_ranking(db: Session = Depends(get_db)):
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile]):
+async def post_file(files: list[UploadFile], db: Session = Depends(get_db)):
     try:
         for file in files:
-            print(parse_remote_results_file(file.filename, await file.read())[-1])
+            algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(file.filename, await file.read())
+            print("nono")
+            create_file(db, algorithm_name, dimension, function_number, parsed_contents)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
