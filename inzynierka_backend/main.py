@@ -42,16 +42,6 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def root():
-    return {"message": f"Hello {13}"}
-
-
-@app.get("/data")
-async def root():
-    return {"data": [44, 44, 44, 44]}
-
-
 @app.get("/rankings")
 async def get_rankings(db: Session = Depends(get_db)):
     medians, averages, cec2022, friedman = get_updated_rankings(db)

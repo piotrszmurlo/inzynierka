@@ -52,7 +52,6 @@ sealed class MainAppAction : RAction {
     object FetchCEC2022ScoresStarted : MainAppAction()
     data class FetchCEC2022ScoresSuccess(val scores: RemoteCEC2022Data) : MainAppAction()
     data class FetchCEC2022ScoresFailed(val error: DomainError?) : MainAppAction()
-
     object PerformPairTest : MainAppAction()
     data class PairTestSuccess(val scores: Int) : MainAppAction()
     data class PairTestFailed(val error: DomainError?) : MainAppAction()
