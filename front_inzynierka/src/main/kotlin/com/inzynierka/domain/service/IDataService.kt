@@ -23,4 +23,6 @@ interface IDataService {
      * @return [Result] containing mock data, or DomainError if an error occurred
      **/
     suspend fun postFiles(kFiles: List<KFile>): Result<Unit>
+
+    suspend fun getPairTest(algorithm1: String, algorithm2: String, dimension: Int): Result<Int>
 }

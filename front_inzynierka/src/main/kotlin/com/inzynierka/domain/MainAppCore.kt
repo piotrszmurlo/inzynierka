@@ -52,6 +52,10 @@ sealed class MainAppAction : RAction {
     object FetchCEC2022ScoresStarted : MainAppAction()
     data class FetchCEC2022ScoresSuccess(val scores: RemoteCEC2022Data) : MainAppAction()
     data class FetchCEC2022ScoresFailed(val error: DomainError?) : MainAppAction()
+
+    object PerformPairTest : MainAppAction()
+    data class PairTestSuccess(val scores: Int) : MainAppAction()
+    data class PairTestFailed(val error: DomainError?) : MainAppAction()
     object FetchAlgorithmNamesStarted : MainAppAction()
     data class FetchAlgorithmNamesSuccess(val names: List<String>) : MainAppAction()
     data class FetchAlgorithmNamesFailed(val error: DomainError?) : MainAppAction()
@@ -146,6 +150,10 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
     is MainAppAction.FetchAlgorithmNamesSuccess -> {
         state.copy(availableAlgorithms = action.names)
     }
+
+    is MainAppAction.PairTestFailed -> state
+    is MainAppAction.PairTestSuccess -> state
+    is MainAppAction.PerformPairTest -> state
 }
 
 fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
@@ -159,7 +167,6 @@ fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataServi
 }
 
 fun loadAvailableAlgorithms(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    console.log("GOWNO")
     CoroutineScope(Dispatchers.Default).launch {
         dispatch(MainAppAction.FetchAlgorithmNamesStarted)
         when (val result = dataService.getAvailableAlgorithms()) {

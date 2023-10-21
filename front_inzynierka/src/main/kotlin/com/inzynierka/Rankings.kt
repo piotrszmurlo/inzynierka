@@ -72,7 +72,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}
                 is Tab.ResultsTab.PairTest -> {
-                    pairTest(state.availableAlgorithms, listOf(10, 20))
+                    pairTest(state.availableAlgorithms, listOf(10, 20), store, dataService)
                 }
 
                 is Tab.ResultsTab.ECDF -> ecdf(store, dataService)

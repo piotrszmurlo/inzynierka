@@ -69,9 +69,10 @@ async def get_available_algorithms(db: Session = Depends(get_db)):
 
 
 @app.post("/rankings/wilcoxon")
-async def get_wilcoxon_test(algorithm_name: Annotated[str, Form()], dimension: Annotated[int, Form()], db: Session = Depends(get_db)):
-    file = get_file(db, algorithm_name=algorithm_name, dimension=dimension)
-    print(file.algorithm_name)
+async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()], dimension: Annotated[int, Form()], db: Session = Depends(get_db)):
+    file = get_file(db, algorithm_name=first_algorithm, dimension=dimension)
+    file2 = get_file(db, algorithm_name=second_algorithm, dimension=dimension)
+    # wilcoxon()
     return {}
 
 
@@ -106,7 +107,6 @@ async def post_file(files: list[UploadFile], db: Session = Depends(get_db)):
     try:
         for file in files:
             algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(file.filename, await file.read())
-            print("nono")
             create_file(db, algorithm_name, dimension, function_number, parsed_contents)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
