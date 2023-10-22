@@ -23,10 +23,7 @@ sealed class Tab {
 }
 
 data class MainAppState(
-    val data: List<Int>,
     val tab: Tab,
-    val isFetching: Boolean,
-    val success: Boolean,
     val error: DomainError?,
     val uploadButtonDisabled: Boolean = true,
     val rankingsData: RankingsData = RankingsData(),
@@ -48,12 +45,11 @@ data class Score(
 )
 
 sealed class MainAppAction : RAction {
-    object FetchDataStarted : MainAppAction()
     object FetchCEC2022ScoresStarted : MainAppAction()
     data class FetchCEC2022ScoresSuccess(val scores: RemoteCEC2022Data) : MainAppAction()
     data class FetchCEC2022ScoresFailed(val error: DomainError?) : MainAppAction()
     object PerformPairTest : MainAppAction()
-    data class PairTestSuccess(val scores: Int) : MainAppAction()
+    data class PairTestSuccess(val result: String) : MainAppAction()
     data class PairTestFailed(val error: DomainError?) : MainAppAction()
     object FetchAlgorithmNamesStarted : MainAppAction()
     data class FetchAlgorithmNamesSuccess(val names: List<String>) : MainAppAction()
@@ -63,27 +59,10 @@ sealed class MainAppAction : RAction {
     object ErrorHandled : MainAppAction()
     data class UploadFormOnChangeHandler(val kFile: KFile?) : MainAppAction()
     data class UploadFileFailed(val error: DomainError?) : MainAppAction()
-    data class FetchDataSuccess(val data: List<Int>) : MainAppAction()
-    data class FetchDataFailed(val error: DomainError) : MainAppAction()
     data class TabSelected(val tab: Tab) : MainAppAction()
 }
 
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
-
-    is MainAppAction.FetchDataStarted -> {
-        state.copy(isFetching = true)
-    }
-
-    is MainAppAction.FetchDataFailed -> {
-        state.copy(error = action.error)
-    }
-
-    is MainAppAction.FetchDataSuccess -> {
-        state.copy(
-            data = action.data,
-            success = true
-        )
-    }
 
     is MainAppAction.UploadFileStarted -> {
         state
@@ -171,6 +150,29 @@ fun loadAvailableAlgorithms(dispatch: Dispatch<MainAppAction>, dataService: IDat
         when (val result = dataService.getAvailableAlgorithms()) {
             is Result.Success -> dispatch(MainAppAction.FetchAlgorithmNamesSuccess(result.data))
             is Result.Error -> dispatch(MainAppAction.FetchAlgorithmNamesFailed(result.domainError))
+        }
+    }
+}
+
+fun performPairTest(
+    dispatch: Dispatch<MainAppAction>,
+    dataService: IDataService,
+    algorithmFirst: String,
+    algorithmSecond: String,
+    dimension: Int,
+    functionNumber: Int
+) {
+    dispatch(MainAppAction.PerformPairTest)
+    CoroutineScope(Dispatchers.Default).launch {
+        val result = dataService.getPairTest(
+            algorithmFirst,
+            algorithmSecond,
+            dimension,
+            functionNumber
+        )
+        when (result) {
+            is Result.Success -> dispatch(MainAppAction.PairTestSuccess(result.data))
+            is Result.Error -> dispatch(MainAppAction.PairTestFailed(result.domainError))
         }
     }
 }

@@ -11,7 +11,7 @@ from src import models
 from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file
 from src.models import ParseError
 from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
-    ALL_DIMENSIONS, TRIALS_COUNT
+    ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_numpy
 from scipy.stats import wilcoxon
 
 
@@ -59,11 +59,25 @@ async def get_available_algorithms(db: Session = Depends(get_db)):
 
 
 @app.post("/rankings/wilcoxon")
-async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()], dimension: Annotated[int, Form()], db: Session = Depends(get_db)):
-    file = get_file(db, algorithm_name=first_algorithm, dimension=dimension)
-    file2 = get_file(db, algorithm_name=second_algorithm, dimension=dimension)
-    # wilcoxon()
-    return {}
+async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()], dimension: Annotated[int, Form()], function_number: Annotated[int, Form()], db: Session = Depends(get_db)):
+    file = get_file(db, algorithm_name=first_algorithm, dimension=dimension, function_number=function_number)
+    file2 = get_file(db, algorithm_name=second_algorithm, dimension=dimension, function_number=function_number)
+    err1 = get_final_error_and_evaluations_number_numpy(file)
+    err2 = get_final_error_and_evaluations_number_numpy(file2)
+    diff = []
+    for index in range(len(err1)):
+        diff.append(err1[index] - err2[index])
+    h0_p_value = wilcoxon(diff)[1]
+    if h0_p_value < 0.05:
+        h1_p_value = wilcoxon(diff, alternative="less")[1]
+        if h1_p_value < 0.05:
+            return "-"
+        return "+"
+
+    else:
+        return "="
+
+
 
 
 @app.get("/rankings/cec2022")

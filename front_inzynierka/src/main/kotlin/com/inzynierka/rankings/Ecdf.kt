@@ -16,12 +16,12 @@ import io.kvision.state.sub
 
 
 fun Container.ecdf(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
-    flexPanel().bind(store.sub(extractor = { state -> state.data })) { state ->
+    flexPanel().bind(store.sub(extractor = { state -> state.error })) { state ->
         alignItems = AlignItems.CENTER
         chart(
             Configuration(
                 ChartType.BAR,
-                listOf(DataSets(data = state)),
+                listOf(DataSets(data = listOf(1, 2, 3, 4))),
                 listOf("One", "Two", "Three", "Four")
             ),
             600, 400

@@ -44,9 +44,14 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getPairTest(algorithm1: String, algorithm2: String, dimension: Int): Result<Int> {
+    override suspend fun getPairTest(
+        algorithm1: String,
+        algorithm2: String,
+        dimension: Int,
+        functionNumber: Int
+    ): Result<String> {
         return try {
-            val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension)
+            val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension, functionNumber)
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.FileUploadError(e.message))

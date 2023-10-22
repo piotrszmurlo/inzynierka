@@ -2,6 +2,7 @@ package com.inzynierka.rankings
 
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
+import com.inzynierka.domain.performPairTest
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -15,9 +16,6 @@ import io.kvision.html.button
 import io.kvision.html.p
 import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 
@@ -25,7 +23,8 @@ import kotlinx.serialization.Serializable
 data class PairTestForm(
     val algorithmFirst: String? = null,
     val algorithmSecond: String? = null,
-    val dimension: String? = null
+    val dimension: String? = null,
+    val functionNumber: String? = null
 )
 
 fun Container.pairTest(
@@ -56,7 +55,11 @@ fun Container.pairTest(
                         value = algorithmNames.lastOrNull()
                     ).bind(PairTestForm::algorithmSecond)
                 }
-
+                p(content = "Select function number", align = Align.CENTER)
+                select(
+                    options = listOf("1" to "1", "2" to "2"),
+                    value = "1"
+                ).bind(PairTestForm::functionNumber)
                 p(content = "Select dimension", align = Align.CENTER)
                 radioGroup(
                     options = dimensions.map { "$it" to "$it" },
@@ -69,12 +72,14 @@ fun Container.pairTest(
         button("Compare") {
             onClick {
                 val formData = formPanel.getData()
-                store.dispatch(MainAppAction.PerformPairTest)
-                CoroutineScope(Dispatchers.Default).launch {
-                    dataService.getPairTest(
+                store.dispatch { dispatch, _ ->
+                    performPairTest(
+                        dispatch,
+                        dataService,
                         formData.algorithmFirst!!,
                         formData.algorithmSecond!!,
-                        formData.dimension!!.toInt()
+                        formData.dimension!!.toInt(),
+                        formData.functionNumber!!.toInt()
                     )
                 }
             }

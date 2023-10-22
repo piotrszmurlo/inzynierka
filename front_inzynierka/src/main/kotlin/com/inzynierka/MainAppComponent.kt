@@ -26,7 +26,6 @@ fun Container.mainAppComponent(store: ReduxStore<MainAppState, MainAppAction>, d
             is Tab.Upload -> uploadFileForm(store, dataService)
             is Tab.ResultsTab -> rankings(store, dataService)
         }
-
     }
 
     div().bind(store) { state ->

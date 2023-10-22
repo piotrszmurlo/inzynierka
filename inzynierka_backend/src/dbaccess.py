@@ -9,11 +9,12 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_file(db: Session, algorithm_name: str, dimension: int):
+def get_file(db: Session, algorithm_name: str, dimension: int, function_number: int):
     return db.query(models.LocalFile).filter(
         and_(
             models.LocalFile.algorithm_name == algorithm_name,
-            models.LocalFile.dimension == dimension
+            models.LocalFile.dimension == dimension,
+            models.LocalFile.function_number == function_number
         )).first()
 
 

@@ -37,15 +37,20 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         )
     }
 
-    override suspend fun getPairTest(firstAlgorithm: String, secondAlgorithm: String, dimension: Int): Int {
-        client.submitForm(
+    override suspend fun getPairTest(
+        firstAlgorithm: String,
+        secondAlgorithm: String,
+        dimension: Int,
+        functionNumber: Int
+    ): String {
+        return client.submitForm(
             url = "rankings/wilcoxon",
             formParameters = parameters {
                 append("first_algorithm", firstAlgorithm)
                 append("second_algorithm", secondAlgorithm)
                 append("dimension", "$dimension")
+                append("function_number", "$functionNumber")
             }
-        )
-        return 1
+        ).body()
     }
 }

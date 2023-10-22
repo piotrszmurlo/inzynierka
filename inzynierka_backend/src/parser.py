@@ -76,6 +76,19 @@ def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.T
     return results
 
 
+def get_final_error_and_evaluations_number_numpy(data_file: LocalFile):
+    """
+    :param data_file: LocalFile with already preprocessed contents
+    :return: list containing final error
+    """
+    rows = data_file.contents.split("\n")
+    evaluations = rows[FINAL_FES_INDEX].split()
+    results = []
+    for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
+        results.append(float(final_error))
+    return results
+
+
 # results[function_number - 1]
 def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
     """
@@ -89,6 +102,7 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
         results[data_file.function_number -
                 1].extend(get_final_error_and_evaluations_number(data_file))
     return results
+
 
 # results[function_number - 1]["algorithm_name]
 # def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
