@@ -12,8 +12,15 @@ data class PairTestState(
     val result: String = "",
     val algorithmNames: List<String> = listOf(),
     val dimensions: List<Int> = listOf(),
-    val availableDimensions: List<Int> = listOf(),
-    val functionNumbers: List<Int> = listOf()
+    val functionNumbers: List<Int> = listOf(),
+    val formState: FormState = FormState()
+)
+
+data class FormState(
+    val algorithmFirst: String? = null,
+    val algorithmSecond: String? = null,
+    val dimension: Int? = null,
+    val functionNumber: Int? = null,
 )
 
 sealed class PairTestAction : RankingsAction() {
@@ -24,6 +31,9 @@ sealed class PairTestAction : RankingsAction() {
     object Initialize : PairTestAction()
     data class InitializeSuccess(val benchmarkData: BenchmarkData) : PairTestAction()
     data class InitializeFailed(val error: DomainError?) : PairTestAction()
+    data class DimensionSelected(val dimension: Int) : PairTestAction()
+    data class FunctionSelected(val functionNumber: Int) : PairTestAction()
+    data class AlgorithmSelected(val algorithmFirst: String, val algorithmSecond: String) : PairTestAction()
 }
 
 fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action) {
@@ -32,7 +42,13 @@ fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action
         state.copy(
             algorithmNames = action.benchmarkData.algorithms,
             dimensions = action.benchmarkData.dimensions,
-            functionNumbers = action.benchmarkData.functionNumbers
+            functionNumbers = action.benchmarkData.functionNumbers,
+            formState = FormState(
+                algorithmFirst = action.benchmarkData.algorithms[0],
+                algorithmSecond = action.benchmarkData.algorithms[1],
+                dimension = action.benchmarkData.dimensions[0],
+                functionNumber = action.benchmarkData.functionNumbers[0]
+            )
         )
     }
 
@@ -41,6 +57,15 @@ fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action
     is PairTestAction.PerformPairTest -> state
     is PairTestAction.PairTestFailed -> state
     is PairTestAction.PairTestSuccess -> state
+    is PairTestAction.AlgorithmSelected -> state.copy(
+        formState = state.formState.copy(
+            algorithmFirst = action.algorithmFirst,
+            algorithmSecond = action.algorithmSecond
+        )
+    )
+
+    is PairTestAction.DimensionSelected -> state.copy(formState = state.formState.copy(dimension = action.dimension))
+    is PairTestAction.FunctionSelected -> state.copy(formState = state.formState.copy(functionNumber = action.functionNumber))
 }
 
 fun performPairTest(

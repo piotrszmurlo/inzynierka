@@ -25,7 +25,6 @@ data class MainAppState(
 
 
 sealed class MainAppAction : RAction {
-
     object ErrorHandled : MainAppAction()
     data class TabSelected(val tab: Tab) : MainAppAction()
 }

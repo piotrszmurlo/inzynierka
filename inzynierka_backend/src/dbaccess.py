@@ -23,6 +23,16 @@ def get_all_algorithm_names(db: Session):
     return [row[0] for row in rows]
 
 
+def get_all_dimensions(db: Session):
+    rows = db.query(distinct(models.LocalFile.dimension)).all()
+    return [row[0] for row in rows]
+
+
+def get_all_functions(db: Session):
+    rows = db.query(distinct(models.LocalFile.function_number)).all()
+    return [row[0] for row in rows]
+
+
 def get_files_for_dimension(db: Session, dimension: int):
     return db.query(models.LocalFile).filter_by(dimension = dimension).all()
 

@@ -4,7 +4,7 @@ import com.inzynierka.model.RemoteCEC2022Data
 import io.kvision.types.KFile
 
 interface IDataRepository {
-    suspend fun getCEC2022Scores(): RemoteCEC2022Data
+    suspend fun getCec2022Scores(): RemoteCEC2022Data
 
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>

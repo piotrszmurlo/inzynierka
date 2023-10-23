@@ -1,9 +1,6 @@
 package com.inzynierka.rankings
 
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.PairTestState
-import com.inzynierka.domain.performPairTest
+import com.inzynierka.domain.*
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
@@ -45,25 +42,42 @@ fun Container.pairTest(
                     justifyContent = JustifyContent.CENTER
                     select(
                         options = pairTestState.algorithmNames.map { it to it },
-                        value = pairTestState.algorithmNames.firstOrNull()
+                        value = pairTestState.formState.algorithmFirst
                     ).bind(PairTestForm::algorithmFirst)
+                        .onChange {
+                            store.dispatch(
+                                PairTestAction.AlgorithmSelected(
+                                    algorithmFirst = this.value!!,
+                                    algorithmSecond = form.getData().algorithmSecond!!
+                                )
+                            )
+                        }
                     select(
                         options = pairTestState.algorithmNames.map { it to it },
-                        value = pairTestState.algorithmNames.lastOrNull()
+                        value = pairTestState.formState.algorithmSecond
                     ).bind(PairTestForm::algorithmSecond)
+                        .onChange {
+                            store.dispatch(
+                                PairTestAction.AlgorithmSelected(
+                                    algorithmFirst = form.getData().algorithmFirst!!,
+                                    algorithmSecond = this.value!!
+                                )
+                            )
+                        }
                 }
                 p(content = "Select function number", align = Align.CENTER)
                 select(
                     options = pairTestState.functionNumbers.map { "$it" to "$it" },
-                    value = "${pairTestState.functionNumbers.firstOrNull()}"
+                    value = "${pairTestState.formState.functionNumber}"
                 ).bind(PairTestForm::functionNumber)
-                    .onChange { }
+                    .onChange { store.dispatch(PairTestAction.FunctionSelected(this.value!!.toInt())) }
                 p(content = "Select dimension", align = Align.CENTER)
                 radioGroup(
                     options = pairTestState.dimensions.map { "$it" to "$it" },
                     inline = true,
-                    value = "${pairTestState.dimensions.firstOrNull()}"
+                    value = "${pairTestState.formState.dimension}"
                 ).bind(PairTestForm::dimension)
+                    .onChange { store.dispatch(PairTestAction.DimensionSelected(this.value!!.toInt())) }
             }
         }
 

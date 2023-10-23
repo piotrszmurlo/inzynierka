@@ -8,7 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src import models
-from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file
+from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file, \
+    get_all_dimensions, get_all_functions
 from src.models import ParseError
 from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
     ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_numpy
@@ -56,6 +57,16 @@ async def get_rankings(db: Session = Depends(get_db)):
 @app.get("/algorithms")
 async def get_available_algorithms(db: Session = Depends(get_db)):
     return get_all_algorithm_names(db)
+
+
+@app.get("/dimensions")
+async def get_available_dimensions(db: Session = Depends(get_db)):
+    return get_all_dimensions(db)
+
+
+@app.get("/functions")
+async def get_available_functions(db: Session = Depends(get_db)):
+    return get_all_functions(db)
 
 
 @app.post("/rankings/wilcoxon")

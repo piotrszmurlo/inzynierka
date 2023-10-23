@@ -11,7 +11,7 @@ import io.kvision.types.KFile
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
-    override suspend fun getCEC2022Scores(): RemoteCEC2022Data {
+    override suspend fun getCec2022Scores(): RemoteCEC2022Data {
         return client.get(urlString = "rankings/cec2022").body()
     }
 
@@ -20,11 +20,11 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     }
 
     override suspend fun getAvailableDimensions(): List<Int> {
-        return listOf(10, 20)
+        return client.get(urlString = "dimensions").body()
     }
 
     override suspend fun getAvailableFunctionNumbers(): List<Int> {
-        return listOf(1, 2)
+        return client.get(urlString = "functions").body()
     }
 
     override suspend fun postFiles(kFiles: List<KFile>) {

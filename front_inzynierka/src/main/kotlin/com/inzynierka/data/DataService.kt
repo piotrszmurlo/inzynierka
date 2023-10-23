@@ -33,7 +33,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun getCec2022Scores(): Result<RemoteCEC2022Data> {
         return try {
-            val result = dataRepository.getCEC2022Scores()
+            val result = dataRepository.getCec2022Scores()
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))
