@@ -2,9 +2,9 @@ package com.inzynierka.ui
 
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.rankings.cec2022
 import com.inzynierka.ui.rankings.ecdf
 import com.inzynierka.ui.rankings.pairTest
+import com.inzynierka.ui.rankings.scoreRanking
 import io.kvision.core.Container
 import io.kvision.core.Display
 import io.kvision.core.FlexDirection
@@ -24,8 +24,18 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
         flexPanel(justify = JustifyContent.CENTER).bind(store) { state ->
             display = Display.FLEX
             when (state.tab as? Tab.ResultsTab) {
-                is Tab.ResultsTab.CEC2022 -> cec2022(state.rankingsState.cec2022)
-                is Tab.ResultsTab.Friedman -> {}
+                is Tab.ResultsTab.CEC2022 -> scoreRanking(
+                    state.rankingsState.cec2022,
+                    scoreHeaderTitle = "CEC 2022 score",
+                    combinedScoreHeaderTitle = "combined CEC 2022 score"
+                )
+
+                is Tab.ResultsTab.Friedman -> scoreRanking(
+                    state.rankingsState.friedman,
+                    scoreHeaderTitle = "Average trial rank",
+                    combinedScoreHeaderTitle = "Average trial rank"
+                )
+
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}
                 is Tab.ResultsTab.PairTest -> {
@@ -66,6 +76,9 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
         button(text = "Friedman", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Friedman))
+                store.dispatch { dispatch, _ ->
+                    loadFriedmanScores(dispatch, dataService)
+                }
             }
         button("Compare two algorithms", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {

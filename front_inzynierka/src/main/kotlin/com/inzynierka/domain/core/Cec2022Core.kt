@@ -3,25 +3,20 @@ package com.inzynierka.domain.core
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.model.Cec2022Scores
+import com.inzynierka.model.RankingScores
 import io.kvision.redux.Dispatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-data class Cec2022RankingState(
-    val cec2022Scores: Scores? = null,
-    val cec2022ScoresCombined: List<Score>? = null,
-    val isFetching: Boolean = false
-)
 
 sealed class Cec2022RankingAction : RankingsAction() {
     object FetchRankingsStarted : Cec2022RankingAction()
-    data class FetchRankingsSuccess(val scores: Cec2022Scores) : Cec2022RankingAction()
+    data class FetchRankingsSuccess(val scores: RankingScores) : Cec2022RankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : Cec2022RankingAction()
 }
 
-fun cec2022Reducer(state: Cec2022RankingState, action: Cec2022RankingAction) = when (action) {
+fun cec2022Reducer(state: ScoreRankingState, action: Cec2022RankingAction) = when (action) {
     is Cec2022RankingAction.FetchRankingsSuccess -> {
         val scores = action.scores.dimension.entries.associate { entry ->
             entry.key to entry.value
@@ -43,13 +38,17 @@ fun cec2022Reducer(state: Cec2022RankingState, action: Cec2022RankingAction) = w
             }
 
         state.copy(
-            cec2022Scores = scores,
-            cec2022ScoresCombined = combinedScores,
+            scores = scores,
+            combinedScores = combinedScores,
             isFetching = false
         )
     }
 
-    is Cec2022RankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
+    is Cec2022RankingAction.FetchRankingsFailed -> {
+        console.log("${(action.error as DomainError.NetworkError).message}")
+        state.copy(isFetching = false)
+    }
+
     is Cec2022RankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
 }
 
@@ -62,3 +61,13 @@ fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataServi
         }
     }
 }
+
+//fun RankingScores.sortScores(): Map<Int, List<Score>> {
+//    return this.scores.entries.associate { entry ->
+//        entry.key to entry.value
+//            .sortedByDescending { it.score }
+//            .mapIndexed { index, scoreEntry ->
+//                Score(rank = index + 1, algorithmName = scoreEntry.algorithmName, score = scoreEntry.score)
+//            }
+//    }
+//}

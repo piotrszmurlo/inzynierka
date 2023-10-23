@@ -1,6 +1,6 @@
 package com.inzynierka.data
 
-import com.inzynierka.model.Cec2022Scores
+import com.inzynierka.model.RankingScores
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,8 +11,12 @@ import io.kvision.types.KFile
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
-    override suspend fun getCec2022Scores(): Cec2022Scores {
+    override suspend fun getCec2022Scores(): RankingScores {
         return client.get(urlString = "rankings/cec2022").body()
+    }
+
+    override suspend fun getFriedmanScores(): RankingScores {
+        return client.get(urlString = "rankings/friedman").body()
     }
 
     override suspend fun getAvailableAlgorithms(): List<String> {

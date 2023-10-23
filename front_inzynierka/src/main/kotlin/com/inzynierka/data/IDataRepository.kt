@@ -1,11 +1,11 @@
 package com.inzynierka.data
 
-import com.inzynierka.model.Cec2022Scores
+import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
 
 interface IDataRepository {
-    suspend fun getCec2022Scores(): Cec2022Scores
-
+    suspend fun getCec2022Scores(): RankingScores
+    suspend fun getFriedmanScores(): RankingScores
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>
     suspend fun getAvailableFunctionNumbers(): List<Int>

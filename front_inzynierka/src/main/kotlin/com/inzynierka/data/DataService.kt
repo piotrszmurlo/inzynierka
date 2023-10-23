@@ -4,7 +4,7 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
-import com.inzynierka.model.Cec2022Scores
+import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
@@ -31,9 +31,18 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getCec2022Scores(): Result<Cec2022Scores> {
+    override suspend fun getCec2022Scores(): Result<RankingScores> {
         return try {
             val result = dataRepository.getCec2022Scores()
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
+    override suspend fun getFriedmanScores(): Result<RankingScores> {
+        return try {
+            val result = dataRepository.getFriedmanScores()
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

@@ -112,14 +112,16 @@ async def get_cec2022_ranking(db: Session = Depends(get_db)):
 
 @app.get("/rankings/friedman")
 async def get_friedman_ranking(db: Session = Depends(get_db)):
-    friedman = {}
+    response = {"dimension": {}}
     for dimension in ALL_DIMENSIONS:
         results = get_final_error_and_evaluation_number_for_files(
             get_files_for_dimension(db, dimension)
         )
-        friedman[dimension] = extensions.calculate_friedman_scores(
-            TRIALS_COUNT, results)
-    return friedman
+        scores = extensions.calculate_friedman_scores(
+            TRIALS_COUNT, results
+        )
+        response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
+    return response
 
 
 @app.post("/file")
