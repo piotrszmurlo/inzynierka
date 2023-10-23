@@ -2,8 +2,9 @@ package com.inzynierka
 
 import com.inzynierka.domain.MainAppAction
 import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.Result
+import com.inzynierka.domain.UploadAction
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.domain.uploadFiles
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.onChangeLaunch
@@ -15,7 +16,6 @@ import io.kvision.html.div
 import io.kvision.panel.vPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.state.bind
-import io.kvision.toast.Toast
 import io.kvision.types.KFile
 import io.kvision.utils.px
 import kotlinx.coroutines.CoroutineScope
@@ -38,33 +38,24 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
             onChangeLaunch {
                 CoroutineScope(Dispatchers.Default).launch {
                     store.dispatch(
-                        MainAppAction.UploadFormOnChangeHandler(
-                            getData().fileToUpload?.get(0)
+                        UploadAction.UploadFormOnChangeHandler(
+                            getData().fileToUpload?.getOrNull(0)
                         )
                     )
                 }
             }
             add(UploadFileForm::fileToUpload, upload(multiple = true))
         }
+
         val uploadFileButton = button("upload file").bind(store) { state ->
-            disabled = state.uploadButtonDisabled
+            disabled = state.uploadFilesState.uploadButtonDisabled
         }
+
         uploadFileButton.onClick {
             store.dispatch { dispatch, _ ->
-                dispatch(MainAppAction.UploadFileStarted)
                 CoroutineScope(Dispatchers.Default).launch {
                     uploadFileForm.form.getDataWithFileContent().fileToUpload?.let { files ->
-                        when (val result = dataService.postFiles(files)) {
-                            is Result.Success -> {
-                                Toast.info("File upload completed")
-                                dispatch(MainAppAction.UploadFileSuccess)
-                            }
-
-                            is Result.Error -> {
-                                dispatch(MainAppAction.UploadFileFailed(result.domainError))
-                                Toast.info("File upload failed")
-                            }
-                        }
+                        uploadFiles(dispatch, dataService, files)
                     }
                 }
             }
