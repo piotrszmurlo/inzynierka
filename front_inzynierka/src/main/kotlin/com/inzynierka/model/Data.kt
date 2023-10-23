@@ -3,7 +3,7 @@ package com.inzynierka.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Data(val data: List<Int>)
+data class BenchmarkData(val algorithms: List<String>, val dimensions: List<Int>, val functionNumbers: List<Int>)
 
 @Serializable
 data class RemoteCEC2022Data(val dimension: Map<Int, List<ScoreEntry>>)

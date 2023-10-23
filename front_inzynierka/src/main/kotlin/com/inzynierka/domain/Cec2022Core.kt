@@ -54,7 +54,7 @@ fun cec2022Reducer(state: Cec2022RankingState, action: Cec2022RankingAction) = w
 fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
     CoroutineScope(Dispatchers.Default).launch {
         dispatch(Cec2022RankingAction.FetchRankingsStarted)
-        when (val result = dataService.getCEC2022Scores()) {
+        when (val result = dataService.getCec2022Scores()) {
             is Result.Success -> dispatch(Cec2022RankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> dispatch(Cec2022RankingAction.FetchRankingsFailed(result.domainError))
         }

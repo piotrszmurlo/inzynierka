@@ -20,6 +20,10 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     }
 
     override suspend fun getAvailableDimensions(): List<Int> {
+        return listOf(10, 20)
+    }
+
+    override suspend fun getAvailableFunctionNumbers(): List<Int> {
         return listOf(1, 2)
     }
 

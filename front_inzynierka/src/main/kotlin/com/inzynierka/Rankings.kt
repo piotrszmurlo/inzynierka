@@ -50,7 +50,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 .onClick {
                     store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
                     store.dispatch { dispatch, _ ->
-                        loadAvailableAlgorithms(dispatch, dataService)
+                        getAvailableBenchmarkData(dispatch, dataService)
                     }
                 }
         }
@@ -63,7 +63,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 is Tab.ResultsTab.Mean -> {}
                 is Tab.ResultsTab.Median -> {}
                 is Tab.ResultsTab.PairTest -> {
-                    pairTest(state.availableAlgorithms, listOf(10, 20), store, dataService)
+                    pairTest(state.rankingsState.pairTest, store, dataService)
                 }
 
                 is Tab.ResultsTab.ECDF -> ecdf(store, dataService)

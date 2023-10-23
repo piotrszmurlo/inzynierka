@@ -3,15 +3,20 @@ package com.inzynierka.data
 import com.inzynierka.domain.DomainError
 import com.inzynierka.domain.Result
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.RemoteCEC2022Data
 import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
 
-    override suspend fun getAvailableAlgorithms(): Result<List<String>> {
+    override suspend fun getAvailableBenchmarkData(): Result<BenchmarkData> {
         return try {
-            val result = dataRepository.getAvailableAlgorithms()
-            Result.Success(result)
+            val algorithms = dataRepository.getAvailableAlgorithms()
+            val dimensions = dataRepository.getAvailableDimensions()
+            val functionNumbers = dataRepository.getAvailableFunctionNumbers()
+            Result.Success(
+                BenchmarkData(algorithms, dimensions, functionNumbers)
+            )
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))
         }
@@ -26,7 +31,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getCEC2022Scores(): Result<RemoteCEC2022Data> {
+    override suspend fun getCec2022Scores(): Result<RemoteCEC2022Data> {
         return try {
             val result = dataRepository.getCEC2022Scores()
             Result.Success(result)
@@ -54,7 +59,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension, functionNumber)
             Result.Success(result)
         } catch (e: Exception) {
-            Result.Error(DomainError.FileUploadError(e.message))
+            Result.Error(DomainError.NetworkError(e.message))
         }
     }
 }

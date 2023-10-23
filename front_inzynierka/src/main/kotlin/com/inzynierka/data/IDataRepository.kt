@@ -8,6 +8,7 @@ interface IDataRepository {
 
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>
+    suspend fun getAvailableFunctionNumbers(): List<Int>
     suspend fun postFiles(kFiles: List<KFile>)
     suspend fun getPairTest(
         firstAlgorithm: String,
