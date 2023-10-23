@@ -78,15 +78,20 @@ async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algo
     diff = []
     for index in range(len(err1)):
         diff.append(err1[index] - err2[index])
-    h0_p_value = wilcoxon(diff)[1]
-    if h0_p_value < 0.05:
-        h1_p_value = wilcoxon(diff, alternative="less")[1]
-        if h1_p_value < 0.05:
-            return "-"
-        return "+"
+    try:
+        h0_p_value = wilcoxon(diff)[1]
+        if h0_p_value < 0.05:
+            h1_p_value = wilcoxon(diff, alternative="less")[1]
+            if h1_p_value < 0.05:
+                return "-"
+            return "+"
 
-    else:
-        return "="
+        else:
+            return "="
+    except ValueError as e:
+        if "zero for all elements" in str(e):
+            return "="
+        raise HTTPException(422, detail=str(e))
 
 
 

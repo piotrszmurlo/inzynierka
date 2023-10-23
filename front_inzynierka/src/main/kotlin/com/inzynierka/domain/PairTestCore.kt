@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 
 data class PairTestState(
-    val result: String = "",
+    val result: String? = null,
     val algorithmNames: List<String> = listOf(),
     val dimensions: List<Int> = listOf(),
     val functionNumbers: List<Int> = listOf(),
@@ -21,7 +21,10 @@ data class FormState(
     val algorithmSecond: String? = null,
     val dimension: Int? = null,
     val functionNumber: Int? = null,
-)
+) {
+    val isSubmitButtonDisabled: Boolean
+        get() = algorithmFirst == algorithmSecond || algorithmFirst == null || dimension == null || functionNumber == null
+}
 
 sealed class PairTestAction : RankingsAction() {
     object PerformPairTest : PairTestAction()
@@ -54,18 +57,29 @@ fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action
 
     is PairTestAction.InitializeFailed -> state
 
-    is PairTestAction.PerformPairTest -> state
-    is PairTestAction.PairTestFailed -> state
-    is PairTestAction.PairTestSuccess -> state
+    is PairTestAction.PerformPairTest -> state.copy(result = null)
+    is PairTestAction.PairTestFailed -> {
+        state.copy(result = "Error")
+    }
+
+    is PairTestAction.PairTestSuccess -> state.copy(result = action.result)
     is PairTestAction.AlgorithmSelected -> state.copy(
         formState = state.formState.copy(
             algorithmFirst = action.algorithmFirst,
             algorithmSecond = action.algorithmSecond
-        )
+        ),
+        result = null
     )
 
-    is PairTestAction.DimensionSelected -> state.copy(formState = state.formState.copy(dimension = action.dimension))
-    is PairTestAction.FunctionSelected -> state.copy(formState = state.formState.copy(functionNumber = action.functionNumber))
+    is PairTestAction.DimensionSelected -> state.copy(
+        formState = state.formState.copy(dimension = action.dimension),
+        result = null
+    )
+
+    is PairTestAction.FunctionSelected -> state.copy(
+        formState = state.formState.copy(functionNumber = action.functionNumber),
+        result = null
+    )
 }
 
 fun performPairTest(

@@ -11,6 +11,7 @@ import io.kvision.html.button
 import io.kvision.html.p
 import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
+import io.kvision.utils.px
 import kotlinx.serialization.Serializable
 
 
@@ -81,7 +82,7 @@ fun Container.pairTest(
             }
         }
 
-        button("Compare") {
+        button(text = "Compare", disabled = pairTestState.formState.isSubmitButtonDisabled) {
             onClick {
                 val formData = formPanel.getData()
                 store.dispatch { dispatch, _ ->
@@ -95,6 +96,11 @@ fun Container.pairTest(
                     )
                 }
             }
+        }
+        pairTestState.result?.let {
+            val result = p(content = "Result: $it", align = Align.CENTER)
+            result.padding = 48.px
+            result.fontSize = 32.px
         }
     }
 }
