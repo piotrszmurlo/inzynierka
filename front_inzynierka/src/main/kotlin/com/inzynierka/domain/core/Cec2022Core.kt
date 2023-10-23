@@ -1,7 +1,9 @@
-package com.inzynierka.domain
+package com.inzynierka.domain.core
 
+import com.inzynierka.common.DomainError
+import com.inzynierka.common.Result
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.model.RemoteCEC2022Data
+import com.inzynierka.model.Cec2022Scores
 import io.kvision.redux.Dispatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +17,7 @@ data class Cec2022RankingState(
 
 sealed class Cec2022RankingAction : RankingsAction() {
     object FetchRankingsStarted : Cec2022RankingAction()
-    data class FetchRankingsSuccess(val scores: RemoteCEC2022Data) : Cec2022RankingAction()
+    data class FetchRankingsSuccess(val scores: Cec2022Scores) : Cec2022RankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : Cec2022RankingAction()
 }
 

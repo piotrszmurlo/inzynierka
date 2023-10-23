@@ -1,5 +1,6 @@
-package com.inzynierka.domain
+package com.inzynierka.domain.core
 
+import com.inzynierka.common.DomainError
 import io.kvision.redux.RAction
 import org.koin.core.component.KoinComponent
 

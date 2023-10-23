@@ -1,10 +1,10 @@
-package com.inzynierka
+package com.inzynierka.ui
 
 import com.inzynierka.di.appModule
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.Tab
-import com.inzynierka.domain.mainAppReducer
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
+import com.inzynierka.domain.core.Tab
+import com.inzynierka.domain.core.mainAppReducer
 import com.inzynierka.domain.service.IDataService
 import io.kvision.*
 import io.kvision.panel.root

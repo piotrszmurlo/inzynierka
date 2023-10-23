@@ -1,8 +1,8 @@
 package com.inzynierka.domain.service
 
-import com.inzynierka.domain.Result
+import com.inzynierka.common.Result
 import com.inzynierka.model.BenchmarkData
-import com.inzynierka.model.RemoteCEC2022Data
+import com.inzynierka.model.Cec2022Scores
 import io.kvision.types.KFile
 
 interface IDataService {
@@ -10,7 +10,7 @@ interface IDataService {
     suspend fun getAvailableBenchmarkData(): Result<BenchmarkData>
     suspend fun getAvailableDimensions(): Result<List<Int>>
 
-    suspend fun getCec2022Scores(): Result<RemoteCEC2022Data>
+    suspend fun getCec2022Scores(): Result<Cec2022Scores>
 
 
     /**

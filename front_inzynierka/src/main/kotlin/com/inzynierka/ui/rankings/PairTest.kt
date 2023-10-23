@@ -1,6 +1,6 @@
-package com.inzynierka.rankings
+package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.*
+import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
@@ -31,14 +31,16 @@ fun Container.pairTest(
     flexPanel(
         direction = FlexDirection.COLUMN,
         justify = JustifyContent.CENTER,
+        alignItems = AlignItems.CENTER
     ) {
+        p(content = "Compare algorithm using Wilcoxon signed-rank test", align = Align.CENTER)
         val formPanel = formPanel<PairTestForm> {
             flexPanel(
                 direction = FlexDirection.COLUMN,
                 justify = JustifyContent.CENTER,
             ) {
                 alignItems = AlignItems.CENTER
-                p(content = "Select algorithms to compare", align = Align.CENTER)
+                p(content = "Select algorithms", align = Align.CENTER)
                 flexPanel(direction = FlexDirection.ROW) {
                     justifyContent = JustifyContent.CENTER
                     select(
@@ -83,6 +85,7 @@ fun Container.pairTest(
         }
 
         button(text = "Compare", disabled = pairTestState.formState.isSubmitButtonDisabled) {
+            width = 150.px
             onClick {
                 val formData = formPanel.getData()
                 store.dispatch { dispatch, _ ->

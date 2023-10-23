@@ -1,8 +1,8 @@
-package com.inzynierka.rankings
+package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.Cec2022RankingState
-import com.inzynierka.domain.Score
-import com.inzynierka.withLoadingSpinner
+import com.inzynierka.domain.core.Cec2022RankingState
+import com.inzynierka.domain.core.Score
+import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent

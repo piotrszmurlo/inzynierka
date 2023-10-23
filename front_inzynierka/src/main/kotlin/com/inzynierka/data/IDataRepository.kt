@@ -1,10 +1,10 @@
 package com.inzynierka.data
 
-import com.inzynierka.model.RemoteCEC2022Data
+import com.inzynierka.model.Cec2022Scores
 import io.kvision.types.KFile
 
 interface IDataRepository {
-    suspend fun getCec2022Scores(): RemoteCEC2022Data
+    suspend fun getCec2022Scores(): Cec2022Scores
 
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>

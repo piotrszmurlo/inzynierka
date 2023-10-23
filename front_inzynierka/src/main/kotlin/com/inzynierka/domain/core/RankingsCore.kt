@@ -1,4 +1,4 @@
-package com.inzynierka.domain
+package com.inzynierka.domain.core
 
 typealias Scores = Map<Int, List<Score>>
 

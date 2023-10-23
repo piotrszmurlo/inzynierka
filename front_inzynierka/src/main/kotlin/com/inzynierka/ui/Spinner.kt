@@ -1,4 +1,4 @@
-package com.inzynierka
+package com.inzynierka.ui
 
 import io.kvision.core.Container
 import io.kvision.react.react

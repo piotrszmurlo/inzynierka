@@ -1,8 +1,8 @@
-package com.inzynierka
+package com.inzynierka.ui
 
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.Tab
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
+import com.inzynierka.domain.core.Tab
 import io.kvision.core.Container
 import io.kvision.html.button
 import io.kvision.html.div

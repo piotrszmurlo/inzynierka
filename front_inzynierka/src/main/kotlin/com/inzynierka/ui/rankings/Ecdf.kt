@@ -1,7 +1,7 @@
-package com.inzynierka.rankings
+package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
 import com.inzynierka.domain.service.IDataService
 import io.kvision.chart.ChartType
 import io.kvision.chart.Configuration

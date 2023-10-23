@@ -1,10 +1,10 @@
-package com.inzynierka
+package com.inzynierka.ui
 
-import com.inzynierka.domain.MainAppAction
-import com.inzynierka.domain.MainAppState
-import com.inzynierka.domain.UploadAction
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
+import com.inzynierka.domain.core.UploadAction
+import com.inzynierka.domain.core.uploadFiles
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.domain.uploadFiles
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.onChangeLaunch

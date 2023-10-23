@@ -1,6 +1,6 @@
 package com.inzynierka.data
 
-import com.inzynierka.model.RemoteCEC2022Data
+import com.inzynierka.model.Cec2022Scores
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,7 +11,7 @@ import io.kvision.types.KFile
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
-    override suspend fun getCec2022Scores(): RemoteCEC2022Data {
+    override suspend fun getCec2022Scores(): Cec2022Scores {
         return client.get(urlString = "rankings/cec2022").body()
     }
 
