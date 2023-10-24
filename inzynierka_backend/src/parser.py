@@ -111,7 +111,6 @@ def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_fi
     for data_file in data_files:
         listresult[data_file.function_number - 1][data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
     results.extend(listresult)
-    pprint(extensions.calculate_basic_ranking(results))
     return results
 
 

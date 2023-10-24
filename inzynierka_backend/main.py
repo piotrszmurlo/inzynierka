@@ -124,17 +124,16 @@ async def get_friedman_ranking(db: Session = Depends(get_db)):
         response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
     return response
 
+
 @app.get("/rankings/basic")
 async def get_basic_ranking(db: Session = Depends(get_db)):
-    response = {}
-    res = extensions.calculate_basic_ranking(
-        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db))
+    response = []
+    res = extensions.calculate_statisticsV2(
+        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db)),
+        response
     )
-    response["dimension"] = {
-
-    }
-    return res
-
+    print(response)
+    return response
 
 
 @app.post("/file")

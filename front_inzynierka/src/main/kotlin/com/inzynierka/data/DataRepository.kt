@@ -1,6 +1,6 @@
 package com.inzynierka.data
 
-import com.inzynierka.data.models.BasicScoresDTO
+import com.inzynierka.data.models.BasicScoreDTO
 import com.inzynierka.model.RankingScores
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -20,7 +20,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         return client.get(urlString = "rankings/friedman").body()
     }
 
-    override suspend fun getBasicScores(): BasicScoresDTO {
+    override suspend fun getBasicScores(): List<BasicScoreDTO> {
         return client.get(urlString = "rankings/basic").body()
     }
 

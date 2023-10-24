@@ -5,6 +5,7 @@ import com.inzynierka.domain.service.IDataService
 import com.inzynierka.ui.rankings.ecdf
 import com.inzynierka.ui.rankings.pairTest
 import com.inzynierka.ui.rankings.scoreRanking
+import com.inzynierka.ui.rankings.statisticsRanking
 import io.kvision.core.Container
 import io.kvision.core.Display
 import io.kvision.core.FlexDirection
@@ -36,7 +37,13 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     combinedScoreHeaderTitle = "Average trial rank"
                 )
 
-                is Tab.ResultsTab.Mean -> {}
+                is Tab.ResultsTab.Mean -> {
+                    statisticsRanking(
+                        headerNames = listOf("Rank", "Algorithm", "Mean", "Median", "Stddev", "Best", "Worst"),
+                        state = state.rankingsState.mean
+                    )
+                }
+
                 is Tab.ResultsTab.Median -> {}
                 is Tab.ResultsTab.PairTest -> {
                     pairTest(state.rankingsState.pairTest, store, dataService)
@@ -64,6 +71,9 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
         button(text = "Mean", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Mean))
+                store.dispatch { dispatch, _ ->
+                    loadMeanRanking(dispatch, dataService)
+                }
             }
         button(text = "Median", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {

@@ -1,6 +1,6 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.core.Score
+import com.inzynierka.domain.core.BasicScore
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
@@ -13,7 +13,11 @@ import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
 
-fun Container.statisticsRankingTable(headerNames: List<String>, title: String, scores: List<Score>) {
+fun Container.statisticTable(
+    headerNames: List<String>,
+    title: String,
+    scores: List<BasicScore>,
+) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
         p(content = title, align = Align.CENTER)
@@ -25,9 +29,11 @@ fun Container.statisticsRankingTable(headerNames: List<String>, title: String, s
                 row {
                     cell("${it.rank}")
                     cell(it.algorithmName)
-                    cell(it.algorithmName)
-                    cell(it.algorithmName)
-                    cell("${it.score}".substring(0, 6))
+                    cell("${it.mean}")
+                    cell("${it.median}")
+                    cell("${it.stddev}")
+                    cell("${it.min}")
+                    cell("${it.max}")
                 }
             }
         }

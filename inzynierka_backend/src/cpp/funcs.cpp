@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <vector>
 #include <pybind11/pybind11.h>
+#include <numeric>
+#include <algorithm>
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
@@ -48,6 +50,23 @@ double median(std::vector<double> &input) {
     median = (*max + median) * 0.5;
   }
   return median;
+}
+
+
+double mean(const TrialsVector& input) {
+    double sum = std::accumulate(input.begin(), input.end(), 0.0, [](double a, FunctionAlgorithmTrial b){
+        return a + b.finalError;
+    });
+    return sum / input.size();
+}
+
+double stddev(const TrialsVector& input, double mean) {
+    std::vector<double> differences(input.size());
+    std::transform(input.begin(), input.end(), differences.begin(), [mean](FunctionAlgorithmTrial a) {
+        return a.finalError - mean;
+    });
+    double sumOfSquares = std::inner_product(differences.begin(), differences.end(), differences.begin(), 0.0);
+    return std::sqrt(sumOfSquares / input.size());
 }
 
 std::unordered_map<std::string, double> calculate_cec2022_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
@@ -185,76 +204,35 @@ std::string parse_results(std::string input) {
     return result.str();
 }
 
-using Statistic2Value = std::unordered_map<std::string, double>;
-using Algorithm2Statistic = std::unordered_map<std::string, Statistic2Value>;
-using FunctionNumber2Algorithm= std::unordered_map<int, Algorithm2Statistic>;
-using Dimension2FunctionNumber = std::unordered_map<int, FunctionNumber2Algorithm>;
-
 using BasicRankingInput = std::vector<std::map<int, std::map<std::string, TrialsVector>>>;
-
-Dimension2FunctionNumber calculate_basic_ranking(const BasicRankingInput& input) {
-    Dimension2FunctionNumber results;
-    std::unordered_map<int, std::unordered_map<std::string, std::unordered_map<std::string, std::vector<double>>>> accumulatedValues;
+void calculate_statisticsV2(const BasicRankingInput& input, pybind11::list output) {
     for (size_t i = 0; i < input.size(); i++) {
         for (auto& dimension : input[i]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
-                results[dimension.first][i][algorithmName]["best"] = trialsVector.front().finalError;
-                results[dimension.first][i][algorithmName]["worst"] = trialsVector.back().finalError;
-                results[dimension.first][i][algorithmName]["stddev"] = 11.1; // do policzenia
-                results[dimension.first][i][algorithmName]["mean"] = 22.2; // do policzenia
+                pybind11::dict obj = pybind11::dict();
+                obj["min"] = trialsVector.front().finalError;
+                obj["max"] = trialsVector.back().finalError;
+                obj["algorithm_name"] = algorithmName;
+                obj["dimension"] = dimension.first;
+                obj["function_number"] = i + 1;
                 int numberOfTrials = trialsVector.size();
                 if (numberOfTrials % 2 != 0) {
-                    results[dimension.first][i][algorithmName]["median"] = trialsVector[numberOfTrials/2].finalError;
+                    obj["median"] = trialsVector[numberOfTrials/2].finalError;
                 } else {
                     double median = ((trialsVector[numberOfTrials/2].finalError) + (trialsVector[(numberOfTrials/2) - 1].finalError))/2;
-                    results[dimension.first][i][algorithmName]["median"] = median;
+                    obj["median"] = median;
                 }
-                // jeszcze mean policzyc
+                obj["min_fe_term"] = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const FunctionAlgorithmTrial& a, const FunctionAlgorithmTrial& b){
+                    return a.numberOfEvaluations < b.numberOfEvaluations;
+                })).numberOfEvaluations;
+                double errorMean = mean(trialsVector);
+                obj["mean"] = errorMean;
+                obj["stddev"] = stddev(trialsVector, errorMean);
+                output.append(obj);
             } 
         }
     }
-    return results;
 }
-
-
-
-
-std::unordered_map<std::string, double> calculate_medianV2(const TrialsVector& input) {
-    if (input.empty()) {
-        throw std::invalid_argument("Input data is empty");
-    }
-    for (auto& trial : input) {
-
-    }
-    std::unordered_map<std::string, double> medians;
-    std::unordered_map<std::string, std::vector<double>> algorithmTrials;
-    for (const auto& trial : input) {
-        algorithmTrials[trial.algorithmName].push_back(trial.finalError);
-    }
-    for (auto& results : algorithmTrials) {
-        medians[results.first] = median(results.second);
-    }
-    return medians;
-}
-
-// primitive types are zero-initialized, so no need to check if map is empty
-// Dimension2Algorithm calculate_example(const FunctionTrialsVector& input) {
-//     if (input.empty()) {
-//         throw std::invalid_argument("Input data is empty");
-//     }
-//     Dimension2Algorithm test;
-//     test[10]["algorithm_name_1"]["best"] = 1.69;
-//     test[10]["algorithm_name_2"]["best"] = 1.69;
-//     test[10]["algorithm_name_2"]["mean"] += 1.3;
-//     test[10]["algorithm_name_1"]["mean"] += 1.3;
-
-//     test[20]["algorithm_name_1"]["best"] = 1.69;
-//     test[20]["algorithm_name_2"]["best"] = 1.69;
-//     test[20]["algorithm_name_2"]["mean"] += 1.3;
-//     test[20]["algorithm_name_1"]["mean"] += 1.3;
-
-//     return test;
-// }

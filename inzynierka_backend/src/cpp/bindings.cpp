@@ -55,8 +55,8 @@ PYBIND11_MODULE(python_extensions, m) {
         Calculate friedman scores
     )pbdoc");
 
-    m.def("calculate_basic_ranking", &calculate_basic_ranking, R"pbdoc(
-        Calculate basic ranking
+    m.def("calculate_statisticsV2", &calculate_statisticsV2, R"pbdoc(
+        calculate_statisticsV2
     )pbdoc");
 
     py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
