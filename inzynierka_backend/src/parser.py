@@ -1,4 +1,5 @@
 import base64
+from collections import defaultdict
 from pprint import pprint
 
 from sqlalchemy.orm import Session
@@ -76,13 +77,12 @@ def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.T
     return results
 
 
-def get_final_error_and_evaluations_number_numpy(data_file: LocalFile):
+def get_final_error_and_evaluations_number_array(data_file: LocalFile):
     """
     :param data_file: LocalFile with already preprocessed contents
     :return: list containing final error
     """
     rows = data_file.contents.split("\n")
-    evaluations = rows[FINAL_FES_INDEX].split()
     results = []
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
         results.append(float(final_error))
@@ -104,20 +104,15 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
     return results
 
 
-# results[function_number - 1]["algorithm_name]
-# def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
-#     """
-#     :param data_files: list of LocalFile(s) with already preprocessed contents
-#     :return: FunctionTrialsVector[TrialsVector[FunctionAlgorithmTrial]] with all final results provided
-#     """
-#     results = extensions.BasicRankingInput()
-#     results_for_function = {}
-#     for _ in range(FUNCTIONS_COUNT):
-#         results.append({})
-#         # results.append(extensions.TrialsVector())
-#     for data_file in data_files:
-#         results[data_file.function_number - 1] =
-#     return results
+# results[function_number - 1][algorithm_name]
+def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]):
+    results = extensions.BasicRankingInput()
+    listresult = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
+    for data_file in data_files:
+        listresult[data_file.function_number - 1][data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
+    results.extend(listresult)
+    pprint(extensions.calculate_basic_ranking(results))
+    return results
 
 
 def get_updated_rankings(db: Session):

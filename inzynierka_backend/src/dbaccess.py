@@ -38,7 +38,7 @@ def get_files_for_dimension(db: Session, dimension: int):
 
 
 def get_all_files(db: Session):
-    return db.query(models.LocalFile)
+    return db.query(models.LocalFile).all()
 
 
 def create_file(db: Session, algorithm_name: str, dimension: int, function_number: int, content: str) -> models.LocalFile:

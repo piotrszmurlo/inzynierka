@@ -12,14 +12,14 @@ fun Container.scoreRanking(state: ScoreRankingState, scoreHeaderTitle: String, c
         flexPanel(direction = FlexDirection.ROW) {
             justifyContent = JustifyContent.CENTER
             state.scores?.forEach {
-                rankingTable(
+                scoreRankingTable(
                     headerNames = listOf("Rank", "Algorithm", scoreHeaderTitle),
                     title = "Dimension = ${it.key}",
                     scores = it.value
                 )
             }
             state.combinedScores?.let {
-                rankingTable(
+                scoreRankingTable(
                     headerNames = listOf("Rank", "Algorithm", combinedScoreHeaderTitle),
                     title = "Combined ranking",
                     scores = it

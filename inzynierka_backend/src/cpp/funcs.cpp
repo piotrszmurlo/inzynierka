@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <vector>
+#include <pybind11/pybind11.h>
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
@@ -184,15 +185,15 @@ std::string parse_results(std::string input) {
     return result.str();
 }
 
-
 using Statistic2Value = std::unordered_map<std::string, double>;
 using Algorithm2Statistic = std::unordered_map<std::string, Statistic2Value>;
-using Dimension2Algorithm = std::unordered_map<int, Algorithm2Statistic>;
+using FunctionNumber2Algorithm= std::unordered_map<int, Algorithm2Statistic>;
+using Dimension2FunctionNumber = std::unordered_map<int, FunctionNumber2Algorithm>;
 
 using BasicRankingInput = std::vector<std::map<int, std::map<std::string, TrialsVector>>>;
 
-Dimension2Algorithm calculate_basic_ranking(const BasicRankingInput& input) {
-    Dimension2Algorithm results;
+Dimension2FunctionNumber calculate_basic_ranking(const BasicRankingInput& input) {
+    Dimension2FunctionNumber results;
     std::unordered_map<int, std::unordered_map<std::string, std::unordered_map<std::string, std::vector<double>>>> accumulatedValues;
     for (size_t i = 0; i < input.size(); i++) {
         for (auto& dimension : input[i]) {
@@ -200,21 +201,25 @@ Dimension2Algorithm calculate_basic_ranking(const BasicRankingInput& input) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
-                accumulatedValues[dimension.first][algorithmName]["best"].push_back(trialsVector.front().finalError);
-                accumulatedValues[dimension.first][algorithmName]["worst"].push_back(trialsVector.back().finalError);
+                results[dimension.first][i][algorithmName]["best"] = trialsVector.front().finalError;
+                results[dimension.first][i][algorithmName]["worst"] = trialsVector.back().finalError;
+                results[dimension.first][i][algorithmName]["stddev"] = 11.1; // do policzenia
+                results[dimension.first][i][algorithmName]["mean"] = 22.2; // do policzenia
                 int numberOfTrials = trialsVector.size();
                 if (numberOfTrials % 2 != 0) {
-                    accumulatedValues[dimension.first][algorithmName]["median"].push_back(trialsVector[numberOfTrials/2].finalError);
+                    results[dimension.first][i][algorithmName]["median"] = trialsVector[numberOfTrials/2].finalError;
                 } else {
                     double median = ((trialsVector[numberOfTrials/2].finalError) + (trialsVector[(numberOfTrials/2) - 1].finalError))/2;
-                    accumulatedValues[dimension.first][algorithmName]["median"].push_back(median);
+                    results[dimension.first][i][algorithmName]["median"] = median;
                 }
                 // jeszcze mean policzyc
-            }
+            } 
         }
     }
     return results;
 }
+
+
 
 
 std::unordered_map<std::string, double> calculate_medianV2(const TrialsVector& input) {
@@ -236,20 +241,20 @@ std::unordered_map<std::string, double> calculate_medianV2(const TrialsVector& i
 }
 
 // primitive types are zero-initialized, so no need to check if map is empty
-Dimension2Algorithm calculate_example(const FunctionTrialsVector& input) {
-    if (input.empty()) {
-        throw std::invalid_argument("Input data is empty");
-    }
-    Dimension2Algorithm test;
-    test[10]["algorithm_name_1"]["best"] = 1.69;
-    test[10]["algorithm_name_2"]["best"] = 1.69;
-    test[10]["algorithm_name_2"]["mean"] += 1.3;
-    test[10]["algorithm_name_1"]["mean"] += 1.3;
+// Dimension2Algorithm calculate_example(const FunctionTrialsVector& input) {
+//     if (input.empty()) {
+//         throw std::invalid_argument("Input data is empty");
+//     }
+//     Dimension2Algorithm test;
+//     test[10]["algorithm_name_1"]["best"] = 1.69;
+//     test[10]["algorithm_name_2"]["best"] = 1.69;
+//     test[10]["algorithm_name_2"]["mean"] += 1.3;
+//     test[10]["algorithm_name_1"]["mean"] += 1.3;
 
-    test[20]["algorithm_name_1"]["best"] = 1.69;
-    test[20]["algorithm_name_2"]["best"] = 1.69;
-    test[20]["algorithm_name_2"]["mean"] += 1.3;
-    test[20]["algorithm_name_1"]["mean"] += 1.3;
+//     test[20]["algorithm_name_1"]["best"] = 1.69;
+//     test[20]["algorithm_name_2"]["best"] = 1.69;
+//     test[20]["algorithm_name_2"]["mean"] += 1.3;
+//     test[20]["algorithm_name_1"]["mean"] += 1.3;
 
-    return test;
-}
+//     return test;
+// }

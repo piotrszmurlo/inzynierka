@@ -13,7 +13,7 @@ import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
 
-fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores: List<Score>) {
+fun Container.statisticsRankingTable(headerNames: List<String>, title: String, scores: List<Score>) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
         p(content = title, align = Align.CENTER)
@@ -24,6 +24,8 @@ fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores
             scores.forEach {
                 row {
                     cell("${it.rank}")
+                    cell(it.algorithmName)
+                    cell(it.algorithmName)
                     cell(it.algorithmName)
                     cell("${it.score}".substring(0, 6))
                 }

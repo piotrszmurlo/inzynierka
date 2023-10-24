@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 from pprint import pprint
 from typing import Annotated
 
@@ -9,12 +10,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src import models
 from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file, \
-    get_all_dimensions, get_all_functions
+    get_all_dimensions, get_all_functions, get_all_files
 from src.models import ParseError
 from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
-    ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_numpy
+    ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_array, \
+    get_final_error_and_evaluation_number_for_files_grouped_by_algorithm
 from scipy.stats import wilcoxon
-
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -70,11 +71,13 @@ async def get_available_functions(db: Session = Depends(get_db)):
 
 
 @app.post("/rankings/wilcoxon")
-async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()], dimension: Annotated[int, Form()], function_number: Annotated[int, Form()], db: Session = Depends(get_db)):
+async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()],
+                            dimension: Annotated[int, Form()], function_number: Annotated[int, Form()],
+                            db: Session = Depends(get_db)):
     file = get_file(db, algorithm_name=first_algorithm, dimension=dimension, function_number=function_number)
     file2 = get_file(db, algorithm_name=second_algorithm, dimension=dimension, function_number=function_number)
-    err1 = get_final_error_and_evaluations_number_numpy(file)
-    err2 = get_final_error_and_evaluations_number_numpy(file2)
+    err1 = get_final_error_and_evaluations_number_array(file)
+    err2 = get_final_error_and_evaluations_number_array(file2)
     diff = []
     for index in range(len(err1)):
         diff.append(err1[index] - err2[index])
@@ -92,8 +95,6 @@ async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algo
         if "zero for all elements" in str(e):
             return "="
         raise HTTPException(422, detail=str(e))
-
-
 
 
 @app.get("/rankings/cec2022")
@@ -123,12 +124,25 @@ async def get_friedman_ranking(db: Session = Depends(get_db)):
         response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
     return response
 
+@app.get("/rankings/basic")
+async def get_basic_ranking(db: Session = Depends(get_db)):
+    response = {}
+    res = extensions.calculate_basic_ranking(
+        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db))
+    )
+    response["dimension"] = {
+
+    }
+    return res
+
+
 
 @app.post("/file")
 async def post_file(files: list[UploadFile], db: Session = Depends(get_db)):
     try:
         for file in files:
-            algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(file.filename, await file.read())
+            algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(file.filename,
+                                                                                                    await file.read())
             create_file(db, algorithm_name, dimension, function_number, parsed_contents)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')

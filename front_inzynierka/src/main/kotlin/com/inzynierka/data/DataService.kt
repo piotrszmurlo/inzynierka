@@ -2,6 +2,7 @@ package com.inzynierka.data
 
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
+import com.inzynierka.data.models.BasicScoresDTO
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.RankingScores
@@ -43,6 +44,15 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
     override suspend fun getFriedmanScores(): Result<RankingScores> {
         return try {
             val result = dataRepository.getFriedmanScores()
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
+    override suspend fun getBasicScores(): Result<BasicScoresDTO> {
+        return try {
+            val result = dataRepository.getBasicScores()
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))
