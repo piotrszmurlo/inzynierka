@@ -26,16 +26,6 @@ data class BasicScore(
     val minEvaluations: Int
 )
 
-data class StatisticTableEntry(
-    val rank: Int,
-    val algorithmName: String,
-    val mean: Double,
-    val median: Double,
-    val stddev: Double,
-    val min: Double,
-    val max: Double,
-)
-
 sealed class MeanRankingAction : RankingsAction() {
     object FetchRankingsStarted : MeanRankingAction()
     data class FetchRankingsSuccess(val scores: List<BasicScore>) : MeanRankingAction()
@@ -46,17 +36,7 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
     is MeanRankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
     is MeanRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is MeanRankingAction.FetchRankingsSuccess -> {
-        val sorted = action.scores
-            .groupBy { it.dimension }
-            .mapValues {
-                it.value
-                    .groupBy { score -> score.functionNumber }
-                    .mapValues { scores ->
-                        scores.value
-                            .sortedWith(compareBy({ score -> score.mean }, { score -> score.minEvaluations }))
-                            .mapIndexed { index, score -> score.copy(rank = index + 1) }
-                    }
-            }
+        val sorted = action.scores.createRankings(compareBy({ score -> score.mean }, { score -> score.minEvaluations }))
         state.copy(isFetching = false, scores = sorted)
     }
 }

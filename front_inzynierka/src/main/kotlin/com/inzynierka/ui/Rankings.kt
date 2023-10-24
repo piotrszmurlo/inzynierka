@@ -44,7 +44,13 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     )
                 }
 
-                is Tab.ResultsTab.Median -> {}
+                is Tab.ResultsTab.Median -> {
+                    statisticsRanking(
+                        headerNames = listOf("Rank", "Algorithm", "Mean", "Median", "Stddev", "Best", "Worst"),
+                        state = state.rankingsState.median
+                    )
+                }
+
                 is Tab.ResultsTab.PairTest -> {
                     pairTest(state.rankingsState.pairTest, store, dataService)
                 }
@@ -78,6 +84,9 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
         button(text = "Median", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Median))
+                store.dispatch { dispatch, _ ->
+                    loadMedianRanking(dispatch, dataService)
+                }
             }
         button(text = "ECDF", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
