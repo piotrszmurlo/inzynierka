@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 sealed class MedianRankingAction : RankingsAction() {
     object FetchRankingsStarted : MedianRankingAction()
-    data class FetchRankingsSuccess(val scores: List<BasicScore>) : MedianRankingAction()
+    data class FetchRankingsSuccess(val scores: List<StatisticsRankingEntry>) : MedianRankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : MedianRankingAction()
 }
 
@@ -27,7 +27,7 @@ fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = 
     }
 }
 
-fun List<BasicScore>.createRankings(comparator: Comparator<BasicScore>): Map<Int, Map<Int, List<BasicScore>>> {
+fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<StatisticsRankingEntry>): Map<Int, Map<Int, List<StatisticsRankingEntry>>> {
     return this.groupBy { it.dimension }
         .mapValues {
             it.value
@@ -43,7 +43,7 @@ fun List<BasicScore>.createRankings(comparator: Comparator<BasicScore>): Map<Int
 fun loadMedianRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
     CoroutineScope(Dispatchers.Default).launch {
         dispatch(MedianRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getBasicScores()) {
+        when (val result = dataService.getStatisticsRankingEntries()) {
             is Result.Success -> dispatch(MedianRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> dispatch(MedianRankingAction.FetchRankingsFailed(result.domainError))
         }

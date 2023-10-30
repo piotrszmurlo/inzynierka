@@ -10,10 +10,10 @@ import kotlinx.coroutines.launch
 
 data class StatisticsRankingState(
     val isFetching: Boolean = false,
-    val scores: Map<Int, Map<Int, List<BasicScore>>>? = null
+    val scores: Map<Int, Map<Int, List<StatisticsRankingEntry>>>? = null
 )
 
-data class BasicScore(
+data class StatisticsRankingEntry(
     val rank: Int?,
     val dimension: Int,
     val algorithmName: String,
@@ -28,7 +28,7 @@ data class BasicScore(
 
 sealed class MeanRankingAction : RankingsAction() {
     object FetchRankingsStarted : MeanRankingAction()
-    data class FetchRankingsSuccess(val scores: List<BasicScore>) : MeanRankingAction()
+    data class FetchRankingsSuccess(val scores: List<StatisticsRankingEntry>) : MeanRankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : MeanRankingAction()
 }
 
@@ -44,7 +44,7 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
 fun loadMeanRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
     CoroutineScope(Dispatchers.Default).launch {
         dispatch(MeanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getBasicScores()) {
+        when (val result = dataService.getStatisticsRankingEntries()) {
             is Result.Success -> dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
         }

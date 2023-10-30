@@ -3,7 +3,7 @@ package com.inzynierka.data
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
-import com.inzynierka.domain.core.BasicScore
+import com.inzynierka.domain.core.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.RankingScores
@@ -51,9 +51,9 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getBasicScores(): Result<List<BasicScore>> {
+    override suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>> {
         return try {
-            val result = dataRepository.getBasicScores().map { it.toDomain() }
+            val result = dataRepository.getStatisticsEntries().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

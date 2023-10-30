@@ -1,6 +1,6 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.core.BasicScore
+import com.inzynierka.domain.core.StatisticsRankingEntry
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
@@ -16,7 +16,7 @@ import io.kvision.utils.px
 fun Container.statisticTable(
     headerNames: List<String>,
     title: String,
-    scores: List<BasicScore>,
+    scores: List<StatisticsRankingEntry>,
 ) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px

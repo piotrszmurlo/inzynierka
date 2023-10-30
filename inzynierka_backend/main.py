@@ -96,7 +96,7 @@ async def get_friedman_ranking():
     return response
 
 
-@app.get("/rankings/basic")
+@app.get("/rankings/statistics")
 async def get_statistics_ranking_data():
     return rankings.get_statistics_ranking_data()
 

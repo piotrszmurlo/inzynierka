@@ -1,13 +1,13 @@
 package com.inzynierka.data
 
-import com.inzynierka.data.models.BasicScoreDTO
+import com.inzynierka.data.models.StatisticsEntriesDTO
 import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
 
 interface IDataRepository {
     suspend fun getCec2022Scores(): RankingScores
     suspend fun getFriedmanScores(): RankingScores
-    suspend fun getBasicScores(): List<BasicScoreDTO>
+    suspend fun getStatisticsEntries(): List<StatisticsEntriesDTO>
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>
     suspend fun getAvailableFunctionNumbers(): List<Int>

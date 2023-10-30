@@ -1,7 +1,7 @@
 package com.inzynierka.domain.service
 
 import com.inzynierka.common.Result
-import com.inzynierka.domain.core.BasicScore
+import com.inzynierka.domain.core.StatisticsRankingEntry
 import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
@@ -12,7 +12,7 @@ interface IDataService {
     suspend fun getAvailableDimensions(): Result<List<Int>>
     suspend fun getCec2022Scores(): Result<RankingScores>
     suspend fun getFriedmanScores(): Result<RankingScores>
-    suspend fun getBasicScores(): Result<List<BasicScore>>
+    suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
 
 
     /**

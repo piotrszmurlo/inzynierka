@@ -199,7 +199,7 @@ std::string parse_results(std::string input) {
 
 using BasicRankingInput = std::vector<std::unordered_map<int, std::unordered_map<std::string, TrialsVector>>>;
 
-std::vector<StatisticsRankingEntry> calculate_statisticsV2(const BasicRankingInput& input) {
+std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
     for (size_t i = 0; i < input.size(); i++) {
         for (auto& dimension : input[i]) {

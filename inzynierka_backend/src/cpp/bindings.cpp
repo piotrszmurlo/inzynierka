@@ -55,8 +55,8 @@ PYBIND11_MODULE(python_extensions, m) {
         Calculate friedman scores
     )pbdoc");
 
-    m.def("calculate_statisticsV2", &calculate_statisticsV2, R"pbdoc(
-        calculate_statisticsV2
+    m.def("calculate_statistics_entries", &calculate_statistics_entries, R"pbdoc(
+        calculate_statistics_entries
     )pbdoc");
 
     py::class_<Trial>(m, "Trial")

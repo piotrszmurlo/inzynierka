@@ -17,12 +17,13 @@ class Rankings:
 
     def get_statistics_ranking_data(self) -> list[StatisticRankingEntry]:
         if self._statistics_ranking_data is None:
-            ranking_entries = extensions.calculate_statisticsV2(
+            ranking_entries = extensions.calculate_statistics_entries(
                 get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(
                     self._file_service.get_files()
                 )
             )
-            self._statistics_ranking_data = map_statistic_ranking_entries_to_pydantic_model(ranking_entries)
+            self._statistics_ranking_data = map_statistic_ranking_entries_to_pydantic_model(
+                ranking_entries)
         return self._statistics_ranking_data
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int, function_number: int):
@@ -56,5 +57,3 @@ class Rankings:
         except ValueError as e:
             if "zero for all elements" in str(e):
                 return "="
-
-
