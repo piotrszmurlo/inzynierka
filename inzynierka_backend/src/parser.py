@@ -32,7 +32,8 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     :return: algorithm_name, function number, dimension and corrected contents extracted to a tuple
     """
     algorithm_name, function_number, dimension = parse_remote_file_name(
-        filename)
+        filename
+    )
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
         parsed_contents = extensions.parse_results(raw_contents)
@@ -66,13 +67,13 @@ def parse_remote_file_name(filename: str) -> tuple[str, int, int]:
 def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.TrialsVector:
     """
     :param data_file: LocalFile with already preprocessed contents
-    :return: TrialsVector containing final results from the file in form of FunctionAlgorithmTrial
+    :return: TrialsVector containing final results from the file in form of Trial
     """
     rows = data_file.contents.split("\n")
     evaluations = rows[FINAL_FES_INDEX].split()
     results = extensions.TrialsVector()
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
-        results.append(extensions.FunctionAlgorithmTrial(data_file.algorithm_name, data_file.function_number, i,
+        results.append(extensions.Trial(data_file.algorithm_name, data_file.function_number, i,
                                                          float(final_error), int(evaluations[i].split(".")[0])))
     return results
 
@@ -93,7 +94,7 @@ def get_final_error_and_evaluations_number_array(data_file: LocalFile):
 def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
     """
     :param data_files: list of LocalFile(s) with already preprocessed contents
-    :return: FunctionTrialsVector[TrialsVector[FunctionAlgorithmTrial]] with all final results provided
+    :return: FunctionTrialsVector[TrialsVector[Trial]] with all final results provided
     """
     results = extensions.FunctionTrialsVector()
     for _ in range(FUNCTIONS_COUNT):

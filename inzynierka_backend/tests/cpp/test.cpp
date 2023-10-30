@@ -42,16 +42,16 @@ TEST_CASE("median empty vector throws invalid argument exception", "[median]") {
 TEST_CASE("median uneven vector size function algorithm", "[median]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1.3, 200));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1.1, 200));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 1.5, 200));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1.3, 200));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1.1, 200));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 1.5, 200));
 
     TrialsVector trialsVector2;
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 10e-8, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 10e-8, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 10e-8, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 4, 10e-5, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 5, 10e-5, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 1, 10e-8, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 2, 10e-8, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 10e-8, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 4, 10e-5, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 5, 10e-5, 200));
 
     vector.push_back(trialsVector1);
     vector.push_back(trialsVector2);
@@ -66,16 +66,16 @@ TEST_CASE("median uneven vector size function algorithm", "[median]") {
 TEST_CASE("median even vector size function algorithm", "[median]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 1, 99.9, 200));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 2, 1.1, 300));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 1.5, 400));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 4, 1.6, 500));
+    trialsVector1.push_back(Trial("alg1", 2, 1, 99.9, 200));
+    trialsVector1.push_back(Trial("alg1", 2, 2, 1.1, 300));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 1.5, 400));
+    trialsVector1.push_back(Trial("alg1", 1, 4, 1.6, 500));
 
     TrialsVector trialsVector2;
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 1, 10e-2, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 2, 10e-2, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 10e-4, 200));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 4, 10e-4, 200));
+    trialsVector2.push_back(Trial("alg2", 2, 1, 10e-2, 200));
+    trialsVector2.push_back(Trial("alg2", 2, 2, 10e-2, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 10e-4, 200));
+    trialsVector2.push_back(Trial("alg2", 1, 4, 10e-4, 200));
 
     vector.push_back(trialsVector1);
     vector.push_back(trialsVector2);
@@ -90,7 +90,7 @@ TEST_CASE("median even vector size function algorithm", "[median]") {
 TEST_CASE("median one element vector function algorithm", "[median]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 1, 99.9, 200));
+    trialsVector1.push_back(Trial("alg1", 2, 1, 99.9, 200));
     vector.push_back(trialsVector1);
     std::unordered_map<std::string, double> expected;
     expected["alg1"] = 99.9;
@@ -106,7 +106,7 @@ TEST_CASE("median empty vector function algorithm throws invalid argument except
 TEST_CASE("average one element vector function algorithm", "[average]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 13.27, 200));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 13.27, 200));
     vector.push_back(trialsVector1);
     std::unordered_map<std::string, double> expected;
     expected["alg1"] = 13.27;
@@ -116,21 +116,21 @@ TEST_CASE("average one element vector function algorithm", "[average]") {
 TEST_CASE("average many element vector function algorithm", "[average]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 22.22, 111));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 11.11, 222));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 33.33, 333));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 1, 11.11, 111));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 2, 12.22, 222));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 2, 3, 10e-8, 333));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 22.22, 111));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 11.11, 222));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 33.33, 333));
+    trialsVector1.push_back(Trial("alg1", 2, 1, 11.11, 111));
+    trialsVector1.push_back(Trial("alg1", 2, 2, 12.22, 222));
+    trialsVector1.push_back(Trial("alg1", 2, 3, 10e-8, 333));
     vector.push_back(trialsVector1);
 
     TrialsVector trialsVector2;
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1.1, 111));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 10e-8, 222));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 10e-8, 333));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 1, 10e-8, 111));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 2, 10e-8, 222));
-    trialsVector2.push_back(FunctionAlgorithmTrial("alg2", 2, 3, 10e-8, 333));
+    trialsVector2.push_back(Trial("alg2", 1, 1, 1.1, 111));
+    trialsVector2.push_back(Trial("alg2", 1, 2, 10e-8, 222));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 10e-8, 333));
+    trialsVector2.push_back(Trial("alg2", 2, 1, 10e-8, 111));
+    trialsVector2.push_back(Trial("alg2", 2, 2, 10e-8, 222));
+    trialsVector2.push_back(Trial("alg2", 2, 3, 10e-8, 333));
     vector.push_back(trialsVector2);
 
     std::unordered_map<std::string, double> expected;
@@ -168,73 +168,73 @@ TEST_CASE("strict_stod scientific notation input 3", "[utils]") {
     REQUIRE(strict_stod(input) == 472160.0);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator== same arguments", "[utils]") {
-    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
-    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+TEST_CASE("Trial operator== same arguments", "[utils]") {
+    Trial a = Trial("alg1", 1, 1, 5, 100);
+    Trial b = Trial("alg1", 1, 1, 5, 100);
     REQUIRE(a == b);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator== both different", "[utils]") {
-    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1, 100);
-    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 211);
+TEST_CASE("Trial operator== both different", "[utils]") {
+    Trial a = Trial("alg1", 1, 1, 1, 100);
+    Trial b = Trial("alg2", 2, 2, 1.1, 211);
     REQUIRE_FALSE(a == b);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator== both equal", "[utils]") {
-    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
-    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 100);
+TEST_CASE("Trial operator== both equal", "[utils]") {
+    Trial a = Trial("alg1", 1, 1, 1.1, 100);
+    Trial b = Trial("alg2", 2, 2, 1.1, 100);
     REQUIRE(a == b);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator== same error different fes", "[utils]") {
-    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
-    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1.1, 211);
+TEST_CASE("Trial operator== same error different fes", "[utils]") {
+    Trial a = Trial("alg1", 1, 1, 1.1, 100);
+    Trial b = Trial("alg2", 2, 2, 1.1, 211);
     REQUIRE_FALSE(a == b);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator== different error same fes", "[utils]") {
-    FunctionAlgorithmTrial a = FunctionAlgorithmTrial("alg1", 1, 1, 1.1, 100);
-    FunctionAlgorithmTrial b = FunctionAlgorithmTrial("alg2", 2, 2, 1, 100);
+TEST_CASE("Trial operator== different error same fes", "[utils]") {
+    Trial a = Trial("alg1", 1, 1, 1.1, 100);
+    Trial b = Trial("alg2", 2, 2, 1, 100);
     REQUIRE_FALSE(a == b);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator< same arguments", "[utils]") {
-    FunctionAlgorithmTrial same1 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
-    FunctionAlgorithmTrial same2 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
+TEST_CASE("Trial operator< same arguments", "[utils]") {
+    Trial same1 = Trial("alg1", 1, 1, 5, 100);
+    Trial same2 = Trial("alg1", 1, 1, 5, 100);
     REQUIRE_FALSE(same1 < same2);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator< same error different fes", "[utils]") {
-    FunctionAlgorithmTrial better = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
-    FunctionAlgorithmTrial worse = FunctionAlgorithmTrial("alg2", 1, 1, 5, 200);
+TEST_CASE("Trial operator< same error different fes", "[utils]") {
+    Trial better = Trial("alg1", 1, 1, 5, 100);
+    Trial worse = Trial("alg2", 1, 1, 5, 200);
     REQUIRE_FALSE(better < worse);
     REQUIRE(worse < better);
 }
 
-TEST_CASE("FunctionAlgorithmTrial operator< different error same fes", "[utils]") {
-    FunctionAlgorithmTrial better = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
-    FunctionAlgorithmTrial worse = FunctionAlgorithmTrial("alg2", 1, 1, 5.1, 100);
+TEST_CASE("Trial operator< different error same fes", "[utils]") {
+    Trial better = Trial("alg1", 1, 1, 5, 100);
+    Trial worse = Trial("alg2", 1, 1, 5.1, 100);
     REQUIRE_FALSE(better < worse);
     REQUIRE(worse < better);
 }
 
 
-TEST_CASE("FunctionAlgorithmTrial operator< same error same fes", "[utils]") {
-    FunctionAlgorithmTrial same1 = FunctionAlgorithmTrial("alg1", 1, 1, 5, 100);
-    FunctionAlgorithmTrial same2 = FunctionAlgorithmTrial("alg2", 1, 1, 5, 100);
+TEST_CASE("Trial operator< same error same fes", "[utils]") {
+    Trial same1 = Trial("alg1", 1, 1, 5, 100);
+    Trial same2 = Trial("alg2", 1, 1, 5, 100);
     REQUIRE_FALSE(same1 < same2);
 }
 
 TEST_CASE("calculate cec2022 without equal trials", "[cec2022]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 5, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 5, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 2, 100));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 6, 150));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 50));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 6, 150));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 50));
 
     vector.push_back(trialsVector1);
 
@@ -247,13 +247,13 @@ TEST_CASE("calculate cec2022 without equal trials", "[cec2022]") {
 TEST_CASE("calculate cec2022 only equal trials", "[cec2022]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 100));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 100));
 
     vector.push_back(trialsVector1);
 
@@ -266,13 +266,13 @@ TEST_CASE("calculate cec2022 only equal trials", "[cec2022]") {
 TEST_CASE("calculate cec2022 some equal trials in same algorithm", "[cec2022]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 2, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 2, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
 
     vector.push_back(trialsVector1);
 
@@ -285,13 +285,13 @@ TEST_CASE("calculate cec2022 some equal trials in same algorithm", "[cec2022]") 
 TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec2022]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
 
     vector.push_back(trialsVector1);
 
@@ -303,12 +303,12 @@ TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec202
 
 TEST_CASE("TrialsVector is properly sorted reverse", "[utils]") {
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 7, 1));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 7, 1));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
 
     std::sort(trialsVector1.rbegin(), trialsVector1.rend());
     REQUIRE(trialsVector1[0].finalError == 1);
@@ -332,12 +332,12 @@ TEST_CASE("TrialsVector is properly sorted reverse", "[utils]") {
 
 TEST_CASE("TrialsVector is properly sorted", "[utils]") {
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 7, 1));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 7, 1));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
 
     std::sort(trialsVector1.begin(), trialsVector1.end());
 
@@ -365,13 +365,13 @@ TEST_CASE("TrialsVector is properly sorted", "[utils]") {
 TEST_CASE("calculate friedman without equal trials", "[friedman]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 5, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 5, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 2, 100));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 6, 150));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 50));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 6, 150));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 50));
 
     vector.push_back(trialsVector1);
 
@@ -385,13 +385,13 @@ TEST_CASE("calculate friedman without equal trials", "[friedman]") {
 TEST_CASE("calculate friedman with equal only trials", "[friedman]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 100));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 100));
 
     vector.push_back(trialsVector1);
 
@@ -404,13 +404,13 @@ TEST_CASE("calculate friedman with equal only trials", "[friedman]") {
 TEST_CASE("calculate friedman with some equal trials in different algorithm", "[friedman]") {
     FunctionTrialsVector vector;
     TrialsVector trialsVector1;
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 1, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg1", 1, 3, 3, 150));
+    trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
 
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 2, 1, 100));
-    trialsVector1.push_back(FunctionAlgorithmTrial("alg2", 1, 3, 2, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 2, 1, 100));
+    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
 
     vector.push_back(trialsVector1);
 

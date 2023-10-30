@@ -59,11 +59,11 @@ PYBIND11_MODULE(python_extensions, m) {
         calculate_statisticsV2
     )pbdoc");
 
-    py::class_<FunctionAlgorithmTrial>(m, "FunctionAlgorithmTrial")
+    py::class_<Trial>(m, "Trial")
         .def(py::init<const std::string&, const int&, const int&, const double&, const int&>())
         .def("__repr__",
-            [](const FunctionAlgorithmTrial &trial) {
-                return "<extensions.FunctionAlgorithmTrial "
+            [](const Trial &trial) {
+                return "<extensions.Trial "
                 + trial.algorithmName + " " 
                 + std::to_string(trial.functionNumber) + " " 
                 + std::to_string(trial.trialNumber) + " "

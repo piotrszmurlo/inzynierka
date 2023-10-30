@@ -12,8 +12,8 @@
 #define MIN_VALUE 1e-8
 
 
-struct FunctionAlgorithmTrial {
-    FunctionAlgorithmTrial(const std::string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
+struct Trial {
+    Trial(const std::string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
         algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
     std::string algorithmName;
     int functionNumber;
@@ -21,12 +21,12 @@ struct FunctionAlgorithmTrial {
     double finalError;
     int numberOfEvaluations;
 
-    bool operator==(const FunctionAlgorithmTrial &other) const {
+    bool operator==(const Trial &other) const {
         return finalError == other.finalError && numberOfEvaluations == other.numberOfEvaluations;
     }
 
     // std::sort will sort from worst trial to best trial
-    bool operator<(const FunctionAlgorithmTrial &other) const {
+    bool operator<(const Trial &other) const {
         if (finalError != other.finalError) {
             return finalError > other.finalError;
         } else {
@@ -35,7 +35,7 @@ struct FunctionAlgorithmTrial {
     }
 };
 
-using TrialsVector = std::vector<FunctionAlgorithmTrial>;
+using TrialsVector = std::vector<Trial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;
 
 double median(std::vector<double> &input) {
@@ -54,7 +54,7 @@ double median(std::vector<double> &input) {
 
 
 double mean(const TrialsVector& input) {
-    double sum = std::accumulate(input.begin(), input.end(), 0.0, [](double a, FunctionAlgorithmTrial b){
+    double sum = std::accumulate(input.begin(), input.end(), 0.0, [](double a, Trial b){
         return a + b.finalError;
     });
     return sum / input.size();
@@ -62,7 +62,7 @@ double mean(const TrialsVector& input) {
 
 double stddev(const TrialsVector& input, double mean) {
     std::vector<double> differences(input.size());
-    std::transform(input.begin(), input.end(), differences.begin(), [mean](FunctionAlgorithmTrial a) {
+    std::transform(input.begin(), input.end(), differences.begin(), [mean](Trial a) {
         return a.finalError - mean;
     });
     double sumOfSquares = std::inner_product(differences.begin(), differences.end(), differences.begin(), 0.0);
@@ -225,7 +225,7 @@ void calculate_statisticsV2(const BasicRankingInput& input, pybind11::list outpu
                     double median = ((trialsVector[numberOfTrials/2].finalError) + (trialsVector[(numberOfTrials/2) - 1].finalError))/2;
                     obj["median"] = median;
                 }
-                obj["min_fe_term"] = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const FunctionAlgorithmTrial& a, const FunctionAlgorithmTrial& b){
+                obj["min_fe_term"] = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const Trial& a, const Trial& b){
                     return a.numberOfEvaluations < b.numberOfEvaluations;
                 })).numberOfEvaluations;
                 double errorMean = mean(trialsVector);
