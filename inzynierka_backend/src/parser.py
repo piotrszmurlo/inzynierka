@@ -1,11 +1,7 @@
 import base64
 from collections import defaultdict
-from pprint import pprint
 
-from sqlalchemy.orm import Session
-
-from src.models import LocalFile, ParseError, StatisticRankingEntry
-from src.dbaccess import get_files_for_dimension
+from src.models import LocalFile, ParseError
 import python_extensions as extensions
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
@@ -122,18 +118,3 @@ def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_fi
     return results
 
 
-def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[StatisticRankingEntry]:
-    mapped_entries = [
-        StatisticRankingEntry(
-            dimension=entry.dimension,
-            algorithm_name=entry.algorithm_name,
-            function_number=entry.function_number,
-            mean=entry.mean,
-            median=entry.median,
-            stdev=entry.stdev,
-            max=entry.max,
-            min=entry.min,
-            number_of_evaluations=entry.number_of_evaluations
-        ) for entry in entries
-    ]
-    return mapped_entries

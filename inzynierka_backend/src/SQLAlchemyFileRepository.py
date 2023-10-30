@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import create_engine, and_, distinct, select
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, Session
 
 from src import models
@@ -9,6 +9,7 @@ from src.IFileRepository import IFileRepository
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:inzynierka123@localhost:3306/inzynierka"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 class SQLAlchemyFileRepository(IFileRepository):
 
