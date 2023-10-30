@@ -1,6 +1,5 @@
 import base64
 from collections import defaultdict
-from pprint import pprint
 
 from src.models import LocalFile, ParseError
 import python_extensions as extensions

@@ -10,14 +10,20 @@ class Rankings:
 
     def __init__(self, file_service: FileService):
         self._file_service = file_service
+        self._statistics_ranking_data = None
+
+    def invalidate_cache(self):
+        self._statistics_ranking_data = None
 
     def get_statistics_ranking_data(self) -> list[StatisticRankingEntry]:
-        ranking_entries = extensions.calculate_statisticsV2(
-            get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(
-                self._file_service.get_files()
+        if self._statistics_ranking_data is None:
+            ranking_entries = extensions.calculate_statisticsV2(
+                get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(
+                    self._file_service.get_files()
+                )
             )
-        )
-        return map_statistic_ranking_entries_to_pydantic_model(ranking_entries)
+            self._statistics_ranking_data = map_statistic_ranking_entries_to_pydantic_model(ranking_entries)
+        return self._statistics_ranking_data
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int, function_number: int):
         first_errors = get_final_error_and_evaluations_number_array(
@@ -50,3 +56,5 @@ class Rankings:
         except ValueError as e:
             if "zero for all elements" in str(e):
                 return "="
+
+

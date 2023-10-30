@@ -118,6 +118,7 @@ async def post_file(files: list[UploadFile]):
             )
         # for parsed_file_tuple in parsed_file_tuples:
         #     file_service.create_file(parsed_file_tuple[0], parsed_file_tuple[1], parsed_file_tuple[2], parsed_file_tuple[3])
+        rankings.invalidate_cache()
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
