@@ -11,7 +11,7 @@ from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
 from src.models import ParseError
 from src.parser import parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
-    ALL_DIMENSIONS, TRIALS_COUNT
+    ALL_DIMENSIONS, TRIALS_COUNT, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -104,12 +104,25 @@ async def get_statistics_ranking_data():
 @app.post("/file")
 async def post_file(files: list[UploadFile]):
     try:
-        for file in files:
-            algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(
-                file.filename, await file.read()
+        if len(files) != FUNCTIONS_COUNT * len(ALL_DIMENSIONS):
+            raise ParseError(
+                f"Provide exactly {FUNCTIONS_COUNT * len(ALL_DIMENSIONS)} files, one for each function-dimension pair"
             )
-            file_service.create_file(algorithm_name, dimension, function_number, parsed_contents)
+        check_filenames_integrity([parse_remote_filename(file.filename) for file in files])
+        parsed_file_tuples = []
+        for file in files:
+            parsed_file_tuples.append(
+                parse_remote_results_file(
+                    file.filename, await file.read()
+                )
+            )
+        # for parsed_file_tuple in parsed_file_tuples:
+        #     file_service.create_file(parsed_file_tuple[0], parsed_file_tuple[1], parsed_file_tuple[2], parsed_file_tuple[3])
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
         raise HTTPException(422, detail=str(e))
+
+
+
+

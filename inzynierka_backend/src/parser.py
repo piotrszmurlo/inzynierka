@@ -27,7 +27,7 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     :param contents: binary data encoded in base64
     :return: algorithm_name, function number, dimension and corrected contents extracted to a tuple
     """
-    algorithm_name, function_number, dimension = parse_remote_file_name(
+    algorithm_name, function_number, dimension = parse_remote_filename(
         filename
     )
     raw_contents = base64.b64decode(contents).decode('utf-8')
@@ -38,7 +38,7 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     return algorithm_name, function_number, dimension, parsed_contents
 
 
-def parse_remote_file_name(filename: str) -> tuple[str, int, int]:
+def parse_remote_filename(filename: str) -> tuple[str, int, int]:
     """
     Parses file name and extracts necessary values to a tuple
     :param filename: file name in format: [ALGORITHM_NAME]_[FUNCTION_NUMBER]_[DIMENSION].[EXTENSION]
@@ -118,3 +118,21 @@ def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_fi
     return results
 
 
+def check_filenames_integrity(parsed_filenames: list[tuple]):
+    dimensions = []
+    function_numbers = []
+    filenames = []
+
+    for filename, function_number, dimension in parsed_filenames:
+        dimensions.append(dimension)
+        function_numbers.append(function_number)
+        filenames.append(filename)
+
+    if len(set(filenames)) != 1:
+        raise ParseError("Differing algorithm names in files")
+
+    if set(dimensions) != set(ALL_DIMENSIONS):
+        raise ParseError("Incompatible function dimensions")
+
+    if any(function_number > FUNCTIONS_COUNT for function_number in function_numbers):
+        raise ParseError("Incompatible function numbers")

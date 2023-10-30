@@ -4,78 +4,78 @@ import pytest
 
 from main import ROOT_DIR
 
-from src import parse_remote_file_name, ParseError, parse_remote_results_file
+from src import parse_remote_filename, ParseError, parse_remote_results_file
 
 TEST_DATA_DIR = f"{ROOT_DIR}/tests/test_data"
 
 
 def test_parse_simple_file_name():
     file_name = 'IUMOEAII_1_10.txt'
-    assert ('IUMOEAII', 1, 10) == parse_remote_file_name(file_name)
+    assert ('IUMOEAII', 1, 10) == parse_remote_filename(file_name)
 
 
 def test_parse_file_name_with_underscores():
     file_name = 'S_LSHADE_DP_3_20.txt'
-    assert ('S_LSHADE_DP', 3, 20) == parse_remote_file_name(file_name)
+    assert ('S_LSHADE_DP', 3, 20) == parse_remote_filename(file_name)
 
 
 def test_parse_file_name_dat_extension():
     file_name = 'S_LSHADE_DP_3_20.dat'
-    assert ('S_LSHADE_DP', 3, 20) == parse_remote_file_name(file_name)
+    assert ('S_LSHADE_DP', 3, 20) == parse_remote_filename(file_name)
 
 
 def test_parse_file_name_no_extension():
     file_name = 'S_LSHADE_DP_3_20'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_jpg_extension():
     file_name = 'S_LSHADE_DP_3_20.jpg'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_bad_dimensions_and_function_number():
     file_name = 'BAD_NAME_A_B.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_bad_dimensions():
     file_name = 'BAD_DIMENSION_5_B.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_bad_function_numbers():
     file_name = 'BAD_DIMENSION_A_10.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_missing_segments():
     file_name = 'MISSING_FUNCTION_NUMBER_10.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_missing_segments2():
     file_name = 'MISSING_FUNCTION_NUMBER_.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_missing_segments3():
     file_name = 'MISSING_10_.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_file_name_missing_segments4():
     file_name = 'MISSING_10.txt'
     with pytest.raises(ParseError):
-        parse_remote_file_name(file_name)
+        parse_remote_filename(file_name)
 
 
 def test_parse_remote_results_file_correct_input():
