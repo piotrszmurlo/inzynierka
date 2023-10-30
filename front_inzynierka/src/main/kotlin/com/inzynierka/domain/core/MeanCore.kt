@@ -20,7 +20,7 @@ data class BasicScore(
     val functionNumber: Int,
     val mean: Double,
     val median: Double,
-    val stddev: Double,
+    val stdev: Double,
     val max: Double,
     val min: Double,
     val minEvaluations: Int

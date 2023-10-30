@@ -31,7 +31,7 @@ fun Container.statisticTable(
                     cell(it.algorithmName)
                     cell("${it.mean}")
                     cell("${it.median}")
-                    cell("${it.stddev}")
+                    cell("${it.stdev}")
                     cell("${it.min}")
                     cell("${it.max}")
                 }

@@ -4,39 +4,13 @@
 #include <iomanip>
 #include <stdexcept>
 #include <vector>
-#include <pybind11/pybind11.h>
 #include <numeric>
 #include <algorithm>
+#include "structs.cpp"
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define MIN_VALUE 1e-8
 
-
-struct Trial {
-    Trial(const std::string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
-        algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
-    std::string algorithmName;
-    int functionNumber;
-    int trialNumber;
-    double finalError;
-    int numberOfEvaluations;
-
-    bool operator==(const Trial &other) const {
-        return finalError == other.finalError && numberOfEvaluations == other.numberOfEvaluations;
-    }
-
-    // std::sort will sort from worst trial to best trial
-    bool operator<(const Trial &other) const {
-        if (finalError != other.finalError) {
-            return finalError > other.finalError;
-        } else {
-            return numberOfEvaluations > other.numberOfEvaluations;
-        }
-    }
-};
-
-using TrialsVector = std::vector<Trial>;
-using FunctionTrialsVector = std::vector<TrialsVector>;
 
 double median(std::vector<double> &input) {
   if (input.empty()) {
@@ -67,6 +41,25 @@ double stddev(const TrialsVector& input, double mean) {
     });
     double sumOfSquares = std::inner_product(differences.begin(), differences.end(), differences.begin(), 0.0);
     return std::sqrt(sumOfSquares / input.size());
+}
+
+double roundToMinValue(const double& input) {
+    if (input < MIN_VALUE) {
+        return MIN_VALUE; 
+    } else {
+        return input;
+    }
+}
+
+
+//trials must be sorted from best to worst
+double _median(const TrialsVector& sortedTrials) {
+    int numberOfTrials = sortedTrials.size();
+    if (numberOfTrials % 2 != 0) {
+        return sortedTrials[numberOfTrials/2].finalError;
+    } else {
+        return ((sortedTrials[numberOfTrials/2].finalError) + (sortedTrials[(numberOfTrials/2) - 1].finalError))/2;
+    }
 }
 
 std::unordered_map<std::string, double> calculate_cec2022_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
@@ -205,34 +198,41 @@ std::string parse_results(std::string input) {
 }
 
 using BasicRankingInput = std::vector<std::map<int, std::map<std::string, TrialsVector>>>;
-void calculate_statisticsV2(const BasicRankingInput& input, pybind11::list output) {
+
+std::vector<StatisticsRankingEntry> calculate_statisticsV2(const BasicRankingInput& input) {
+    std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
     for (size_t i = 0; i < input.size(); i++) {
         for (auto& dimension : input[i]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
-                pybind11::dict obj = pybind11::dict();
-                obj["min"] = trialsVector.front().finalError;
-                obj["max"] = trialsVector.back().finalError;
-                obj["algorithm_name"] = algorithmName;
-                obj["dimension"] = dimension.first;
-                obj["function_number"] = i + 1;
-                int numberOfTrials = trialsVector.size();
-                if (numberOfTrials % 2 != 0) {
-                    obj["median"] = trialsVector[numberOfTrials/2].finalError;
-                } else {
-                    double median = ((trialsVector[numberOfTrials/2].finalError) + (trialsVector[(numberOfTrials/2) - 1].finalError))/2;
-                    obj["median"] = median;
-                }
-                obj["min_fe_term"] = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const Trial& a, const Trial& b){
+                pybind11::dict resultDict = pybind11::dict();
+                double min = trialsVector.front().finalError;
+                double max = trialsVector.back().finalError;
+                int functionNumber = i + 1;
+                double median = _median(trialsVector);
+                double meanError = roundToMinValue(mean(trialsVector));
+                double stdev = roundToMinValue(stddev(trialsVector, meanError));
+                int numberOfEvaluations = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const Trial& a, const Trial& b) {
                     return a.numberOfEvaluations < b.numberOfEvaluations;
                 })).numberOfEvaluations;
-                double errorMean = mean(trialsVector);
-                obj["mean"] = errorMean;
-                obj["stddev"] = stddev(trialsVector, errorMean);
-                output.append(obj);
+
+                output.push_back(
+                    StatisticsRankingEntry(
+                        dimension.first,
+                        algorithmName,
+                        functionNumber,
+                        meanError,
+                        median,
+                        stdev,
+                        max,
+                        min,    
+                        numberOfEvaluations
+                    )
+            );
             } 
         }
     }
+    return output;
 }

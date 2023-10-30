@@ -14,10 +14,10 @@ data class BasicScoreDTO(
     val functionNumber: Int,
     val mean: Double,
     val median: Double,
-    val stddev: Double,
+    val stdev: Double,
     val max: Double,
     val min: Double,
-    @SerialName("min_fe_term")
+    @SerialName("number_of_evaluations")
     val minEvaluations: Int
 )
 
@@ -28,7 +28,7 @@ fun BasicScoreDTO.toDomain() = BasicScore(
     functionNumber = functionNumber,
     mean = mean,
     median = median,
-    stddev = stddev,
+    stdev = stdev,
     max = max,
     min = min,
     minEvaluations = minEvaluations

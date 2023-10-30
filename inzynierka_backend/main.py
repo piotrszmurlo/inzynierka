@@ -12,7 +12,7 @@ from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_
 from src.models import ParseError
 from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
     ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_array, \
-    get_final_error_and_evaluation_number_for_files_grouped_by_algorithm
+    get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, map_statistic_entries_to_response
 from scipy.stats import wilcoxon
 
 models.Base.metadata.create_all(bind=engine)
@@ -127,11 +127,9 @@ async def get_friedman_ranking(db: Session = Depends(get_db)):
 async def get_basic_ranking(db: Session = Depends(get_db)):
     response = []
     res = extensions.calculate_statisticsV2(
-        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db)),
-        response
+        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db))
     )
-    print(response)
-    return response
+    return map_statistic_entries_to_response(res)
 
 
 @app.post("/file")

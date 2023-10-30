@@ -13,6 +13,7 @@ pymysql = "*"
 pytest-cov = "*"
 python-multipart = "*"
 scipy = "*"
+cryptography = "*"
 
 [dev-packages]
 

@@ -25,7 +25,7 @@ fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores
                 row {
                     cell("${it.rank}")
                     cell(it.algorithmName)
-                    cell("${it.score}".substring(0, 6))
+                    cell("${it.score}".substring(0, 8))
                 }
             }
         }

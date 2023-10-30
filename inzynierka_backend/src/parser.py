@@ -73,8 +73,15 @@ def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.T
     evaluations = rows[FINAL_FES_INDEX].split()
     results = extensions.TrialsVector()
     for i, final_error in enumerate(rows[FINAL_ERROR_INDEX].split()):
-        results.append(extensions.Trial(data_file.algorithm_name, data_file.function_number, i,
-                                                         float(final_error), int(evaluations[i].split(".")[0])))
+        results.append(
+            extensions.Trial(
+                data_file.algorithm_name,
+                data_file.function_number,
+                i,
+                float(final_error),
+                int(evaluations[i].split(".")[0])
+            )
+        )
     return results
 
 
@@ -100,8 +107,7 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
     for _ in range(FUNCTIONS_COUNT):
         results.append(extensions.TrialsVector())
     for data_file in data_files:
-        results[data_file.function_number -
-                1].extend(get_final_error_and_evaluations_number(data_file))
+        results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
     return results
 
 
@@ -110,9 +116,29 @@ def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_fi
     results = extensions.BasicRankingInput()
     listresult = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
     for data_file in data_files:
-        listresult[data_file.function_number - 1][data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
+        listresult[data_file.function_number - 1][data_file.dimension][
+            data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
     results.extend(listresult)
     return results
+
+
+def map_statistic_entries_to_response(input: list[extensions.StatisticsRankingEntry]):
+    res = []
+    for entry in input:
+        res.append(
+            {
+                "dimension": entry.dimension,
+                "algorithm_name": entry.algorithm_name,
+                "function_number": entry.function_number,
+                "mean": entry.mean,
+                "median": entry.median,
+                "stdev": entry.stdev,
+                "max": entry.max,
+                "min": entry.min,
+                "number_of_evaluations": entry.number_of_evaluations
+            }
+        )
+    return res
 
 
 def get_updated_rankings(db: Session):

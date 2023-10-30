@@ -73,6 +73,33 @@ PYBIND11_MODULE(python_extensions, m) {
             }
         );
 
+    py::class_<StatisticsRankingEntry>(m, "StatisticsRankingEntry")
+        .def(py::init<const int&, const std::string&, const int&, const double&, const double&, const double&, const double&, const double&, const int&>())
+        .def_readwrite("dimension", &StatisticsRankingEntry::dimension)
+        .def_readwrite("algorithm_name", &StatisticsRankingEntry::algorithmName)
+        .def_readwrite("function_number", &StatisticsRankingEntry::functionNumber)
+        .def_readwrite("mean", &StatisticsRankingEntry::mean)
+        .def_readwrite("median", &StatisticsRankingEntry::median)
+        .def_readwrite("stdev", &StatisticsRankingEntry::stdev)
+        .def_readwrite("min", &StatisticsRankingEntry::min)
+        .def_readwrite("max", &StatisticsRankingEntry::max)
+        .def_readwrite("number_of_evaluations", &StatisticsRankingEntry::numberOfEvaluations)
+        .def("__repr__",
+            [](const StatisticsRankingEntry &entry) {
+                return "<extensions.StatisticsRankingEntry "
+                + entry.algorithmName + " " 
+                + std::to_string(entry.dimension) + " " 
+                + std::to_string(entry.functionNumber) + " "
+                + std::to_string(entry.mean) + " "
+                + std::to_string(entry.median) + " "
+                + std::to_string(entry.stdev) + " "
+                + std::to_string(entry.min) + " "
+                + std::to_string(entry.max) + " "
+                + std::to_string(entry.numberOfEvaluations) + " "
+                + ">";
+            }
+        );
+
     py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
     py::bind_vector<TrialsVector>(m, "TrialsVector");
     py::bind_vector<BasicRankingInput>(m, "BasicRankingInput");
