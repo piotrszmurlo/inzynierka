@@ -1,5 +1,6 @@
 import base64
 from collections import defaultdict
+from pprint import pprint
 
 from src.models import LocalFile, ParseError
 import python_extensions as extensions
@@ -109,13 +110,11 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
 
 # results[function_number - 1][algorithm_name]
 def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]):
-    results = extensions.BasicRankingInput()
-    listresult = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
+    results = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
     for data_file in data_files:
-        listresult[data_file.function_number - 1][data_file.dimension][
-            data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
-    results.extend(listresult)
-    return results
+        results[data_file.function_number - 1][
+            data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
+    return extensions.BasicRankingInput(results)
 
 
 def check_filenames_integrity(parsed_filenames: list[tuple]):

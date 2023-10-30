@@ -1,7 +1,8 @@
 import python_extensions as extensions
 from scipy.stats import wilcoxon
 
-from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, StatisticRankingEntry, get_final_error_and_evaluations_number_array
+from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, \
+    StatisticRankingEntry, get_final_error_and_evaluations_number_array
 from src.mappers import map_statistic_ranking_entries_to_pydantic_model
 
 

@@ -197,7 +197,7 @@ std::string parse_results(std::string input) {
     return result.str();
 }
 
-using BasicRankingInput = std::vector<std::map<int, std::map<std::string, TrialsVector>>>;
+using BasicRankingInput = std::vector<std::unordered_map<int, std::unordered_map<std::string, TrialsVector>>>;
 
 std::vector<StatisticsRankingEntry> calculate_statisticsV2(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
@@ -207,7 +207,6 @@ std::vector<StatisticsRankingEntry> calculate_statisticsV2(const BasicRankingInp
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
-                pybind11::dict resultDict = pybind11::dict();
                 double min = trialsVector.front().finalError;
                 double max = trialsVector.back().finalError;
                 int functionNumber = i + 1;
