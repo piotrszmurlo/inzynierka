@@ -2,31 +2,25 @@ import os
 from typing import Annotated
 
 import python_extensions as extensions
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, Form
+from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 from src import models
-from src.dbaccess import engine, SessionLocal, get_files_for_dimension, get_all_algorithm_names, create_file, get_file, \
-    get_all_dimensions, get_all_functions, get_all_files
+from src.FileService import FileService
+from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
 from src.models import ParseError
-from src.parser import get_updated_rankings, parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
+from src.parser import parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
     ALL_DIMENSIONS, TRIALS_COUNT, get_final_error_and_evaluations_number_array, \
-    get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, map_statistic_entries_to_response
+    get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, \
+    map_statistic_ranking_entries_to_pydantic_model
 from scipy.stats import wilcoxon
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
+repository = SQLAlchemyFileRepository(SessionLocal())
+service = FileService(repository)
 
 origins = [
     "localhost:3000",
@@ -42,40 +36,29 @@ app.add_middleware(
 )
 
 
-@app.get("/rankings")
-async def get_rankings(db: Session = Depends(get_db)):
-    medians, averages, cec2022, friedman = get_updated_rankings(db)
-    return {
-        "average": averages,
-        "medians": medians,
-        "cec2022": cec2022,
-        "friedman": friedman
-    }
-
-
 @app.get("/algorithms")
-async def get_available_algorithms(db: Session = Depends(get_db)):
-    return get_all_algorithm_names(db)
+async def get_available_algorithms():
+    return service.get_algorithm_names()
 
 
 @app.get("/dimensions")
-async def get_available_dimensions(db: Session = Depends(get_db)):
-    return get_all_dimensions(db)
+async def get_available_dimensions():
+    return service.get_dimensions()
 
 
 @app.get("/functions")
-async def get_available_functions(db: Session = Depends(get_db)):
-    return get_all_functions(db)
+async def get_available_functions():
+    return service.get_function_numbers()
 
 
 @app.post("/rankings/wilcoxon")
 async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algorithm: Annotated[str, Form()],
-                            dimension: Annotated[int, Form()], function_number: Annotated[int, Form()],
-                            db: Session = Depends(get_db)):
-    file = get_file(db, algorithm_name=first_algorithm, dimension=dimension, function_number=function_number)
-    file2 = get_file(db, algorithm_name=second_algorithm, dimension=dimension, function_number=function_number)
-    err1 = get_final_error_and_evaluations_number_array(file)
-    err2 = get_final_error_and_evaluations_number_array(file2)
+                            dimension: Annotated[int, Form()], function_number: Annotated[int, Form()]):
+    first_file = service.get_file(algorithm_name=first_algorithm, dimension=dimension, function_number=function_number)
+    second_file = service.get_file(algorithm_name=second_algorithm, dimension=dimension,
+                                   function_number=function_number)
+    err1 = get_final_error_and_evaluations_number_array(first_file)
+    err2 = get_final_error_and_evaluations_number_array(second_file)
     diff = []
     for index in range(len(err1)):
         diff.append(err1[index] - err2[index])
@@ -96,11 +79,11 @@ async def get_wilcoxon_test(first_algorithm: Annotated[str, Form()], second_algo
 
 
 @app.get("/rankings/cec2022")
-async def get_cec2022_ranking(db: Session = Depends(get_db)):
+async def get_cec2022_ranking():
     response = {"dimension": {}}
     for dimension in ALL_DIMENSIONS:
         errors = get_final_error_and_evaluation_number_for_files(
-            get_files_for_dimension(db, dimension)
+            service.get_files_for_dimension(dimension)
         )
         scores = extensions.calculate_cec2022_scores(
             TRIALS_COUNT, errors
@@ -110,11 +93,11 @@ async def get_cec2022_ranking(db: Session = Depends(get_db)):
 
 
 @app.get("/rankings/friedman")
-async def get_friedman_ranking(db: Session = Depends(get_db)):
+async def get_friedman_ranking():
     response = {"dimension": {}}
     for dimension in ALL_DIMENSIONS:
         results = get_final_error_and_evaluation_number_for_files(
-            get_files_for_dimension(db, dimension)
+            service.get_files_for_dimension(dimension)
         )
         scores = extensions.calculate_friedman_scores(
             TRIALS_COUNT, results
@@ -124,23 +107,23 @@ async def get_friedman_ranking(db: Session = Depends(get_db)):
 
 
 @app.get("/rankings/basic")
-async def get_basic_ranking(db: Session = Depends(get_db)):
-    response = []
-    res = extensions.calculate_statisticsV2(
-        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(get_all_files(db))
+async def get_statistics_ranking_data():
+    ranking_entries = extensions.calculate_statisticsV2(
+        get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(
+            service.get_files()
+        )
     )
-    return map_statistic_entries_to_response(res)
+    return map_statistic_ranking_entries_to_pydantic_model(ranking_entries)
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile], db: Session = Depends(get_db)):
+async def post_file(files: list[UploadFile]):
     try:
         for file in files:
             algorithm_name, function_number, dimension, parsed_contents = parse_remote_results_file(file.filename,
                                                                                                     await file.read())
-            create_file(db, algorithm_name, dimension, function_number, parsed_contents)
+            service.create_file(algorithm_name, dimension, function_number, parsed_contents)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
         raise HTTPException(422, detail=str(e))
-    return {"data": [1, 2, 3]}

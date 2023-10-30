@@ -4,7 +4,7 @@ from pprint import pprint
 
 from sqlalchemy.orm import Session
 
-from src.models import LocalFile, ParseError
+from src.models import LocalFile, ParseError, StatisticRankingEntry
 from src.dbaccess import get_files_for_dimension
 import python_extensions as extensions
 
@@ -122,40 +122,18 @@ def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_fi
     return results
 
 
-def map_statistic_entries_to_response(input: list[extensions.StatisticsRankingEntry]):
-    res = []
-    for entry in input:
-        res.append(
-            {
-                "dimension": entry.dimension,
-                "algorithm_name": entry.algorithm_name,
-                "function_number": entry.function_number,
-                "mean": entry.mean,
-                "median": entry.median,
-                "stdev": entry.stdev,
-                "max": entry.max,
-                "min": entry.min,
-                "number_of_evaluations": entry.number_of_evaluations
-            }
-        )
-    return res
-
-
-def get_updated_rankings(db: Session):
-    averages, medians, cec2022, friedman = \
-        ({dimension: {} for dimension in ALL_DIMENSIONS}
-         for _ in range(NUMBER_OF_STATISTICS))
-    for dimension in ALL_DIMENSIONS:
-        results = get_final_error_and_evaluation_number_for_files(
-            get_files_for_dimension(db, DIMENSION_10)
-        )
-        cec2022[dimension] = extensions.calculate_cec2022_scores(
-            TRIALS_COUNT, results)
-        averages[dimension] = extensions.calculate_average(
-            TRIALS_COUNT, results)
-        medians[dimension] = extensions.calculate_median(results)
-        friedman[dimension] = extensions.calculate_friedman_scores(
-            TRIALS_COUNT, results)
-        pprint(extensions.calculate_example(results))
-
-    return medians, averages, cec2022, friedman
+def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[StatisticRankingEntry]:
+    mapped_entries = [
+        StatisticRankingEntry(
+            dimension=entry.dimension,
+            algorithm_name=entry.algorithm_name,
+            function_number=entry.function_number,
+            mean=entry.mean,
+            median=entry.median,
+            stdev=entry.stdev,
+            max=entry.max,
+            min=entry.min,
+            number_of_evaluations=entry.number_of_evaluations
+        ) for entry in entries
+    ]
+    return mapped_entries

@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlalchemy import Column, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.dialects.mysql import VARCHAR
@@ -20,3 +21,15 @@ class LocalFile(Base):
 
     def __repr__(self):
         return f'LocalFile({self.id}, {self.algorithm_name}, {self.function_number}, {self.dimension})'
+
+
+class StatisticRankingEntry(BaseModel):
+    dimension: int
+    algorithm_name: str
+    function_number: int
+    mean: float
+    median: float
+    stdev: float
+    max: float
+    min: float
+    number_of_evaluations: int
