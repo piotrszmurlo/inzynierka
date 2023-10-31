@@ -33,3 +33,9 @@ class StatisticRankingEntry(BaseModel):
     max: float
     min: float
     number_of_evaluations: int
+
+
+class ScoreRankingEntry(BaseModel):
+    dimension: int
+    algorithm_name: str
+    score: float

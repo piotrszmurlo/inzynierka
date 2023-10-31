@@ -2,6 +2,7 @@ package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
+import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
 import io.kvision.redux.Dispatch
 import kotlinx.coroutines.CoroutineScope
@@ -11,19 +12,6 @@ import kotlinx.coroutines.launch
 data class StatisticsRankingState(
     val isFetching: Boolean = false,
     val scores: Map<Int, Map<Int, List<StatisticsRankingEntry>>>? = null
-)
-
-data class StatisticsRankingEntry(
-    val rank: Int?,
-    val dimension: Int,
-    val algorithmName: String,
-    val functionNumber: Int,
-    val mean: Double,
-    val median: Double,
-    val stdev: Double,
-    val max: Double,
-    val min: Double,
-    val minEvaluations: Int
 )
 
 sealed class MeanRankingAction : RankingsAction() {
@@ -36,7 +24,7 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
     is MeanRankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
     is MeanRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is MeanRankingAction.FetchRankingsSuccess -> {
-        val sorted = action.scores.createRankings(compareBy({ score -> score.mean }, { score -> score.minEvaluations }))
+        val sorted = action.scores.createRankings(compareBy({ it.mean }, { it.minEvaluations }))
         state.copy(isFetching = false, scores = sorted)
     }
 }

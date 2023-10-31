@@ -1,6 +1,6 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.core.Score
+import com.inzynierka.domain.models.ScoreRankingEntry
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
@@ -13,7 +13,7 @@ import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
 
-fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores: List<Score>) {
+fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores: List<ScoreRankingEntry>) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
         p(content = title, align = Align.CENTER)

@@ -62,8 +62,9 @@ double _median(const TrialsVector& sortedTrials) {
     }
 }
 
-std::unordered_map<std::string, double> calculate_cec2022_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
+    std::vector<ScoreRankingEntry> output;
     std::unordered_map<std::string, double> scores;
     for (auto& trial : input) {
         std::sort(trial.begin(), trial.end());
@@ -90,13 +91,21 @@ std::unordered_map<std::string, double> calculate_cec2022_scores(const int& numb
     // apply correction term n(n-1)/2 * number of functions
     int correctionTerm = numberOfTrials * (numberOfTrials - 1) / 2 * totalNumberOfFunctions;
     for (auto& it: scores) {
-        it.second -= correctionTerm;
+        // it.second -= correctionTerm;
+        output.push_back(
+            ScoreRankingEntry(
+                dimension,
+                it.first,
+                it.second - correctionTerm
+            )
+        );
     }
-    return scores;
+    return output;
 }
 
-std::unordered_map<std::string, double> calculate_friedman_scores(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
+    std::vector<ScoreRankingEntry> output;
     std::unordered_map<std::string, double> scores;
         for (auto& trial : input) {
         std::sort(trial.rbegin(), trial.rend());
@@ -122,9 +131,15 @@ std::unordered_map<std::string, double> calculate_friedman_scores(const int& num
 
     int totalTrials = totalNumberOfFunctions * numberOfTrials;
     for (auto& it: scores) {
-        it.second /= totalTrials;
+        output.push_back(
+            ScoreRankingEntry(
+                dimension,
+                it.first,
+                it.second / totalTrials
+            )
+        );
     }
-    return scores;
+    return output;
 }
 
 std::unordered_map<std::string, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {

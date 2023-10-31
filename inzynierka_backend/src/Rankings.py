@@ -2,8 +2,9 @@ import python_extensions as extensions
 from scipy.stats import wilcoxon
 
 from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, \
-    StatisticRankingEntry, get_final_error_and_evaluations_number_array
-from src.mappers import map_statistic_ranking_entries_to_pydantic_model
+    StatisticRankingEntry, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
+    get_final_error_and_evaluation_number_for_files, TRIALS_COUNT
+from src.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model
 
 
 class Rankings:
@@ -11,9 +12,13 @@ class Rankings:
     def __init__(self, file_service: FileService):
         self._file_service = file_service
         self._statistics_ranking_data = None
+        self._cec2022_ranking_scores = None
+        self._friedman_ranking_scores = None
 
     def invalidate_cache(self):
         self._statistics_ranking_data = None
+        self._cec2022_ranking_scores = None
+        self._friedman_ranking_scores = None
 
     def get_statistics_ranking_data(self) -> list[StatisticRankingEntry]:
         if self._statistics_ranking_data is None:
@@ -23,8 +28,35 @@ class Rankings:
                 )
             )
             self._statistics_ranking_data = map_statistic_ranking_entries_to_pydantic_model(
-                ranking_entries)
+                ranking_entries
+            )
         return self._statistics_ranking_data
+
+    def get_cec2022_ranking_scores(self):
+        if self._cec2022_ranking_scores is None:
+            self._cec2022_ranking_scores = []
+            for dimension in ALL_DIMENSIONS:
+                errors = get_final_error_and_evaluation_number_for_files(
+                    self._file_service.get_files_for_dimension(dimension)
+                )
+                score_entries = extensions.calculate_cec2022_scores(
+                    TRIALS_COUNT, dimension, errors
+                )
+                self._cec2022_ranking_scores.extend(map_score_ranking_entries_to_pydantic_model(score_entries))
+        return self._cec2022_ranking_scores
+
+    def get_friedman_ranking_scores(self):
+        if self._friedman_ranking_scores is None:
+            self._friedman_ranking_scores = []
+            for dimension in ALL_DIMENSIONS:
+                errors = get_final_error_and_evaluation_number_for_files(
+                    self._file_service.get_files_for_dimension(dimension)
+                )
+                score_entries = extensions.calculate_friedman_scores(
+                    TRIALS_COUNT, dimension, errors
+                )
+                self._friedman_ranking_scores.extend(map_score_ranking_entries_to_pydantic_model(score_entries))
+        return self._friedman_ranking_scores
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int, function_number: int):
         first_errors = get_final_error_and_evaluations_number_array(

@@ -100,6 +100,12 @@ PYBIND11_MODULE(python_extensions, m) {
             }
         );
 
+    py::class_<ScoreRankingEntry>(m, "ScoreRankingEntry")
+        .def(py::init<const int&, const std::string&, const double&>())
+        .def_readwrite("dimension", &ScoreRankingEntry::dimension)
+        .def_readwrite("algorithm_name", &ScoreRankingEntry::algorithmName)
+        .def_readwrite("score", &ScoreRankingEntry::score);
+
     py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
     py::bind_vector<TrialsVector>(m, "TrialsVector");
     py::bind_vector<BasicRankingInput>(m, "BasicRankingInput");

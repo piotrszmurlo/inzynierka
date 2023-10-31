@@ -1,23 +1,23 @@
 package com.inzynierka.domain.service
 
 import com.inzynierka.common.Result
-import com.inzynierka.domain.core.StatisticsRankingEntry
+import com.inzynierka.domain.models.ScoreRankingEntry
+import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.model.BenchmarkData
-import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
 
 interface IDataService {
 
     suspend fun getAvailableBenchmarkData(): Result<BenchmarkData>
     suspend fun getAvailableDimensions(): Result<List<Int>>
-    suspend fun getCec2022Scores(): Result<RankingScores>
-    suspend fun getFriedmanScores(): Result<RankingScores>
+    suspend fun getCec2022Scores(): Result<List<ScoreRankingEntry>>
+    suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>>
     suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
 
 
     /**
      * uploads [kFiles] to the server
-     * @return [Result] containing mock data, or DomainError if an error occurred
+     * @return [Result] Unit or DomainError if an error occurred
      **/
     suspend fun postFiles(kFiles: List<KFile>): Result<Unit>
 

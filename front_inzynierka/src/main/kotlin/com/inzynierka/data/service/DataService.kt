@@ -1,12 +1,13 @@
-package com.inzynierka.data
+package com.inzynierka.data.service
 
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
-import com.inzynierka.domain.core.StatisticsRankingEntry
+import com.inzynierka.data.repository.IDataRepository
+import com.inzynierka.domain.models.ScoreRankingEntry
+import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
-import com.inzynierka.model.RankingScores
 import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
@@ -33,18 +34,18 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getCec2022Scores(): Result<RankingScores> {
+    override suspend fun getCec2022Scores(): Result<List<ScoreRankingEntry>> {
         return try {
-            val result = dataRepository.getCec2022Scores()
+            val result = dataRepository.getCec2022Scores().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
 
-    override suspend fun getFriedmanScores(): Result<RankingScores> {
+    override suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>> {
         return try {
-            val result = dataRepository.getFriedmanScores()
+            val result = dataRepository.getFriedmanScores().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

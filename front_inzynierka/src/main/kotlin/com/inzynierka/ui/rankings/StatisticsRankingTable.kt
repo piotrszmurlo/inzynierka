@@ -1,6 +1,6 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.core.StatisticsRankingEntry
+import com.inzynierka.domain.models.StatisticsRankingEntry
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent

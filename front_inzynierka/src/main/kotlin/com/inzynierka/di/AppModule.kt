@@ -1,8 +1,8 @@
 package com.inzynierka.di
 
-import com.inzynierka.data.DataRepository
-import com.inzynierka.data.DataService
-import com.inzynierka.data.IDataRepository
+import com.inzynierka.data.repository.DataRepository
+import com.inzynierka.data.repository.IDataRepository
+import com.inzynierka.data.service.DataService
 import com.inzynierka.domain.service.IDataService
 import io.ktor.client.*
 import io.ktor.client.engine.js.*

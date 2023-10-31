@@ -37,7 +37,7 @@ struct StatisticsRankingEntry {
         const double& min,
         const double& max,
         const int& numberOfEvaluations
-        ):
+    ):
         dimension(dimension),
         algorithmName(algorithmName),
         functionNumber(functionNumber),
@@ -57,6 +57,21 @@ struct StatisticsRankingEntry {
     double max;
     double min;
     int numberOfEvaluations;
+};
+
+struct ScoreRankingEntry {
+    ScoreRankingEntry(
+        const int& dimension,
+        const std::string& algorithmName,
+        const double& score
+    ):
+        dimension(dimension),
+        algorithmName(algorithmName),
+        score(score) {}
+
+    int dimension;
+    std::string algorithmName;
+    double score;
 };
 
 using TrialsVector = std::vector<Trial>;

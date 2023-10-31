@@ -1,12 +1,12 @@
 package com.inzynierka.data.models
 
-import com.inzynierka.domain.core.StatisticsRankingEntry
+import com.inzynierka.domain.models.StatisticsRankingEntry
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class StatisticsEntriesDTO(
+data class StatisticsEntryDTO(
     val dimension: Int,
     @SerialName("algorithm_name")
     val algorithmName: String,
@@ -21,7 +21,7 @@ data class StatisticsEntriesDTO(
     val minEvaluations: Int
 )
 
-fun StatisticsEntriesDTO.toDomain() = StatisticsRankingEntry(
+fun StatisticsEntryDTO.toDomain() = StatisticsRankingEntry(
     rank = null,
     dimension = dimension,
     algorithmName = algorithmName,

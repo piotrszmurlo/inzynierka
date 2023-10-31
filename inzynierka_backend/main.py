@@ -70,30 +70,12 @@ async def get_wilcoxon_test(
 
 @app.get("/rankings/cec2022")
 async def get_cec2022_ranking():
-    response = {"dimension": {}}
-    for dimension in ALL_DIMENSIONS:
-        errors = get_final_error_and_evaluation_number_for_files(
-            file_service.get_files_for_dimension(dimension)
-        )
-        scores = extensions.calculate_cec2022_scores(
-            TRIALS_COUNT, errors
-        )
-        response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
-    return response
+    return rankings.get_cec2022_ranking_scores()
 
 
 @app.get("/rankings/friedman")
 async def get_friedman_ranking():
-    response = {"dimension": {}}
-    for dimension in ALL_DIMENSIONS:
-        results = get_final_error_and_evaluation_number_for_files(
-            file_service.get_files_for_dimension(dimension)
-        )
-        scores = extensions.calculate_friedman_scores(
-            TRIALS_COUNT, results
-        )
-        response["dimension"][dimension] = [{"algorithmName": name, "score": score} for name, score in scores.items()]
-    return response
+    return rankings.get_friedman_ranking_scores()
 
 
 @app.get("/rankings/statistics")

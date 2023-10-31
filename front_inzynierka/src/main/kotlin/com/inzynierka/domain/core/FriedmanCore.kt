@@ -2,8 +2,8 @@ package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
+import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.model.RankingScores
 import io.kvision.redux.Dispatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,36 +12,13 @@ import kotlinx.coroutines.launch
 
 sealed class FriedmanRankingAction : RankingsAction() {
     object FetchRankingsStarted : FriedmanRankingAction()
-    data class FetchRankingsSuccess(val scores: RankingScores) : FriedmanRankingAction()
+    data class FetchRankingsSuccess(val scores: List<ScoreRankingEntry>) : FriedmanRankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : FriedmanRankingAction()
 }
 
 fun friedmanReducer(state: ScoreRankingState, action: FriedmanRankingAction) = when (action) {
     is FriedmanRankingAction.FetchRankingsSuccess -> {
-        val scores = action.scores.dimension.entries.associate { entry ->
-            entry.key to entry.value
-                .sortedBy { it.score }
-                .mapIndexed { index, scoreEntry ->
-                    Score(rank = index + 1, algorithmName = scoreEntry.algorithmName, score = scoreEntry.score)
-                }
-        }
-        val combinedScores = scores.values.toMutableList()
-            .reduce { acc, next -> acc + next }
-            .groupingBy { score -> score.algorithmName }
-            .reduce { _, acc, next ->
-                acc.copy(score = (acc.score + next.score) / 2)
-            }
-            .values
-            .sortedBy { score -> score.score }
-            .mapIndexed { index, score ->
-                score.copy(rank = index + 1)
-            }
-
-        state.copy(
-            scores = scores,
-            combinedScores = combinedScores,
-            isFetching = false
-        )
+        action.scores.createRankings(compareBy { it.score })
     }
 
     is FriedmanRankingAction.FetchRankingsFailed -> state.copy(isFetching = false)

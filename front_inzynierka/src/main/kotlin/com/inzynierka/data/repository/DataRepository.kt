@@ -1,7 +1,8 @@
-package com.inzynierka.data
+package com.inzynierka.data.repository
 
-import com.inzynierka.data.models.StatisticsEntriesDTO
-import com.inzynierka.model.RankingScores
+import com.inzynierka.data.actualFileContentOnly
+import com.inzynierka.data.models.ScoreEntryDTO
+import com.inzynierka.data.models.StatisticsEntryDTO
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -12,15 +13,15 @@ import io.kvision.types.KFile
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
-    override suspend fun getCec2022Scores(): RankingScores {
+    override suspend fun getCec2022Scores(): List<ScoreEntryDTO> {
         return client.get(urlString = "rankings/cec2022").body()
     }
 
-    override suspend fun getFriedmanScores(): RankingScores {
+    override suspend fun getFriedmanScores(): List<ScoreEntryDTO> {
         return client.get(urlString = "rankings/friedman").body()
     }
 
-    override suspend fun getStatisticsEntries(): List<StatisticsEntriesDTO> {
+    override suspend fun getStatisticsEntries(): List<StatisticsEntryDTO> {
         return client.get(urlString = "rankings/statistics").body()
     }
 
