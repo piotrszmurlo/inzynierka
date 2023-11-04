@@ -74,5 +74,30 @@ struct ScoreRankingEntry {
     double score;
 };
 
+struct RevisitedRankingEntry {
+    RevisitedRankingEntry(
+        const int& dimension,
+        const std::string& algorithmName,
+        const int& functionNumber,
+        const double& successfulTrialsPercentage,
+        const double& thresholdsAchievedPercentage,
+        const double& budgetLeftPercentage
+    ):
+        dimension(dimension),
+        algorithmName(algorithmName),
+        functionNumber(functionNumber),
+        successfulTrialsPercentage(successfulTrialsPercentage),
+        thresholdsAchievedPercentage(thresholdsAchievedPercentage),
+        budgetLeftPercentage(budgetLeftPercentage) {}
+
+    int dimension;
+    std::string algorithmName;
+    int functionNumber;
+    double successfulTrialsPercentage;
+    double thresholdsAchievedPercentage;
+    double budgetLeftPercentage;
+
+};
+
 using TrialsVector = std::vector<Trial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;

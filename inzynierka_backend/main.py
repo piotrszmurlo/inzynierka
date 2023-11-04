@@ -58,7 +58,7 @@ async def get_wilcoxon_test(
         function_number: Annotated[int, Form()]
 ):
     try:
-        rankings.get_wilcoxon_test(
+        return rankings.get_wilcoxon_test(
             first_algorithm=first_algorithm,
             second_algorithm=second_algorithm,
             dimension=dimension,

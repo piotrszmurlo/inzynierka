@@ -56,6 +56,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 }
 
                 is Tab.ResultsTab.ECDF -> ecdf(store, dataService)
+
                 null -> {}
             }
         }
@@ -105,6 +106,10 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
                 store.dispatch { dispatch, _ ->
                     getAvailableBenchmarkData(dispatch, dataService)
                 }
+            }
+        button(text = "ECDF", style = ButtonStyle.OUTLINEPRIMARY)
+            .onClick {
+                store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.ECDF))
             }
     }
 }

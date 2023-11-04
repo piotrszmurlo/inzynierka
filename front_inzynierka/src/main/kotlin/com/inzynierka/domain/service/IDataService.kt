@@ -15,7 +15,7 @@ interface IDataService {
     suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
 
 
-    /**
+    /*
      * uploads [kFiles] to the server
      * @return [Result] Unit or DomainError if an error occurred
      **/

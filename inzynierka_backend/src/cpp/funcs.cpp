@@ -91,7 +91,6 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
     // apply correction term n(n-1)/2 * number of functions
     int correctionTerm = numberOfTrials * (numberOfTrials - 1) / 2 * totalNumberOfFunctions;
     for (auto& it: scores) {
-        // it.second -= correctionTerm;
         output.push_back(
             ScoreRankingEntry(
                 dimension,
@@ -216,15 +215,15 @@ using BasicRankingInput = std::vector<std::unordered_map<int, std::unordered_map
 
 std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
-    for (size_t i = 0; i < input.size(); i++) {
-        for (auto& dimension : input[i]) {
+    for (size_t function = 0; function < input.size(); function++) {
+        for (auto& dimension : input[function]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
                 std::sort(trialsVector.rbegin(), trialsVector.rend()); //sort from best to worst
                 double min = trialsVector.front().finalError;
                 double max = trialsVector.back().finalError;
-                int functionNumber = i + 1;
+                int functionNumber = function + 1;
                 double median = _median(trialsVector);
                 double meanError = roundToMinValue(mean(trialsVector));
                 double stdev = roundToMinValue(stddev(trialsVector, meanError));
@@ -240,8 +239,8 @@ std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRank
                         meanError,
                         median,
                         stdev,
-                        max,
-                        min,    
+                        min,
+                        max,    
                         numberOfEvaluations
                     )
             );
@@ -249,4 +248,8 @@ std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRank
         }
     }
     return output;
+}
+
+std::vector<StatisticsRankingEntry> calculate_revisited_ranking(const BasicRankingInput& input) {
+
 }
