@@ -14,17 +14,29 @@ fun Container.statisticsRanking(
 ) {
     withLoadingSpinner(state.isFetching) {
         flexPanel(FlexDirection.ROW, justify = JustifyContent.CENTER, alignItems = AlignItems.CENTER) {
-            state.scores?.forEach { dimension ->
+            val sortedDimensions = state.scores?.keys?.sorted()
+            sortedDimensions?.forEach { dim ->
                 flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
-                    dimension.value.forEach { functionNumber ->
+                    state.scores[dim]?.forEach { functionNumber ->
                         statisticTable(
                             headerNames = headerNames,
-                            title = "Dimension = ${dimension.key}, Function = ${functionNumber.key}",
+                            title = "Dimension = ${dim}, Function = ${functionNumber.key}",
                             scores = functionNumber.value
                         )
                     }
                 }
             }
+//            state.scores?.forEach { dimension ->
+//                flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
+//                    dimension.value.forEach { functionNumber ->
+//                        statisticTable(
+//                            headerNames = headerNames,
+//                            title = "Dimension = ${dimension.key}, Function = ${functionNumber.key}",
+//                            scores = functionNumber.value
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 }

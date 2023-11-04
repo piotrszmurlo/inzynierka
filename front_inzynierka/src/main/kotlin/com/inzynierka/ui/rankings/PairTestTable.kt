@@ -5,7 +5,7 @@ import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
 import io.kvision.html.Align
-import io.kvision.html.p
+import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.table.TableType
 import io.kvision.table.cell
@@ -20,7 +20,8 @@ fun Container.pairTestTable(
 ) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
-        p(content = title, align = Align.CENTER)
+        h5(content = title, align = Align.CENTER)
+//        h5(content = title, align = Align.CENTER)
         table(
             headerNames = headerNames,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
@@ -42,7 +43,7 @@ fun Container.pairTestSumTable(
 ) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
-        p(content = title, align = Align.CENTER)
+        h5(content = title, align = Align.CENTER)
         table(
             headerNames = headerNames,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),

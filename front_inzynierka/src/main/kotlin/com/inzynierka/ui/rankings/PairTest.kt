@@ -8,7 +8,7 @@ import io.kvision.form.formPanel
 import io.kvision.form.select.select
 import io.kvision.html.Align
 import io.kvision.html.button
-import io.kvision.html.p
+import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.utils.px
@@ -32,14 +32,14 @@ fun Container.pairTest(
         justify = JustifyContent.CENTER,
         alignItems = AlignItems.CENTER
     ) {
-        p(content = "Compare algorithm using Wilcoxon signed-rank test", align = Align.CENTER)
+        h5(content = "Compare algorithm using Wilcoxon signed-rank test", align = Align.CENTER)
         val formPanel = formPanel<PairTestForm> {
             flexPanel(
                 direction = FlexDirection.COLUMN,
                 justify = JustifyContent.CENTER,
             ) {
                 alignItems = AlignItems.CENTER
-                p(content = "Select algorithms", align = Align.CENTER)
+                h5(content = "Select algorithms", align = Align.CENTER)
                 flexPanel(direction = FlexDirection.ROW) {
                     justifyContent = JustifyContent.CENTER
                     select(
@@ -67,7 +67,7 @@ fun Container.pairTest(
                             )
                         }
                 }
-                p(content = "Select dimension", align = Align.CENTER)
+                h5(content = "Select dimension", align = Align.CENTER)
                 radioGroup(
                     options = pairTestState.dimensions.map { "$it" to "$it" },
                     inline = true,

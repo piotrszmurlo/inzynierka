@@ -1,7 +1,5 @@
 package com.inzynierka.domain.core
 
-typealias Scores = Map<Int, List<Score>>
-
 data class RankingsState(
     val cec2022: ScoreRankingState = ScoreRankingState(),
     val pairTest: PairTestState = PairTestState(),
