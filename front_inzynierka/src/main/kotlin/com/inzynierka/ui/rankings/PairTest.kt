@@ -92,12 +92,22 @@ fun Container.pairTest(
                 }
             }
         }
-        pairTestState.results?.let {
-            pairTestTable(
-                headerNames = listOf("Function number", "Result"),
-                title = "Results table",
-                results = it
-            )
+        flexPanel(direction = FlexDirection.ROW, alignItems = AlignItems.START) {
+            paddingTop = 48.px
+            pairTestState.results?.let {
+                pairTestTable(
+                    headerNames = listOf("Function number", "Result"),
+                    title = "Results table",
+                    results = it
+                )
+            }
+            pairTestState.resultsSum?.let {
+                pairTestSumTable(
+                    headerNames = listOf("Algorithm", "Sum of wins"),
+                    title = "Summed results",
+                    resultsSum = it
+                )
+            }
         }
     }
 }
