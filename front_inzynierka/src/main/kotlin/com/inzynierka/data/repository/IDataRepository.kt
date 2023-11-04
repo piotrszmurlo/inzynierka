@@ -1,5 +1,6 @@
 package com.inzynierka.data.repository
 
+import com.inzynierka.data.models.PairTestEntryDTO
 import com.inzynierka.data.models.ScoreEntryDTO
 import com.inzynierka.data.models.StatisticsEntryDTO
 import io.kvision.types.KFile
@@ -15,7 +16,6 @@ interface IDataRepository {
     suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,
-        dimension: Int,
-        functionNumber: Int
-    ): String
+        dimension: Int
+    ): List<PairTestEntryDTO>
 }

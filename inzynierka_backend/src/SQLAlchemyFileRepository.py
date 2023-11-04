@@ -28,6 +28,10 @@ class SQLAlchemyFileRepository(IFileRepository):
         query = select(models.LocalFile).filter_by(dimension=dimension)
         return self._db.scalars(query).all()
 
+    def get_files_for_dimension_and_algorithm_name(self, dimension: int, algorithm_name: str):
+        query = select(models.LocalFile).filter_by(dimension=dimension, algorithm_name=algorithm_name)
+        return self._db.scalars(query).all()
+
     def get_files(self):
         query = select(models.LocalFile)
         return self._db.scalars(query).all()

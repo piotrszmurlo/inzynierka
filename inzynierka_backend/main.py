@@ -54,15 +54,13 @@ async def get_available_functions():
 async def get_wilcoxon_test(
         first_algorithm: Annotated[str, Form()],
         second_algorithm: Annotated[str, Form()],
-        dimension: Annotated[int, Form()],
-        function_number: Annotated[int, Form()]
+        dimension: Annotated[int, Form()]
 ):
     try:
         return rankings.get_wilcoxon_test(
             first_algorithm=first_algorithm,
             second_algorithm=second_algorithm,
-            dimension=dimension,
-            function_number=function_number
+            dimension=dimension
         )
     except ValueError as e:
         raise HTTPException(422, detail=str(e))

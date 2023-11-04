@@ -1,6 +1,7 @@
 package com.inzynierka.data.repository
 
 import com.inzynierka.data.actualFileContentOnly
+import com.inzynierka.data.models.PairTestEntryDTO
 import com.inzynierka.data.models.ScoreEntryDTO
 import com.inzynierka.data.models.StatisticsEntryDTO
 import io.ktor.client.*
@@ -54,16 +55,14 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     override suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,
-        dimension: Int,
-        functionNumber: Int
-    ): String {
+        dimension: Int
+    ): List<PairTestEntryDTO> {
         return client.submitForm(
             url = "rankings/wilcoxon",
             formParameters = parameters {
                 append("first_algorithm", firstAlgorithm)
                 append("second_algorithm", secondAlgorithm)
                 append("dimension", "$dimension")
-                append("function_number", "$functionNumber")
             }
         ).body()
     }

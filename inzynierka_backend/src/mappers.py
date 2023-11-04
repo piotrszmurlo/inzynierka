@@ -3,8 +3,7 @@ import python_extensions as extensions
 from src import StatisticRankingEntry, ScoreRankingEntry
 
 
-def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[
-    StatisticRankingEntry]:
+def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[StatisticRankingEntry]:
     mapped_entries = [
         StatisticRankingEntry(
             dimension=entry.dimension,

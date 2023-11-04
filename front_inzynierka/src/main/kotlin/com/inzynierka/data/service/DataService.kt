@@ -4,6 +4,7 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
 import com.inzynierka.data.repository.IDataRepository
+import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
@@ -73,11 +74,10 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
     override suspend fun getPairTest(
         algorithm1: String,
         algorithm2: String,
-        dimension: Int,
-        functionNumber: Int
-    ): Result<String> {
+        dimension: Int
+    ): Result<List<PairTestEntry>> {
         return try {
-            val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension, functionNumber)
+            val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension).map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

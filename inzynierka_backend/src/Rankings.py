@@ -5,7 +5,7 @@ from src import get_final_error_and_evaluation_number_for_files_grouped_by_algor
     StatisticRankingEntry, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
     get_final_error_and_evaluation_number_for_files, TRIALS_COUNT
 from src.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model
-
+from src.models import PairTestEntry
 
 class Rankings:
 
@@ -58,34 +58,59 @@ class Rankings:
                 self._friedman_ranking_scores.extend(map_score_ranking_entries_to_pydantic_model(score_entries))
         return self._friedman_ranking_scores
 
-    def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int, function_number: int):
-        first_errors = get_final_error_and_evaluations_number_array(
-            self._file_service.get_file(
-                algorithm_name=first_algorithm,
-                dimension=dimension,
-                function_number=function_number
+    def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int):
+        results = []
+        function_numbers = self._file_service.get_function_numbers()
+        for function_number in function_numbers:
+            first_errors = get_final_error_and_evaluations_number_array(
+                self._file_service.get_file(
+                    algorithm_name=first_algorithm,
+                    dimension=dimension,
+                    function_number=function_number
+                )
             )
-        )
-        second_errors = get_final_error_and_evaluations_number_array(
-            self._file_service.get_file(
-                algorithm_name=second_algorithm,
-                dimension=dimension,
-                function_number=function_number
+            second_errors = get_final_error_and_evaluations_number_array(
+                self._file_service.get_file(
+                    algorithm_name=second_algorithm,
+                    dimension=dimension,
+                    function_number=function_number
+                )
             )
-        )
-        diff = []
-        for index in range(len(first_errors)):
-            diff.append(first_errors[index] - second_errors[index])
-        try:
-            h0_p_value = wilcoxon(diff)[1]
-            if h0_p_value < 0.05:
-                h1_p_value = wilcoxon(diff, alternative="less")[1]
-                if h1_p_value < 0.05:
-                    return "-"
-                return "+"
+            diff = []
+            for index in range(len(first_errors)):
+                diff.append(first_errors[index] - second_errors[index])
+            try:
+                h0_p_value = wilcoxon(diff)[1]
+                if h0_p_value < 0.05:
+                    h1_p_value = wilcoxon(diff, alternative="less")[1]
+                    if h1_p_value < 0.05:
+                        results.append(
+                            PairTestEntry(
+                                function_number=function_number,
+                                winner=first_algorithm
+                            )
+                        )
+                    else:
+                        results.append(
+                            PairTestEntry(
+                                function_number=function_number,
+                                winner=second_algorithm
+                            )
+                        )
 
-            else:
-                return "="
-        except ValueError as e:
-            if "zero for all elements" in str(e):
-                return "="
+                else:
+                    results.append(
+                        PairTestEntry(
+                            function_number=function_number,
+                            winner=None
+                        )
+                    )
+            except ValueError as e:
+                if "zero for all elements" in str(e):
+                    results.append(
+                        PairTestEntry(
+                            function_number=function_number,
+                            winner=None
+                        )
+                    )
+        return results

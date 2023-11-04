@@ -19,8 +19,7 @@ import kotlinx.serialization.Serializable
 data class PairTestForm(
     val algorithmFirst: String? = null,
     val algorithmSecond: String? = null,
-    val dimension: String? = null,
-    val functionNumber: String? = null
+    val dimension: String? = null
 )
 
 fun Container.pairTest(
@@ -68,12 +67,6 @@ fun Container.pairTest(
                             )
                         }
                 }
-                p(content = "Select function number", align = Align.CENTER)
-                select(
-                    options = pairTestState.functionNumbers.map { "$it" to "$it" },
-                    value = "${pairTestState.formState.functionNumber}"
-                ).bind(PairTestForm::functionNumber)
-                    .onChange { store.dispatch(PairTestAction.FunctionSelected(this.value!!.toInt())) }
                 p(content = "Select dimension", align = Align.CENTER)
                 radioGroup(
                     options = pairTestState.dimensions.map { "$it" to "$it" },
@@ -94,16 +87,17 @@ fun Container.pairTest(
                         dataService,
                         formData.algorithmFirst!!,
                         formData.algorithmSecond!!,
-                        formData.dimension!!.toInt(),
-                        formData.functionNumber!!.toInt()
+                        formData.dimension!!.toInt()
                     )
                 }
             }
         }
-        pairTestState.result?.let {
-            val result = p(content = "Result: $it", align = Align.CENTER)
-            result.padding = 48.px
-            result.fontSize = 32.px
+        pairTestState.results?.let {
+            pairTestTable(
+                headerNames = listOf("Function number", "Result"),
+                title = "Results table",
+                results = it
+            )
         }
     }
 }

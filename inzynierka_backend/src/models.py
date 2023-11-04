@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from sqlalchemy import Column, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import declarative_base
@@ -39,3 +41,8 @@ class ScoreRankingEntry(BaseModel):
     dimension: int
     algorithm_name: str
     score: float
+
+
+class PairTestEntry(BaseModel):
+    function_number: int
+    winner: Optional[str]
