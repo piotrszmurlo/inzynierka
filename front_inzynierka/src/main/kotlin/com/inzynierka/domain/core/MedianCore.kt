@@ -14,6 +14,8 @@ sealed class MedianRankingAction : RankingsAction() {
     object FetchRankingsStarted : MedianRankingAction()
     data class FetchRankingsSuccess(val scores: List<StatisticsRankingEntry>) : MedianRankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : MedianRankingAction()
+    object ToggleNumberNotation : MedianRankingAction()
+    data class ChangePrecision(val precision: Int) : MedianRankingAction()
 }
 
 fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = when (action) {
@@ -26,6 +28,12 @@ fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = 
         )
         state.copy(isFetching = false, scores = sorted)
     }
+
+    is MedianRankingAction.ChangePrecision -> state.copy(numberPrecision = action.precision)
+    is MedianRankingAction.ToggleNumberNotation -> {
+        state.copy(numberNotation = toggleNotation(state.numberNotation))
+    }
+
 }
 
 fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<StatisticsRankingEntry>): Map<Int, Map<Int, List<StatisticsRankingEntry>>> {
@@ -39,6 +47,13 @@ fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<Statistic
                         .mapIndexed { index, score -> score.copy(rank = index + 1) }
                 }
         }
+}
+
+fun toggleNotation(numberNotation: NumberNotation): NumberNotation {
+    return when (numberNotation) {
+        is NumberNotation.Decimal -> NumberNotation.Scientific
+        is NumberNotation.Scientific -> NumberNotation.Decimal
+    }
 }
 
 fun loadMedianRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {

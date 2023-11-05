@@ -23,7 +23,7 @@ fun Container.navBar(store: ReduxStore<MainAppState, MainAppAction>) {
             div {
                 padding = 4.px
                 button("Browse rankings").onClick {
-                    store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.CEC2022))
+                    store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
                 }
             }
         }

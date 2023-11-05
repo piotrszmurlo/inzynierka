@@ -9,7 +9,7 @@ from src import models
 from src.FileService import FileService
 from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
-from src.models import ParseError
+from src.models import ParseError, RevisitedRankingEntry
 from src.parser import parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
     ALL_DIMENSIONS, TRIALS_COUNT, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity
 
@@ -81,6 +81,48 @@ async def get_statistics_ranking_data():
     return rankings.get_statistics_ranking_data()
 
 
+@app.get("/rankings/revisited")
+async def get_revisited_ranking():
+    return [
+        RevisitedRankingEntry(
+        function_number=1,
+        dimension=10,
+        algorithm_name="IUOI",
+        successful_trials_percentage=0.55,
+        thresholds_achieved_percentage=0.65,
+        budget_left_percentage=0.22,
+        score=0.73
+    ),
+        RevisitedRankingEntry(
+        function_number=1,
+        dimension=20,
+        algorithm_name="IU22OI",
+        successful_trials_percentage=0.55,
+        thresholds_achieved_percentage=0.65,
+        budget_left_percentage=0.22,
+        score=0.73
+    ),
+        RevisitedRankingEntry(
+        function_number=1,
+        dimension=20,
+        algorithm_name="IUOI",
+        successful_trials_percentage=0.44,
+        thresholds_achieved_percentage=0.65,
+        budget_left_percentage=0.22,
+        score=0.73
+    ),
+        RevisitedRankingEntry(
+        function_number=1,
+        dimension=10,
+        algorithm_name="IU22OI",
+        successful_trials_percentage=0.55,
+        thresholds_achieved_percentage=0.65,
+        budget_left_percentage=0.22,
+        score=0.73
+    )
+    ]
+
+
 @app.post("/file")
 async def post_file(files: list[UploadFile]):
     try:
@@ -103,7 +145,3 @@ async def post_file(files: list[UploadFile]):
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
         raise HTTPException(422, detail=str(e))
-
-
-
-

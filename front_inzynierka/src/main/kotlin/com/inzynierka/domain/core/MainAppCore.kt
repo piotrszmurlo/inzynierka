@@ -8,11 +8,12 @@ sealed class Tab {
     object Upload : Tab()
     sealed class ResultsTab : Tab() {
         object PairTest : ResultsTab()
-        object CEC2022 : ResultsTab()
+        object Cec2022 : ResultsTab()
         object Friedman : ResultsTab()
         object Median : ResultsTab()
         object Mean : ResultsTab()
-        object ECDF : ResultsTab()
+        object Ecdf : ResultsTab()
+        object Revisited : ResultsTab()
     }
 }
 

@@ -5,6 +5,7 @@ import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
 import com.inzynierka.data.repository.IDataRepository
 import com.inzynierka.domain.models.PairTestEntry
+import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
@@ -58,6 +59,16 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             val result = dataRepository.getStatisticsEntries().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
+    override suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>> {
+        return try {
+            val result = dataRepository.getRevisitedEntries().map { it.toDomain() }
+            Result.Success(result)
+        } catch (e: Exception) {
+            console.log(e.message)
             Result.Error(DomainError.NetworkError(e.message))
         }
     }

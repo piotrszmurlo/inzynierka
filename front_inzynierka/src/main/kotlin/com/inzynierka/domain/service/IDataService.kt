@@ -2,6 +2,7 @@ package com.inzynierka.domain.service
 
 import com.inzynierka.common.Result
 import com.inzynierka.domain.models.PairTestEntry
+import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.model.BenchmarkData
@@ -15,6 +16,7 @@ interface IDataService {
     suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>>
     suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
 
+    suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>>
 
     /*
      * uploads [kFiles] to the server

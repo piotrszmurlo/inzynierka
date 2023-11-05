@@ -1,5 +1,6 @@
 package com.inzynierka.ui.rankings
 
+import com.inzynierka.domain.core.NumberNotation
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
@@ -12,11 +13,14 @@ import io.kvision.table.cell
 import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
+import js.core.toExponential
 
 fun Container.statisticTable(
     headerNames: List<String>,
     title: String,
     scores: List<StatisticsRankingEntry>,
+    notation: NumberNotation,
+    precision: Int
 ) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
@@ -29,13 +33,25 @@ fun Container.statisticTable(
                 row {
                     cell("${it.rank}")
                     cell(it.algorithmName)
-                    cell("${it.mean}")
-                    cell("${it.median}")
-                    cell("${it.stdev}")
-                    cell("${it.min}")
-                    cell("${it.max}")
+                    cell(it.mean.format(notation, precision))
+                    cell(it.median.format(notation, precision))
+                    cell(it.stdev.format(notation, precision))
+                    cell(it.min.format(notation, precision))
+                    cell(it.max.format(notation, precision))
                 }
             }
+        }
+    }
+}
+
+fun Double.format(notation: NumberNotation, precision: Int): String {
+    return when (notation) {
+        is NumberNotation.Decimal -> {
+            this.toExponential(precision).toDouble().toString()
+        }
+
+        is NumberNotation.Scientific -> {
+            this.toExponential(precision)
         }
     }
 }

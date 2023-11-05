@@ -2,6 +2,7 @@ package com.inzynierka.data.repository
 
 import com.inzynierka.data.actualFileContentOnly
 import com.inzynierka.data.models.PairTestEntryDTO
+import com.inzynierka.data.models.RevisitedEntryDTO
 import com.inzynierka.data.models.ScoreEntryDTO
 import com.inzynierka.data.models.StatisticsEntryDTO
 import io.ktor.client.*
@@ -24,6 +25,10 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
 
     override suspend fun getStatisticsEntries(): List<StatisticsEntryDTO> {
         return client.get(urlString = "rankings/statistics").body()
+    }
+
+    override suspend fun getRevisitedEntries(): List<RevisitedEntryDTO> {
+        return client.get(urlString = "rankings/revisited").body()
     }
 
     override suspend fun getAvailableAlgorithms(): List<String> {

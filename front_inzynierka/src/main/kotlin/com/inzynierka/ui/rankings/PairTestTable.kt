@@ -21,7 +21,6 @@ fun Container.pairTestTable(
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
         h5(content = title, align = Align.CENTER)
-//        h5(content = title, align = Align.CENTER)
         table(
             headerNames = headerNames,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
