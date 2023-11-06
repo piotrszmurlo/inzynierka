@@ -5,10 +5,12 @@ import com.inzynierka.common.Result
 import com.inzynierka.domain.service.IDataService
 import io.kvision.redux.Dispatch
 import io.kvision.toast.Toast
+import io.kvision.toast.ToastOptions
+import io.kvision.toast.ToastPosition
 import io.kvision.types.KFile
 
 data class UploadFilesState(
-    val uploadButtonDisabled: Boolean = true,
+    val uploadButtonDisabled: Boolean = true
 )
 
 sealed class UploadAction : MainAppAction() {
@@ -40,7 +42,10 @@ suspend fun uploadFiles(dispatch: Dispatch<MainAppAction>, dataService: IDataSer
 
         is Result.Error -> {
             dispatch(UploadAction.UploadFileFailed(result.domainError))
-            Toast.info("File upload failed")
+            Toast.danger(
+                "File upload failed: " + (result.domainError as DomainError.FileUploadError).message,
+                options = ToastOptions(ToastPosition.TOPLEFT, close = true, duration = 10000)
+            )
         }
     }
 }

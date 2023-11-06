@@ -3,6 +3,7 @@ package com.inzynierka.data.service
 import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
+import com.inzynierka.data.parsedRemoteExceptionMessage
 import com.inzynierka.data.repository.IDataRepository
 import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.models.RevisitedRankingEntry
@@ -68,7 +69,6 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             val result = dataRepository.getRevisitedEntries().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
-            console.log(e.message)
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -78,7 +78,9 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             val result = dataRepository.postFiles(kFiles)
             Result.Success(result)
         } catch (e: Exception) {
-            Result.Error(DomainError.FileUploadError(e.message))
+            Result.Error(
+                DomainError.FileUploadError(e.parsedRemoteExceptionMessage)
+            )
         }
     }
 

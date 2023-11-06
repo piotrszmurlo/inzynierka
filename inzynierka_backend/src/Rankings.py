@@ -23,7 +23,7 @@ class Rankings:
             file_service: FileService,
             thresholds=np.logspace(3, -8, num=51),
             revisited_ranking_weight=0.01,
-            dimensionBudget: dict[int, int] = {10: 200000,20: 1000000}
+            dimensionBudget: dict[int, int] = {10: 200000, 20: 1000000}
     ):
         self.dimensionBudget = dimensionBudget
         self._file_service = file_service

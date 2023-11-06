@@ -185,24 +185,33 @@ std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVec
 double strict_stod(const std::string& s) {
     std::size_t pos;
     const auto result = std::stod(s, &pos);
-    if (pos != s.size()) throw std::invalid_argument("Unexpected character found in data");
+    if (pos != s.size()) throw std::invalid_argument("Unexpected character found in data: " + s);
     return result;
 }
 
-std::string parse_results(std::string input) {
+std::string parse_results(std::string input, int maxBudget) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
     std::stringstream result("");
     result << std::setprecision(8);
     std::string word;
     double value;
-    int rowcount = 0;
+    int columnCount = 0;
+    int rowNumber = 1;
+    std::vector<double> finalErrors;
     while (ss >> word) {
         value = strict_stod(word);
         if (value < MIN_VALUE) { value = MIN_VALUE; }
-        if (++rowcount == 30) {
+        if (rowNumber == 16) {
+            finalErrors.push_back(value);
+        } else if (rowNumber == 17) {
+            if ((finalErrors[columnCount] != MIN_VALUE) && (value != maxBudget)) throw std::invalid_argument("Unexpected evaluation number in data(max budget not recorded in a failed trial): " + std::to_string(value));
+            if (value > maxBudget) throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value));
+        }
+        if (++columnCount == 30) {
             result << value << "\n";
-            rowcount = 0;
+            columnCount = 0;
+            ++rowNumber;
         } else {
             result << value << " ";
         }

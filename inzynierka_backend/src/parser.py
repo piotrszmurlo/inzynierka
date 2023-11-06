@@ -29,9 +29,14 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     algorithm_name, function_number, dimension = parse_remote_filename(
         filename
     )
+    DIM2BUDGET = {
+        10: 200000,
+        20: 1000000
+    }
+
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
-        parsed_contents = extensions.parse_results(raw_contents)
+        parsed_contents = extensions.parse_results(raw_contents, DIM2BUDGET[dimension])
     except ValueError as e:
         raise ParseError(e.args[0])
     return algorithm_name, function_number, dimension, parsed_contents

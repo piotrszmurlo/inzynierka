@@ -21,7 +21,6 @@ data class MainAppState(
     val tab: Tab,
     val error: DomainError?,
     val uploadFilesState: UploadFilesState = UploadFilesState(),
-
     val rankingsState: RankingsState = RankingsState()
 ) : KoinComponent
 
