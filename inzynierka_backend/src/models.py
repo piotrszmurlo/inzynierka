@@ -49,9 +49,9 @@ class PairTestEntry(BaseModel):
 
 
 class RevisitedRankingEntry(BaseModel):
-    function_number: int
     dimension: int
     algorithm_name: str
+    function_number: int
     successful_trials_percentage: float
     thresholds_achieved_percentage: float
     budget_left_percentage: float

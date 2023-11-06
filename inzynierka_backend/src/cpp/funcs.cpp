@@ -250,6 +250,66 @@ std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRank
     return output;
 }
 
-std::vector<StatisticsRankingEntry> calculate_revisited_ranking(const BasicRankingInput& input) {
 
+double successfulTrialsPercentage(const TrialsVector& input) {
+    int successfulTrialsCount = 0;
+    for (auto& trial: input) {
+        if (trial.finalError == MIN_VALUE) {
+            ++successfulTrialsCount;
+        }
+    }
+    return successfulTrialsCount / double(input.size());
 }
+
+double thresholdsAchievedPercentage(const TrialsVector& input, const std::vector<double>& thresholds) {
+    int thresholdAchieved = 0;
+    for (auto& trial : input) {
+        for(auto& threshold : thresholds){
+            if (trial.finalError <= threshold) {
+                ++thresholdAchieved;
+            }
+        }
+    }
+    return double(thresholdAchieved) / (thresholds.size() * input.size());
+}
+
+double budgetLeftPercentage(const TrialsVector& input, const double maxBudget) {
+    int budgetLeftSum = 0;
+    for (auto& trial : input) {
+        budgetLeftSum += (maxBudget - trial.numberOfEvaluations);
+    }
+    return double(budgetLeftSum) / (maxBudget * input.size());
+}
+
+
+std::vector<RevisitedRankingEntry> calculate_revisited_ranking(const BasicRankingInput& input, const std::vector<double> thresholds, std::unordered_map<int, int> maxBudgets, double weight) {
+    double weightSquared = pow(weight, 2);
+    std::vector<RevisitedRankingEntry> output = std::vector<RevisitedRankingEntry>();
+    for (size_t function = 0; function < input.size(); function++) {
+        for (auto& dimension : input[function]) {
+            for (auto& algorithm : dimension.second) {
+                std::string algorithmName = algorithm.first;
+                TrialsVector trialsVector = algorithm.second;
+                int functionNumber = function + 1;
+                double successfulTrials = successfulTrialsPercentage(trialsVector);
+                double thresholdsAchieved = thresholdsAchievedPercentage(trialsVector, thresholds);
+                double budgetLeft = budgetLeftPercentage(trialsVector, maxBudgets[dimension.first]);
+                double score = successfulTrials + weight * thresholdsAchieved + budgetLeft * weightSquared;
+                output.push_back(
+                    RevisitedRankingEntry(
+                        dimension.first,
+                        algorithmName,
+                        functionNumber,
+                        successfulTrials,
+                        thresholdsAchieved,
+                        budgetLeft,
+                        score
+                    )
+                );
+            }
+        }
+    }
+    return output;
+}
+
+

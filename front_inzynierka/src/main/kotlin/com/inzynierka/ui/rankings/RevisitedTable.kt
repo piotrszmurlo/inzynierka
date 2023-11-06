@@ -12,6 +12,7 @@ import io.kvision.table.cell
 import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
+import io.kvision.utils.toFixedNoRound
 
 
 fun Container.revisitedTable(headerNames: List<String>, title: String, scores: List<RevisitedRankingEntry>) {
@@ -26,12 +27,16 @@ fun Container.revisitedTable(headerNames: List<String>, title: String, scores: L
                 row {
                     cell("${it.rank}")
                     cell(it.algorithmName)
-                    cell(it.successfulTrialsPercentage.toString())
-                    cell(it.thresholdsAchievedPercentage.toString())
-                    cell(it.budgetLeftPercentage.toString())
-                    cell("${it.score}".substring(0, 8))
+                    cell(it.successfulTrialsPercentage.toPercentage(3))
+                    cell(it.thresholdsAchievedPercentage.toPercentage(3))
+                    cell(it.budgetLeftPercentage.toPercentage(3))
+                    cell(it.score.toFixedNoRound(3))
                 }
             }
         }
     }
+}
+
+fun Double.toPercentage(precision: Int): String {
+    return (this * 100).toFixedNoRound(precision) + "%"
 }

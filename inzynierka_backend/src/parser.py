@@ -12,7 +12,6 @@ TRIALS_COUNT = 30
 DIMENSION_10 = 10
 DIMENSION_20 = 20
 ALL_DIMENSIONS = [DIMENSION_10, DIMENSION_20]
-NUMBER_OF_STATISTICS = 4
 
 
 def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int, int, str]:

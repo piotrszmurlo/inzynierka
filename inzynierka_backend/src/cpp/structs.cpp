@@ -92,14 +92,16 @@ struct RevisitedRankingEntry {
         const int functionNumber,
         const double successfulTrialsPercentage,
         const double thresholdsAchievedPercentage,
-        const double budgetLeftPercentage
+        const double budgetLeftPercentage,
+        const double score
     ):
         dimension(dimension),
         algorithmName(algorithmName),
         functionNumber(functionNumber),
         successfulTrialsPercentage(successfulTrialsPercentage),
         thresholdsAchievedPercentage(thresholdsAchievedPercentage),
-        budgetLeftPercentage(budgetLeftPercentage) {}
+        budgetLeftPercentage(budgetLeftPercentage),
+        score(score) {}
 
     int dimension;
     std::string algorithmName;
@@ -107,6 +109,7 @@ struct RevisitedRankingEntry {
     double successfulTrialsPercentage;
     double thresholdsAchievedPercentage;
     double budgetLeftPercentage;
+    double score;
 
 };
 

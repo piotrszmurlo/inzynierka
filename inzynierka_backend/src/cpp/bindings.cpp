@@ -59,6 +59,10 @@ PYBIND11_MODULE(python_extensions, m) {
         calculate_statistics_entries
     )pbdoc");
 
+    m.def("calculate_revisited_ranking", &calculate_revisited_ranking, R"pbdoc(
+        calculate_revisited_ranking
+    )pbdoc");
+
     py::class_<Trial>(m, "Trial")
         .def(py::init<const std::string, const int, const int, const double, const int>())
         .def("__repr__",
@@ -105,6 +109,16 @@ PYBIND11_MODULE(python_extensions, m) {
         .def_readwrite("dimension", &ScoreRankingEntry::dimension)
         .def_readwrite("algorithm_name", &ScoreRankingEntry::algorithmName)
         .def_readwrite("score", &ScoreRankingEntry::score);
+
+    py::class_<RevisitedRankingEntry>(m, "RevisitedRankingEntry")
+        .def(py::init<const int, const std::string, const int, const double, const double, const double, const double>())
+        .def_readwrite("dimension", &RevisitedRankingEntry::dimension)
+        .def_readwrite("algorithm_name", &RevisitedRankingEntry::algorithmName)
+        .def_readwrite("functionNumber", &RevisitedRankingEntry::functionNumber)
+        .def_readwrite("successfulTrialsPercentage", &RevisitedRankingEntry::successfulTrialsPercentage)
+        .def_readwrite("thresholdsAchievedPercentage", &RevisitedRankingEntry::thresholdsAchievedPercentage)
+        .def_readwrite("budgetLeftPercentage", &RevisitedRankingEntry::budgetLeftPercentage)
+        .def_readwrite("score", &RevisitedRankingEntry::score);
 
     py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
     py::bind_vector<TrialsVector>(m, "TrialsVector");

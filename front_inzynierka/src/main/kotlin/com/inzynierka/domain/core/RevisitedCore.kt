@@ -36,8 +36,9 @@ fun revisitedReducer(state: RevisitedRankingState, action: RevisitedRankingActio
                             .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
                     }
             }
-        val entriesPerAlgorithm = action.scores.groupBy { entry -> entry.algorithmName }.values.size
+        var entriesPerAlgorithm: Int
         val averagedEntries = action.scores.groupBy { entry -> entry.algorithmName }.values
+            .also { entriesPerAlgorithm = it.elementAt(0).count() }
             .map {
                 it.reduce { acc, next ->
                     acc.copy(
