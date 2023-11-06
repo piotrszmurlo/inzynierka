@@ -4,8 +4,19 @@
 
 
 struct Trial {
-    Trial(const std::string &algorithmName, const int &functionNumber, const int &trialNumber, const double finalError, int numberOfEvaluations):
-        algorithmName(algorithmName), functionNumber(functionNumber), trialNumber(trialNumber), finalError(finalError), numberOfEvaluations(numberOfEvaluations) {}
+    Trial(
+        const std::string algorithmName,
+        const int functionNumber,
+        const int trialNumber,
+        const double finalError,
+        int numberOfEvaluations
+    ):
+        algorithmName(algorithmName),
+        functionNumber(functionNumber),
+        trialNumber(trialNumber),
+        finalError(finalError),
+        numberOfEvaluations(numberOfEvaluations) {}
+
     std::string algorithmName;
     int functionNumber;
     int trialNumber;
@@ -28,15 +39,15 @@ struct Trial {
 
 struct StatisticsRankingEntry {
     StatisticsRankingEntry(
-        const int& dimension,
-        const std::string& algorithmName,
-        const int& functionNumber,
-        const double& mean,
-        const double& median,
-        const double& stdev,
-        const double& min,
-        const double& max,
-        const int& numberOfEvaluations
+        const int dimension,
+        const std::string algorithmName,
+        const int functionNumber,
+        const double mean,
+        const double median,
+        const double stdev,
+        const double min,
+        const double max,
+        const int numberOfEvaluations
     ):
         dimension(dimension),
         algorithmName(algorithmName),
@@ -61,9 +72,9 @@ struct StatisticsRankingEntry {
 
 struct ScoreRankingEntry {
     ScoreRankingEntry(
-        const int& dimension,
-        const std::string& algorithmName,
-        const double& score
+        const int dimension,
+        const std::string algorithmName,
+        const double score
     ):
         dimension(dimension),
         algorithmName(algorithmName),
@@ -76,12 +87,12 @@ struct ScoreRankingEntry {
 
 struct RevisitedRankingEntry {
     RevisitedRankingEntry(
-        const int& dimension,
-        const std::string& algorithmName,
-        const int& functionNumber,
-        const double& successfulTrialsPercentage,
-        const double& thresholdsAchievedPercentage,
-        const double& budgetLeftPercentage
+        const int dimension,
+        const std::string algorithmName,
+        const int functionNumber,
+        const double successfulTrialsPercentage,
+        const double thresholdsAchievedPercentage,
+        const double budgetLeftPercentage
     ):
         dimension(dimension),
         algorithmName(algorithmName),

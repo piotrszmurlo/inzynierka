@@ -60,7 +60,7 @@ PYBIND11_MODULE(python_extensions, m) {
     )pbdoc");
 
     py::class_<Trial>(m, "Trial")
-        .def(py::init<const std::string&, const int&, const int&, const double&, const int&>())
+        .def(py::init<const std::string, const int, const int, const double, const int>())
         .def("__repr__",
             [](const Trial &trial) {
                 return "<extensions.Trial "
@@ -74,7 +74,7 @@ PYBIND11_MODULE(python_extensions, m) {
         );
 
     py::class_<StatisticsRankingEntry>(m, "StatisticsRankingEntry")
-        .def(py::init<const int&, const std::string&, const int&, const double&, const double&, const double&, const double&, const double&, const int&>())
+        .def(py::init<const int, const std::string, const int, const double, const double, const double, const double, const double, const int>())
         .def_readwrite("dimension", &StatisticsRankingEntry::dimension)
         .def_readwrite("algorithm_name", &StatisticsRankingEntry::algorithmName)
         .def_readwrite("function_number", &StatisticsRankingEntry::functionNumber)
@@ -101,7 +101,7 @@ PYBIND11_MODULE(python_extensions, m) {
         );
 
     py::class_<ScoreRankingEntry>(m, "ScoreRankingEntry")
-        .def(py::init<const int&, const std::string&, const double&>())
+        .def(py::init<const int, const std::string, const double>())
         .def_readwrite("dimension", &ScoreRankingEntry::dimension)
         .def_readwrite("algorithm_name", &ScoreRankingEntry::algorithmName)
         .def_readwrite("score", &ScoreRankingEntry::score);
