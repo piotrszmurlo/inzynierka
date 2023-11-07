@@ -56,7 +56,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     pairTest(state.rankingsState.pairTest, store, dataService)
                 }
 
-                is Tab.ResultsTab.Ecdf -> ecdf(state.rankingsState.ecdf)
+                is Tab.ResultsTab.Ecdf -> ecdf(state.rankingsState.ecdf) { store.dispatch(EcdfAction.ToggleShowFunctionGroups) }
 
                 is Tab.ResultsTab.Revisited -> {
                     revisitedRanking(state.rankingsState.revisited)

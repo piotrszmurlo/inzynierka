@@ -11,7 +11,8 @@ from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
 from src.models import ParseError, RevisitedRankingEntry
 from src.parser import parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
-    ALL_DIMENSIONS, TRIALS_COUNT, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity
+    ALL_DIMENSIONS, TRIALS_COUNT, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity, \
+    get_all_errors_and_evaluations_number
 import numpy as np
 
 models.Base.metadata.create_all(bind=engine)
@@ -89,38 +90,7 @@ async def get_revisited_ranking():
 
 @app.get("/rankings/ecdf")
 async def get_ecdf_data():
-    return [
-        {
-            "function_number": 1,
-            "dimension": 10,
-            "algorithm_name": "IUMOEAII",
-            "thresholds_achieved_fractions": [0.07, 0.11, 0.17, 0.18, 0.19, 0.24, 0.24, 0.29, 0.3, 0.43, 0.44, 0.47, 0.5, 0.81, 0.89, 0.98],
-            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
-        },
-        {
-            "function_number": 1,
-            "dimension": 10,
-            "algorithm_name": "SHADEP",
-            "thresholds_achieved_fractions": [0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39, 0.41, 0.43],
-            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
-        },
-        {
-            "function_number": 1,
-            "dimension": 20,
-            "algorithm_name": "IUMOEAII",
-            "thresholds_achieved_fractions": [0.07, 0.11, 0.17, 0.18, 0.19, 0.24, 0.24, 0.29, 0.3, 0.43, 0.44, 0.47,
-                                              0.5, 0.81, 0.89, 0.98],
-            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
-        },
-        {
-            "function_number": 1,
-            "dimension": 20,
-            "algorithm_name": "SHADEP",
-            "thresholds_achieved_fractions": [0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.29, 0.31, 0.33, 0.35,
-                                              0.37, 0.39, 0.41, 0.43],
-            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
-        }
-    ]
+    return rankings.get_ecdf_data()
 
 
 @app.post("/file")

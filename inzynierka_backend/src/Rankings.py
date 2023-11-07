@@ -4,9 +4,10 @@ from scipy.stats import wilcoxon
 
 from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, \
     StatisticRankingEntry, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
-    get_final_error_and_evaluation_number_for_files, TRIALS_COUNT
+    get_final_error_and_evaluation_number_for_files, TRIALS_COUNT, get_all_errors_and_evaluations_number, \
+    get_all_errors_and_evaluations_numbers_for_files
 from src.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model, \
-    map_revisited_ranking_entries_to_pydantic_model
+    map_revisited_ranking_entries_to_pydantic_model, map_ecdf_entries_to_pydantic_model
 from src.models import PairTestEntry
 
 DIM2BUDGET = {
@@ -93,6 +94,14 @@ class Rankings:
             self._revisited_ranking_data = map_revisited_ranking_entries_to_pydantic_model(
                 ranking_entries)
         return self._revisited_ranking_data
+
+    def get_ecdf_data(self):
+        _ecdf_data = get_all_errors_and_evaluations_numbers_for_files(
+            self._file_service.get_files()
+        )
+        res = extensions.calculate_ecdf_data(_ecdf_data, self._thresholds, self.dimensionBudget)
+
+        return map_ecdf_entries_to_pydantic_model(res)
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int):
         results = []

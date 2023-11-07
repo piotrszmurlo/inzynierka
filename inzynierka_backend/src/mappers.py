@@ -1,6 +1,6 @@
 import python_extensions as extensions
 
-from src import StatisticRankingEntry, ScoreRankingEntry, RevisitedRankingEntry
+from src import StatisticRankingEntry, ScoreRankingEntry, RevisitedRankingEntry, EcdfEntry
 
 
 def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[
@@ -42,6 +42,18 @@ def map_revisited_ranking_entries_to_pydantic_model(entries: list[extensions.Rev
             thresholds_achieved_percentage=entry.thresholdsAchievedPercentage,
             budget_left_percentage=entry.budgetLeftPercentage,
             score=entry.score
+        ) for entry in entries
+    ]
+    return mapped_entries
+
+def map_ecdf_entries_to_pydantic_model(entries: list[extensions.EcdfEntry]) -> list[EcdfEntry]:
+    mapped_entries = [
+        EcdfEntry(
+            dimension=entry.dimension,
+            algorithm_name=entry.algorithm_name,
+            function_number=entry.functionNumber,
+            thresholds_achieved_fractions=entry.thresholds_achieved_fraction,
+            function_evaluations=entry.function_evaluations
         ) for entry in entries
     ]
     return mapped_entries

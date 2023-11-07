@@ -37,6 +37,27 @@ struct Trial {
     }
 };
 
+struct AllErrors {
+    AllErrors(
+        const std::string algorithmName,
+        const int functionNumber,
+        const int dimension,
+        std::vector<std::vector<double>>& errorsMatrix,
+        std::vector<int> numberOfEvaluations
+    ):
+        algorithmName(algorithmName),
+        functionNumber(functionNumber),
+        dimension(dimension),
+        errorsMatrix(errorsMatrix),
+        numberOfEvaluations(numberOfEvaluations) {}
+
+    std::string algorithmName;
+    int functionNumber;
+    int dimension;
+    std::vector<std::vector<double>> errorsMatrix;
+    std::vector<int> numberOfEvaluations;
+};
+
 struct StatisticsRankingEntry {
     StatisticsRankingEntry(
         const int dimension,
@@ -110,8 +131,29 @@ struct RevisitedRankingEntry {
     double thresholdsAchievedPercentage;
     double budgetLeftPercentage;
     double score;
+};
 
+struct EcdfEntry {
+    EcdfEntry(
+        const int dimension,
+        const std::string algorithmName,
+        const int functionNumber,
+        std::vector<double>& thresholdAchievedFractions,
+        std::vector<double>& functionEvaluations
+    ):
+        dimension(dimension),
+        algorithmName(algorithmName),
+        functionNumber(functionNumber),
+        thresholdAchievedFractions(thresholdAchievedFractions),
+        functionEvaluations(functionEvaluations) {}
+
+    int dimension;
+    std::string algorithmName;
+    int functionNumber;
+    std::vector<double> thresholdAchievedFractions;
+    std::vector<double> functionEvaluations;
 };
 
 using TrialsVector = std::vector<Trial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;
+using AllErrorsVector = std::vector<AllErrors>;

@@ -13,6 +13,7 @@
 PYBIND11_MAKE_OPAQUE(FunctionTrialsVector);
 PYBIND11_MAKE_OPAQUE(TrialsVector);
 PYBIND11_MAKE_OPAQUE(BasicRankingInput);
+PYBIND11_MAKE_OPAQUE(AllErrorsVector);
 
 namespace py = pybind11;
 
@@ -63,6 +64,11 @@ PYBIND11_MODULE(python_extensions, m) {
         calculate_revisited_ranking
     )pbdoc");
 
+
+    m.def("calculate_ecdf_data", &calculate_ecdf_data, R"pbdoc(
+        calculate_ecdf_data
+    )pbdoc");
+
     py::class_<Trial>(m, "Trial")
         .def(py::init<const std::string, const int, const int, const double, const int>())
         .def("__repr__",
@@ -76,6 +82,9 @@ PYBIND11_MODULE(python_extensions, m) {
                  + ">";
             }
         );
+
+        py::class_<AllErrors>(m, "AllErrors")
+        .def(py::init<const std::string, const int, const int, std::vector<std::vector<double>>&, std::vector<int>>());
 
     py::class_<StatisticsRankingEntry>(m, "StatisticsRankingEntry")
         .def(py::init<const int, const std::string, const int, const double, const double, const double, const double, const double, const int>())
@@ -120,8 +129,17 @@ PYBIND11_MODULE(python_extensions, m) {
         .def_readwrite("budgetLeftPercentage", &RevisitedRankingEntry::budgetLeftPercentage)
         .def_readwrite("score", &RevisitedRankingEntry::score);
 
+    py::class_<EcdfEntry>(m, "EcdfEntry")
+        .def(py::init<const int, const std::string, const int, std::vector<double>&, std::vector<double>&>())
+        .def_readwrite("dimension", &EcdfEntry::dimension)
+        .def_readwrite("algorithm_name", &EcdfEntry::algorithmName)
+        .def_readwrite("functionNumber", &EcdfEntry::functionNumber)
+        .def_readwrite("thresholds_achieved_fraction", &EcdfEntry::thresholdAchievedFractions)
+        .def_readwrite("function_evaluations", &EcdfEntry::functionEvaluations);
+
     py::bind_vector<FunctionTrialsVector>(m, "FunctionTrialsVector");
     py::bind_vector<TrialsVector>(m, "TrialsVector");
+    py::bind_vector<AllErrorsVector>(m, "AllErrorsVector");
     py::bind_vector<BasicRankingInput>(m, "BasicRankingInput");
 
 #ifdef VERSION_INFO

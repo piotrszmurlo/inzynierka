@@ -321,4 +321,56 @@ std::vector<RevisitedRankingEntry> calculate_revisited_ranking(const BasicRankin
     return output;
 }
 
+double thresholdsAchievedFraction(const std::vector<double>& input, const std::vector<double>& thresholds) {
+    int thresholdAchieved = 0;
+    for (auto& error : input) {
+        for(auto& threshold : thresholds){
+            if (error <= threshold) {
+                ++thresholdAchieved;
+            }
+        }
+    }
+    return double(thresholdAchieved) / (thresholds.size() * input.size());
+}
+
+std::vector<double>  getRecordedErrorSteps(int dimension, int maxBudget) {
+    std::vector<double> output;
+    for (int i = 0; i < 16; ++i) {
+        output.push_back(pow(10, (i / double(5)) - 3 ) * maxBudget);
+    }
+    return output;
+}
+
+std::vector<EcdfEntry> calculate_ecdf_data(const AllErrorsVector& input, const std::vector<double>& thresholds, std::unordered_map<int, int> maxBudgets) {
+    std::vector<EcdfEntry> output = std::vector<EcdfEntry>();
+    for (auto& errors : input) {
+        std::vector<double> fractions;
+        for (auto& row : errors.errorsMatrix) {
+            fractions.push_back(thresholdsAchievedFraction(row, thresholds));
+        }
+        double mean = 0;
+        for (auto& evalNumber : errors.numberOfEvaluations) {
+            mean += evalNumber;
+        }
+        mean = mean / double(errors.numberOfEvaluations.size());
+        std::vector<double> steps = getRecordedErrorSteps(errors.dimension, maxBudgets[errors.dimension]);
+        for (auto& step : steps) {
+            step = log10(step/double(errors.dimension));
+        }
+
+        // std::for_each(steps.begin(), steps.back(), [errors](double& step) {
+        //     step = log10(step/double(errors.dimension));
+        // });
+        output.push_back(
+            EcdfEntry(
+                errors.dimension,
+                errors.algorithmName,
+                errors.functionNumber,
+                fractions,
+                steps
+            )
+        );
+    }
+    return output;
+}
 

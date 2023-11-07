@@ -1,5 +1,6 @@
 import base64
 from collections import defaultdict
+from pprint import pprint
 
 from src.models import LocalFile, ParseError
 import python_extensions as extensions
@@ -82,6 +83,31 @@ def get_final_error_and_evaluations_number(data_file: LocalFile) -> extensions.T
                 int(evaluations[i].split(".")[0])
             )
         )
+    return results
+
+
+def get_all_errors_and_evaluations_number(data_file: LocalFile) -> extensions.AllErrors:
+    """
+    :param data_file: LocalFile with already preprocessed contents
+    :return: TrialsVector containing all results from the file in form of FullTrial
+    """
+    rows = data_file.contents.split("\n")
+    result = []
+    for row in rows[:-1]:
+        result.append([float(x) for x in row.split()])
+    return extensions.AllErrors(
+        data_file.algorithm_name,
+        data_file.function_number,
+        data_file.dimension,
+        result,
+        [int(x.split(".")[0]) for x in rows[FINAL_FES_INDEX].split()]
+    )
+
+
+def get_all_errors_and_evaluations_numbers_for_files(data_files: list[LocalFile]):
+    results = extensions.AllErrorsVector()
+    for data_file in data_files:
+        results.append(get_all_errors_and_evaluations_number(data_file))
     return results
 
 

@@ -56,3 +56,11 @@ class RevisitedRankingEntry(BaseModel):
     thresholds_achieved_percentage: float
     budget_left_percentage: float
     score: float
+
+
+class EcdfEntry(BaseModel):
+    dimension: int
+    algorithm_name: str
+    function_number: int
+    thresholds_achieved_fractions: list[float]
+    function_evaluations: list[float]
