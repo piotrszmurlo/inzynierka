@@ -6,6 +6,7 @@ import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.model.BenchmarkData
+import com.inzynierka.model.EcdfData
 import io.kvision.types.KFile
 
 interface IDataService {
@@ -17,6 +18,7 @@ interface IDataService {
     suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
 
     suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>>
+    suspend fun getEcdfData(): Result<List<EcdfData>>
 
     /*
      * uploads [kFiles] to the server

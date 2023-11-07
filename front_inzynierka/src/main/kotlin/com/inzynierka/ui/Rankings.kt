@@ -56,7 +56,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     pairTest(state.rankingsState.pairTest, store, dataService)
                 }
 
-                is Tab.ResultsTab.Ecdf -> ecdf(store, dataService)
+                is Tab.ResultsTab.Ecdf -> ecdf(state.rankingsState.ecdf)
 
                 is Tab.ResultsTab.Revisited -> {
                     revisitedRanking(state.rankingsState.revisited)
@@ -97,6 +97,9 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
         button(text = "ECDF", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Ecdf))
+                store.dispatch { dispatch, _ ->
+                    loadEcdfData(dispatch, dataService)
+                }
             }
         button(text = "Friedman", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {

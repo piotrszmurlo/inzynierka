@@ -6,7 +6,8 @@ data class RankingsState(
     val friedman: ScoreRankingState = ScoreRankingState(),
     val mean: StatisticsRankingState = StatisticsRankingState(),
     val median: StatisticsRankingState = StatisticsRankingState(),
-    val revisited: RevisitedRankingState = RevisitedRankingState()
+    val revisited: RevisitedRankingState = RevisitedRankingState(),
+    val ecdf: EcdfState = EcdfState()
 )
 
 sealed class RankingsAction : MainAppAction()
@@ -18,4 +19,5 @@ fun rankingsReducer(state: RankingsState, action: RankingsAction) = when (action
     is MeanRankingAction -> state.copy(mean = meanReducer(state.mean, action))
     is MedianRankingAction -> state.copy(median = medianReducer(state.median, action))
     is RevisitedRankingAction -> state.copy(revisited = revisitedReducer(state.revisited, action))
+    is EcdfAction -> state.copy(ecdf = ecdfReducer(state.ecdf, action))
 }

@@ -11,6 +11,7 @@ import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
+import com.inzynierka.model.EcdfData
 import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
@@ -67,6 +68,15 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
     override suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>> {
         return try {
             val result = dataRepository.getRevisitedEntries().map { it.toDomain() }
+            Result.Success(result)
+        } catch (e: Exception) {
+            Result.Error(DomainError.NetworkError(e.message))
+        }
+    }
+
+    override suspend fun getEcdfData(): Result<List<EcdfData>> {
+        return try {
+            val result = dataRepository.getEcdfData().map { it.toDomain() }
             Result.Success(result)
         } catch (e: Exception) {
             Result.Error(DomainError.NetworkError(e.message))

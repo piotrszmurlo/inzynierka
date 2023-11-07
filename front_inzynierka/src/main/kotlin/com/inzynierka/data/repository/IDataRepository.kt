@@ -1,9 +1,6 @@
 package com.inzynierka.data.repository
 
-import com.inzynierka.data.models.PairTestEntryDTO
-import com.inzynierka.data.models.RevisitedEntryDTO
-import com.inzynierka.data.models.ScoreEntryDTO
-import com.inzynierka.data.models.StatisticsEntryDTO
+import com.inzynierka.data.models.*
 import io.kvision.types.KFile
 
 interface IDataRepository {
@@ -11,6 +8,7 @@ interface IDataRepository {
     suspend fun getFriedmanScores(): List<ScoreEntryDTO>
     suspend fun getStatisticsEntries(): List<StatisticsEntryDTO>
     suspend fun getRevisitedEntries(): List<RevisitedEntryDTO>
+    suspend fun getEcdfData(): List<EcdfDataDTO>
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>
     suspend fun getAvailableFunctionNumbers(): List<Int>

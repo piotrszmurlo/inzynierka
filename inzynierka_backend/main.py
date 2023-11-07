@@ -87,6 +87,42 @@ async def get_revisited_ranking():
     return rankings.get_revisited_ranking_entries()
 
 
+@app.get("/rankings/ecdf")
+async def get_ecdf_data():
+    return [
+        {
+            "function_number": 1,
+            "dimension": 10,
+            "algorithm_name": "IUMOEAII",
+            "thresholds_achieved_fractions": [0.07, 0.11, 0.17, 0.18, 0.19, 0.24, 0.24, 0.29, 0.3, 0.43, 0.44, 0.47, 0.5, 0.81, 0.89, 0.98],
+            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
+        },
+        {
+            "function_number": 1,
+            "dimension": 10,
+            "algorithm_name": "SHADEP",
+            "thresholds_achieved_fractions": [0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.29, 0.31, 0.33, 0.35, 0.37, 0.39, 0.41, 0.43],
+            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
+        },
+        {
+            "function_number": 1,
+            "dimension": 20,
+            "algorithm_name": "IUMOEAII",
+            "thresholds_achieved_fractions": [0.07, 0.11, 0.17, 0.18, 0.19, 0.24, 0.24, 0.29, 0.3, 0.43, 0.44, 0.47,
+                                              0.5, 0.81, 0.89, 0.98],
+            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
+        },
+        {
+            "function_number": 1,
+            "dimension": 20,
+            "algorithm_name": "SHADEP",
+            "thresholds_achieved_fractions": [0.13, 0.15, 0.17, 0.19, 0.21, 0.23, 0.25, 0.27, 0.29, 0.31, 0.33, 0.35,
+                                              0.37, 0.39, 0.41, 0.43],
+            "function_evaluations": [1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3]
+        }
+    ]
+
+
 @app.post("/file")
 async def post_file(files: list[UploadFile]):
     try:
@@ -94,7 +130,8 @@ async def post_file(files: list[UploadFile]):
             raise ParseError(
                 f"Provide exactly {FUNCTIONS_COUNT * len(ALL_DIMENSIONS)} files, one for each function-dimension pair"
             )
-        check_filenames_integrity([parse_remote_filename(file.filename) for file in files])
+        check_filenames_integrity(
+            [parse_remote_filename(file.filename) for file in files])
         parsed_file_tuples = []
         for file in files:
             parsed_file_tuples.append(

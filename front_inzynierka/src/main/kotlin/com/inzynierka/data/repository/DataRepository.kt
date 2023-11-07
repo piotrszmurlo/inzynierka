@@ -1,10 +1,7 @@
 package com.inzynierka.data.repository
 
 import com.inzynierka.data.actualFileContentOnly
-import com.inzynierka.data.models.PairTestEntryDTO
-import com.inzynierka.data.models.RevisitedEntryDTO
-import com.inzynierka.data.models.ScoreEntryDTO
-import com.inzynierka.data.models.StatisticsEntryDTO
+import com.inzynierka.data.models.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -29,6 +26,10 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
 
     override suspend fun getRevisitedEntries(): List<RevisitedEntryDTO> {
         return client.get(urlString = "rankings/revisited").body()
+    }
+
+    override suspend fun getEcdfData(): List<EcdfDataDTO> {
+        return client.get(urlString = "rankings/ecdf").body()
     }
 
     override suspend fun getAvailableAlgorithms(): List<String> {
