@@ -1,15 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
 import com.inzynierka.domain.models.StatisticsRankingEntry
-import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 sealed class MedianRankingAction : RankingsAction() {
@@ -58,15 +50,3 @@ fun toggleNotation(numberNotation: NumberNotation): NumberNotation {
     }
 }
 
-fun loadMedianRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    CoroutineScope(Dispatchers.Default).launch {
-        dispatch(MedianRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getStatisticsRankingEntries()) {
-            is Result.Success -> dispatch(MedianRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> {
-                Toast.show("Ranking fetch failed")
-                dispatch(MedianRankingAction.FetchRankingsFailed(result.domainError))
-            }
-        }
-    }
-}

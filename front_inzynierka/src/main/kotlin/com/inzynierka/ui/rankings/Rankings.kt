@@ -1,7 +1,7 @@
 package com.inzynierka.ui.rankings
 
+import com.inzynierka.domain.NetworkActions
 import com.inzynierka.domain.core.*
-import com.inzynierka.domain.service.IDataService
 import io.kvision.core.Container
 import io.kvision.core.Display
 import io.kvision.core.FlexDirection
@@ -13,10 +13,13 @@ import io.kvision.redux.ReduxStore
 import io.kvision.state.bind
 import io.kvision.utils.px
 
-fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
+fun Container.rankings(
+    store: ReduxStore<MainAppState, MainAppAction>,
+    networkActions: NetworkActions
+) {
     flexPanel(direction = FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         display = Display.FLEX
-        rankingTabs(store, dataService)
+        rankingTabs(store, networkActions)
 
         flexPanel(justify = JustifyContent.CENTER).bind(store) { state ->
             display = Display.FLEX
@@ -52,7 +55,7 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                 }
 
                 is Tab.ResultsTab.PairTest -> {
-                    pairTest(state.rankingsState.pairTest, store, dataService)
+                    pairTest(state.rankingsState.pairTest, store, networkActions)
                 }
 
                 is Tab.ResultsTab.Ecdf -> ecdfTab(state.rankingsState.ecdf,
@@ -69,7 +72,10 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
     }
 }
 
-fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
+fun Container.rankingTabs(
+    store: ReduxStore<MainAppState, MainAppAction>,
+    networkActions: NetworkActions
+) {
     flexPanel(direction = FlexDirection.ROW, justify = JustifyContent.CENTER, spacing = 8) {
         padding = 16.px
         paddingBottom = 32.px
@@ -78,49 +84,49 @@ fun Container.rankingTabs(store: ReduxStore<MainAppState, MainAppAction>, dataSe
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
                 store.dispatch { dispatch, _ ->
-                    loadCec2022Scores(dispatch, dataService)
+                    networkActions.loadCec2022Scores(dispatch)
                 }
             }
         button(text = "Mean", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Mean))
                 store.dispatch { dispatch, _ ->
-                    loadMeanRanking(dispatch, dataService)
+                    networkActions.loadMeanRanking(dispatch)
                 }
             }
         button(text = "Median", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Median))
                 store.dispatch { dispatch, _ ->
-                    loadMedianRanking(dispatch, dataService)
+                    networkActions.loadMedianRanking(dispatch)
                 }
             }
         button(text = "ECDF", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Ecdf))
                 store.dispatch { dispatch, _ ->
-                    loadEcdfData(dispatch, dataService)
+                    networkActions.loadEcdfData(dispatch)
                 }
             }
         button(text = "Friedman", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Friedman))
                 store.dispatch { dispatch, _ ->
-                    loadFriedmanScores(dispatch, dataService)
+                    networkActions.loadFriedmanScores(dispatch)
                 }
             }
         button("Compare two algorithms", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
                 store.dispatch { dispatch, _ ->
-                    getAvailableBenchmarkData(dispatch, dataService)
+                    networkActions.getAvailableBenchmarkData(dispatch)
                 }
             }
         button(text = "Revisited Ranking", style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Revisited))
                 store.dispatch { dispatch, _ ->
-                    loadRevisitedRanking(dispatch, dataService)
+                    networkActions.loadRevisitedRanking(dispatch)
                 }
             }
     }

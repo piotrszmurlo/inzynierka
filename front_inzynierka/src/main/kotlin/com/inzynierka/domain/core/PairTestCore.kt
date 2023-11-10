@@ -1,16 +1,8 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
 import com.inzynierka.domain.models.PairTestEntry
-import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 private const val FIRST_WON = "-"
 private const val SECOND_WON = "+"
@@ -114,36 +106,5 @@ fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action
     )
 }
 
-fun performPairTest(
-    dispatch: Dispatch<MainAppAction>,
-    dataService: IDataService,
-    algorithmFirst: String,
-    algorithmSecond: String,
-    dimension: Int
-) {
-    dispatch(PairTestAction.PerformPairTest)
-    CoroutineScope(Dispatchers.Default).launch {
-        val result = dataService.getPairTest(
-            algorithmFirst,
-            algorithmSecond,
-            dimension
-        )
-        when (result) {
-            is Result.Success -> dispatch(PairTestAction.PairTestSuccess(result.data))
-            is Result.Error -> dispatch(PairTestAction.PairTestFailed(result.domainError))
-        }
-    }
-}
 
-fun getAvailableBenchmarkData(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    CoroutineScope(Dispatchers.Default).launch {
-        dispatch(PairTestAction.Initialize)
-        when (val result = dataService.getAvailableBenchmarkData()) {
-            is Result.Success -> dispatch(PairTestAction.InitializeSuccess(result.data))
-            is Result.Error -> {
-                Toast.show("Ranking fetch failed")
-                dispatch(PairTestAction.InitializeFailed(result.domainError))
-            }
-        }
-    }
-}
+

@@ -1,8 +1,11 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.core.*
+import com.inzynierka.domain.NetworkActions
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
+import com.inzynierka.domain.core.PairTestAction
+import com.inzynierka.domain.core.PairTestState
 import com.inzynierka.domain.models.PairTestEntry
-import com.inzynierka.domain.service.IDataService
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
 import io.kvision.form.formPanel
@@ -30,7 +33,7 @@ data class PairTestForm(
 fun Container.pairTest(
     pairTestState: PairTestState,
     store: ReduxStore<MainAppState, MainAppAction>,
-    dataService: IDataService
+    networkActions: NetworkActions
 ) {
     flexPanel(
         direction = FlexDirection.COLUMN,
@@ -87,9 +90,8 @@ fun Container.pairTest(
             onClick {
                 val formData = formPanel.getData()
                 store.dispatch { dispatch, _ ->
-                    performPairTest(
+                    networkActions.performPairTest(
                         dispatch,
-                        dataService,
                         formData.algorithmFirst!!,
                         formData.algorithmSecond!!,
                         formData.dimension!!.toInt()

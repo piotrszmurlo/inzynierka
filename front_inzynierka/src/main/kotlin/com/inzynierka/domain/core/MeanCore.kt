@@ -1,15 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
 import com.inzynierka.domain.models.StatisticsRankingEntry
-import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 typealias Dimension = Int
 typealias FunctionNumber = Int
@@ -47,17 +39,4 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
     }
 
     is MeanRankingAction.ChangePrecision -> state.copy(numberPrecision = action.precision)
-}
-
-fun loadMeanRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    CoroutineScope(Dispatchers.Default).launch {
-        dispatch(MeanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getStatisticsRankingEntries()) {
-            is Result.Success -> dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> {
-                Toast.show("Ranking fetch failed")
-                dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
-            }
-        }
-    }
 }

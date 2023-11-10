@@ -1,15 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
-import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.EcdfData
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 sealed class EcdfAction : RankingsAction() {
     object FetchRankingsStarted : EcdfAction()
@@ -101,15 +93,3 @@ fun getFunctionGroup(functionNumber: FunctionNumber): FunctionGroup {
     }
 }
 
-fun loadEcdfData(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    CoroutineScope(Dispatchers.Default).launch {
-        dispatch(FriedmanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getEcdfData()) {
-            is Result.Success -> dispatch(EcdfAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> {
-                Toast.show("Ranking fetch failed")
-                dispatch(EcdfAction.FetchRankingsFailed(result.domainError))
-            }
-        }
-    }
-}

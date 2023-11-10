@@ -1,8 +1,10 @@
 package com.inzynierka.ui
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.domain.core.*
-import com.inzynierka.domain.service.IDataService
+import com.inzynierka.domain.NetworkActions
+import com.inzynierka.domain.core.MainAppAction
+import com.inzynierka.domain.core.MainAppState
+import com.inzynierka.domain.core.UploadAction
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.onChangeLaunch
@@ -29,7 +31,10 @@ data class UploadFileForm(
     val fileToUpload: List<KFile>? = null
 )
 
-fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dataService: IDataService) {
+fun Container.uploadFileForm(
+    store: ReduxStore<MainAppState, MainAppAction>,
+    networkActions: NetworkActions
+) {
     vPanel(alignItems = AlignItems.CENTER) {
         div {
             content = "Select results file to upload"
@@ -66,7 +71,7 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
                     store.dispatch { dispatch, _ ->
                         CoroutineScope(Dispatchers.Default).launch {
                             uploadFileForm.form.getDataWithFileContent().fileToUpload?.let { files ->
-                                uploadFiles(dispatch, dataService, files)
+                                networkActions.uploadFiles(dispatch, files)
                             }
                         }
                     }

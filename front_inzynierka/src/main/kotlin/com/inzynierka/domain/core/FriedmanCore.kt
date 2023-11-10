@@ -1,15 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
 import com.inzynierka.domain.models.ScoreRankingEntry
-import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 sealed class FriedmanRankingAction : RankingsAction() {
@@ -27,15 +19,3 @@ fun friedmanReducer(state: ScoreRankingState, action: FriedmanRankingAction) = w
     is FriedmanRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
 }
 
-fun loadFriedmanScores(dispatch: Dispatch<MainAppAction>, dataService: IDataService) {
-    CoroutineScope(Dispatchers.Default).launch {
-        dispatch(FriedmanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getFriedmanScores()) {
-            is Result.Success -> dispatch(FriedmanRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> {
-                Toast.show("Ranking fetch failed")
-                dispatch(FriedmanRankingAction.FetchRankingsFailed(result.domainError))
-            }
-        }
-    }
-}

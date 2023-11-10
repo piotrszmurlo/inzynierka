@@ -3,6 +3,7 @@ package com.inzynierka.di
 import com.inzynierka.data.repository.DataRepository
 import com.inzynierka.data.repository.IDataRepository
 import com.inzynierka.data.service.DataService
+import com.inzynierka.domain.NetworkActions
 import com.inzynierka.domain.service.IDataService
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
@@ -36,4 +37,5 @@ val appModule = module {
         )
     }
     single<IDataService> { DataService(get()) }
+    single<NetworkActions> { NetworkActions(get()) }
 }

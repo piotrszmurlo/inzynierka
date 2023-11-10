@@ -1,11 +1,11 @@
 package com.inzynierka.ui
 
 import com.inzynierka.di.appModule
+import com.inzynierka.domain.NetworkActions
 import com.inzynierka.domain.core.MainAppAction
 import com.inzynierka.domain.core.MainAppState
 import com.inzynierka.domain.core.Tab
 import com.inzynierka.domain.core.mainAppReducer
-import com.inzynierka.domain.service.IDataService
 import io.kvision.*
 import io.kvision.panel.root
 import io.kvision.redux.ReduxStore
@@ -18,7 +18,7 @@ import org.koin.core.context.GlobalContext.startKoin
 class App : Application(), KoinComponent {
 
     private val store: ReduxStore<MainAppState, MainAppAction>
-    private val dataService: IDataService by inject()
+    private val networkActions: NetworkActions by inject()
 
     init {
         require("css/kvapp.css")
@@ -29,7 +29,7 @@ class App : Application(), KoinComponent {
 
     override fun start() {
         root("kvapp") {
-            mainAppComponent(store, dataService)
+            mainAppComponent(store, networkActions)
         }
     }
 

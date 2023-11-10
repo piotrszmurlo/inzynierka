@@ -1,11 +1,6 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.common.Result
-import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.show
-import io.kvision.redux.Dispatch
-import io.kvision.toast.Toast
 import io.kvision.types.KFile
 
 data class UploadFilesState(
@@ -28,20 +23,3 @@ fun uploadReducer(state: UploadFilesState, action: UploadAction) = when (action)
     is UploadAction.UploadFileFailed -> state.copy(isUploading = false, error = action.error)
     is UploadAction.UploadFormOnChangeHandler -> state.copy(uploadButtonDisabled = action.kFile == null)
 }
-
-
-suspend fun uploadFiles(dispatch: Dispatch<MainAppAction>, dataService: IDataService, files: List<KFile>) {
-    dispatch(UploadAction.UploadFileStarted)
-    when (val result = dataService.postFiles(files)) {
-        is Result.Success -> {
-            Toast.show("File upload completed")
-            dispatch(UploadAction.UploadFileSuccess)
-        }
-
-        is Result.Error -> {
-            dispatch(UploadAction.UploadFileFailed(result.domainError))
-            Toast.show("File upload failed: " + (result.domainError as DomainError.FileUploadError).message)
-        }
-    }
-}
-
