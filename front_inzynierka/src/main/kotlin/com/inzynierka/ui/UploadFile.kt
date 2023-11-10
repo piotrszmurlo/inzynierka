@@ -1,9 +1,7 @@
 package com.inzynierka.ui
 
-import com.inzynierka.domain.core.MainAppAction
-import com.inzynierka.domain.core.MainAppState
-import com.inzynierka.domain.core.UploadAction
-import com.inzynierka.domain.core.uploadFiles
+import com.inzynierka.common.DomainError
+import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -16,12 +14,15 @@ import io.kvision.html.div
 import io.kvision.panel.vPanel
 import io.kvision.redux.ReduxStore
 import io.kvision.state.bind
+import io.kvision.toast.Toast
 import io.kvision.types.KFile
 import io.kvision.utils.px
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+
+const val MAX_UPLOAD_SIZE = 200_000
 
 @Serializable
 data class UploadFileForm(
@@ -48,14 +49,26 @@ fun Container.uploadFileForm(store: ReduxStore<MainAppState, MainAppAction>, dat
         }
 
         val uploadFileButton = button("upload file").bind(store) { state ->
-            disabled = state.uploadFilesState.uploadButtonDisabled
+            disabled = state.uploadFilesState.uploadButtonDisabled || state.uploadFilesState.isUploading
         }
-
         uploadFileButton.onClick {
-            store.dispatch { dispatch, _ ->
-                CoroutineScope(Dispatchers.Default).launch {
-                    uploadFileForm.form.getDataWithFileContent().fileToUpload?.let { files ->
-                        uploadFiles(dispatch, dataService, files)
+            uploadFileForm.getData().fileToUpload?.sumOf { it.size }?.let { totalSize ->
+                if (totalSize > MAX_UPLOAD_SIZE) {
+                    store.dispatch(
+                        UploadAction.UploadFileFailed(
+                            DomainError.FileUploadError(
+                                "File size exceeded"
+                            )
+                        )
+                    )
+                    Toast.show("Maximum file size exceeded")
+                } else {
+                    store.dispatch { dispatch, _ ->
+                        CoroutineScope(Dispatchers.Default).launch {
+                            uploadFileForm.form.getDataWithFileContent().fileToUpload?.let { files ->
+                                uploadFiles(dispatch, dataService, files)
+                            }
+                        }
                     }
                 }
             }

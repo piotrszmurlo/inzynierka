@@ -4,7 +4,9 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.show
 import io.kvision.redux.Dispatch
+import io.kvision.toast.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +29,10 @@ fun loadCec2022Scores(dispatch: Dispatch<MainAppAction>, dataService: IDataServi
         dispatch(Cec2022RankingAction.FetchRankingsStarted)
         when (val result = dataService.getCec2022Scores()) {
             is Result.Success -> dispatch(Cec2022RankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> dispatch(Cec2022RankingAction.FetchRankingsFailed(result.domainError))
+            is Result.Error -> {
+                Toast.show("Ranking fetch failed")
+                dispatch(Cec2022RankingAction.FetchRankingsFailed(result.domainError))
+            }
         }
     }
 }

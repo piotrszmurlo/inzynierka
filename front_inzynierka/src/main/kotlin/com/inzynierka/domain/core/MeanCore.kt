@@ -4,7 +4,9 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.show
 import io.kvision.redux.Dispatch
+import io.kvision.toast.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +54,10 @@ fun loadMeanRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataService
         dispatch(MeanRankingAction.FetchRankingsStarted)
         when (val result = dataService.getStatisticsRankingEntries()) {
             is Result.Success -> dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
+            is Result.Error -> {
+                Toast.show("Ranking fetch failed")
+                dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
+            }
         }
     }
 }

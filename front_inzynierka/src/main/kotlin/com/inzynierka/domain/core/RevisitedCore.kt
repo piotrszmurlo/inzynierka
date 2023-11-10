@@ -4,7 +4,9 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.show
 import io.kvision.redux.Dispatch
+import io.kvision.toast.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,7 +75,10 @@ fun loadRevisitedRanking(dispatch: Dispatch<MainAppAction>, dataService: IDataSe
         dispatch(RevisitedRankingAction.FetchRankingsStarted)
         when (val result = dataService.getRevisitedRankingEntries()) {
             is Result.Success -> dispatch(RevisitedRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> dispatch(RevisitedRankingAction.FetchRankingsFailed(result.domainError))
+            is Result.Error -> {
+                Toast.show("Ranking fetch failed")
+                dispatch(RevisitedRankingAction.FetchRankingsFailed(result.domainError))
+            }
         }
     }
 }

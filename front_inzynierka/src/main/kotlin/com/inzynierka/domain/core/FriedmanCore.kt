@@ -4,7 +4,9 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.show
 import io.kvision.redux.Dispatch
+import io.kvision.toast.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +32,10 @@ fun loadFriedmanScores(dispatch: Dispatch<MainAppAction>, dataService: IDataServ
         dispatch(FriedmanRankingAction.FetchRankingsStarted)
         when (val result = dataService.getFriedmanScores()) {
             is Result.Success -> dispatch(FriedmanRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> dispatch(FriedmanRankingAction.FetchRankingsFailed(result.domainError))
+            is Result.Error -> {
+                Toast.show("Ranking fetch failed")
+                dispatch(FriedmanRankingAction.FetchRankingsFailed(result.domainError))
+            }
         }
     }
 }

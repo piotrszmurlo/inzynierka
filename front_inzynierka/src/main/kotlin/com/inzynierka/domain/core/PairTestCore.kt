@@ -5,7 +5,9 @@ import com.inzynierka.common.Result
 import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
+import com.inzynierka.ui.show
 import io.kvision.redux.Dispatch
+import io.kvision.toast.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -138,7 +140,10 @@ fun getAvailableBenchmarkData(dispatch: Dispatch<MainAppAction>, dataService: ID
         dispatch(PairTestAction.Initialize)
         when (val result = dataService.getAvailableBenchmarkData()) {
             is Result.Success -> dispatch(PairTestAction.InitializeSuccess(result.data))
-            is Result.Error -> dispatch(PairTestAction.InitializeFailed(result.domainError))
+            is Result.Error -> {
+                Toast.show("Ranking fetch failed")
+                dispatch(PairTestAction.InitializeFailed(result.domainError))
+            }
         }
     }
 }
