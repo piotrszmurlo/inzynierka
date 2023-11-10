@@ -1,6 +1,5 @@
 import base64
 from collections import defaultdict
-from pprint import pprint
 
 from src.models import LocalFile, ParseError
 import python_extensions as extensions
@@ -8,7 +7,7 @@ import python_extensions as extensions
 ALLOWED_EXTENSIONS = ("txt", "dat")
 FINAL_ERROR_INDEX = 15
 FINAL_FES_INDEX = 16
-FUNCTIONS_COUNT = 5
+FUNCTIONS_COUNT = 12
 TRIALS_COUNT = 30
 DIMENSION_10 = 10
 DIMENSION_20 = 20
@@ -36,6 +35,7 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
     }
 
     raw_contents = base64.b64decode(contents).decode('utf-8')
+    print(raw_contents)
     try:
         parsed_contents = extensions.parse_results(raw_contents, DIM2BUDGET[dimension])
     except ValueError as e:
@@ -141,6 +141,9 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
 def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]):
     results = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
     for data_file in data_files:
+        print("GGGGGGGGG")
+        print(data_file.function_number - 1)
+        print("GGGGGGGGG")
         results[data_file.function_number - 1][
             data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
     return extensions.BasicRankingInput(results)

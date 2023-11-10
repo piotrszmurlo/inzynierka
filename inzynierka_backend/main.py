@@ -1,7 +1,6 @@
 import os
 from typing import Annotated
 
-import python_extensions as extensions
 from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
@@ -9,11 +8,8 @@ from src import models
 from src.FileService import FileService
 from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
-from src.models import ParseError, RevisitedRankingEntry
-from src.parser import parse_remote_results_file, get_final_error_and_evaluation_number_for_files, \
-    ALL_DIMENSIONS, TRIALS_COUNT, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity, \
-    get_all_errors_and_evaluations_number
-import numpy as np
+from src.models import ParseError
+from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -109,8 +105,8 @@ async def post_file(files: list[UploadFile]):
                     file.filename, await file.read()
                 )
             )
-        # for parsed_file_tuple in parsed_file_tuples:
-        #     file_service.create_file(parsed_file_tuple[0], parsed_file_tuple[1], parsed_file_tuple[2], parsed_file_tuple[3])
+        for algorithm_name, function_number, dimension, content in parsed_file_tuples:
+            file_service.create_file(algorithm_name=algorithm_name, function_number=function_number, dimension=dimension, content=content)
         rankings.invalidate_cache()
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')

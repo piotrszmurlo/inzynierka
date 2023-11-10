@@ -26,7 +26,7 @@ class FileService:
     def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str):
         return self._repository.create_file(
             algorithm_name=algorithm_name,
-            contents=content,
+            content=content,
             dimension=dimension,
             function_number=function_number
         )

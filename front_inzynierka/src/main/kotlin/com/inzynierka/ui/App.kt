@@ -32,7 +32,6 @@ class App : Application(), KoinComponent {
             mainAppComponent(store, networkActions)
         }
     }
-
 }
 
 fun main() {
