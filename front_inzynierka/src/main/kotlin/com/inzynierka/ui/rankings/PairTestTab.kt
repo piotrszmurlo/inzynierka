@@ -1,6 +1,7 @@
 package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
+import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.service.IDataService
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
@@ -11,6 +12,10 @@ import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.redux.ReduxStore
+import io.kvision.table.TableType
+import io.kvision.table.cell
+import io.kvision.table.row
+import io.kvision.table.table
 import io.kvision.utils.px
 import kotlinx.serialization.Serializable
 
@@ -107,6 +112,50 @@ fun Container.pairTest(
                     title = "Summed results",
                     resultsSum = it
                 )
+            }
+        }
+    }
+}
+
+fun Container.pairTestTable(
+    headerNames: List<String>,
+    title: String,
+    results: List<PairTestEntry>
+) {
+    flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
+        padding = 16.px
+        h5(content = title, align = Align.CENTER)
+        table(
+            headerNames = headerNames,
+            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
+        ) {
+            results.forEach {
+                row {
+                    cell("${it.functionNumber}")
+                    cell(it.winner ?: "Equal")
+                }
+            }
+        }
+    }
+}
+
+fun Container.pairTestSumTable(
+    headerNames: List<String>,
+    title: String,
+    resultsSum: Map<String, Int>
+) {
+    flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
+        padding = 16.px
+        h5(content = title, align = Align.CENTER)
+        table(
+            headerNames = headerNames,
+            types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
+        ) {
+            resultsSum.forEach { (algorithmName, sumOfWins) ->
+                row {
+                    cell(algorithmName)
+                    cell("$sumOfWins")
+                }
             }
         }
     }

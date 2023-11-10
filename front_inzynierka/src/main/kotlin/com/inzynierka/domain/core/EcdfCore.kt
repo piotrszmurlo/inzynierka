@@ -11,16 +11,20 @@ import kotlinx.coroutines.launch
 
 sealed class EcdfAction : RankingsAction() {
     object FetchRankingsStarted : EcdfAction()
-    object ToggleShowFunctionGroups : EcdfAction()
+    data class EcdfTypeChanged(val type: EcdfType) : EcdfAction()
     data class FetchRankingsSuccess(val data: List<EcdfData>) : EcdfAction()
     data class FetchRankingsFailed(val error: DomainError?) : EcdfAction()
 }
 
+sealed class EcdfType {
+    object Averaged : EcdfType()
+    object PerFunction : EcdfType()
+}
 
 data class EcdfState(
     val isFetching: Boolean = false,
-    val showFunctionGroups: Boolean = false,
-    val data: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>? = null,
+    val ecdfType: EcdfType = EcdfType.Averaged,
+    val splitData: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>? = null,
     val combinedData: Map<Dimension, List<EcdfData>>? = null,
     val functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? = null
 )
@@ -32,7 +36,7 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
         val combinedData = action.data.groupBy { it.dimension }
         state.copy(
             isFetching = false,
-            data = splitEcdfs(action.data),
+            splitData = splitEcdfs(action.data),
             combinedData = combinedData.mapValues {
                 it.value
                     .groupBy { ecdfData -> ecdfData.algorithmName }
@@ -55,7 +59,7 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
         )
     }
 
-    is EcdfAction.ToggleShowFunctionGroups -> state.copy(showFunctionGroups = !state.showFunctionGroups)
+    is EcdfAction.EcdfTypeChanged -> state.copy(ecdfType = action.type)
 }
 
 fun List<EcdfData>.averageThresholdsAchieved(): EcdfData {

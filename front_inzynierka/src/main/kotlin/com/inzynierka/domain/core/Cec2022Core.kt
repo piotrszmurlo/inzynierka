@@ -17,15 +17,8 @@ sealed class Cec2022RankingAction : RankingsAction() {
 }
 
 fun cec2022Reducer(state: ScoreRankingState, action: Cec2022RankingAction) = when (action) {
-    is Cec2022RankingAction.FetchRankingsSuccess -> {
-        action.scores.createRankings(compareByDescending { score -> score.score })
-    }
-
-    is Cec2022RankingAction.FetchRankingsFailed -> {
-        console.log("${(action.error as DomainError.NetworkError).message}")
-        state.copy(isFetching = false)
-    }
-
+    is Cec2022RankingAction.FetchRankingsSuccess -> action.scores.createRankings(compareByDescending { score -> score.score })
+    is Cec2022RankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
     is Cec2022RankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
 }
 

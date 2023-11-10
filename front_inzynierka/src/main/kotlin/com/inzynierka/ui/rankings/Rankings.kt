@@ -1,8 +1,7 @@
-package com.inzynierka.ui
+package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.rankings.*
 import io.kvision.core.Container
 import io.kvision.core.Display
 import io.kvision.core.FlexDirection
@@ -56,7 +55,9 @@ fun Container.rankings(store: ReduxStore<MainAppState, MainAppAction>, dataServi
                     pairTest(state.rankingsState.pairTest, store, dataService)
                 }
 
-                is Tab.ResultsTab.Ecdf -> ecdf(state.rankingsState.ecdf) { store.dispatch(EcdfAction.ToggleShowFunctionGroups) }
+                is Tab.ResultsTab.Ecdf -> ecdfTab(state.rankingsState.ecdf,
+                    perFunctionClicked = { store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.PerFunction)) },
+                    averagedClicked = { store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) })
 
                 is Tab.ResultsTab.Revisited -> {
                     revisitedRanking(state.rankingsState.revisited)

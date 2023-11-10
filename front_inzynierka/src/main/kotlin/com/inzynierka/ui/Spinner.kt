@@ -12,7 +12,7 @@ external interface SpinnerProps : Props {
     var color: String
 }
 
-val Spinner: ComponentClass<SpinnerProps> = io.kvision.require("react-spinners").PropagateLoader
+private val Spinner: ComponentClass<SpinnerProps> = io.kvision.require("react-spinners").PropagateLoader
 
 fun Container.withLoadingSpinner(isLoading: Boolean, element: Container.() -> Unit) {
     if (isLoading) {
