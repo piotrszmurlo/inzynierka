@@ -33,15 +33,41 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
         state.copy(
             isFetching = false,
             data = splitEcdfs(action.data),
-            combinedData = combinedData,
+            combinedData = combinedData.mapValues {
+                it.value
+                    .groupBy { ecdfData -> ecdfData.algorithmName }
+                    .map { (_, oneAlgorithmData) ->
+                        oneAlgorithmData.averageThresholdsAchieved()
+                    }
+            },
             functionGroupData = combinedData
-                .mapValues {
-                    it.value.groupBy { ecdfData -> getFunctionGroup(ecdfData.functionNumber) }
+                .mapValues { (_, dimensionData) ->
+                    dimensionData
+                        .groupBy { ecdfData -> getFunctionGroup(ecdfData.functionNumber) }
+                        .mapValues { (_, functionGroupData) ->
+                            functionGroupData
+                                .groupBy { ecdfData -> ecdfData.algorithmName }.values
+                                .map { oneAlgorithmData ->
+                                    oneAlgorithmData.averageThresholdsAchieved()
+                                }
+                        }
                 }
         )
     }
 
     is EcdfAction.ToggleShowFunctionGroups -> state.copy(showFunctionGroups = !state.showFunctionGroups)
+}
+
+fun List<EcdfData>.averageThresholdsAchieved(): EcdfData {
+    return this.reduce { acc, next ->
+        acc.copy(
+            thresholdAchievedFractions = acc.thresholdAchievedFractions
+                .mapIndexed { index, fraction ->
+                    fraction + next.thresholdAchievedFractions[index]
+                }
+        )
+    }
+        .let { it.copy(thresholdAchievedFractions = it.thresholdAchievedFractions.map { fraction -> fraction / this.size }) }
 }
 
 fun splitEcdfs(data: List<EcdfData>): Map<Dimension, Map<FunctionNumber, List<EcdfData>>> {

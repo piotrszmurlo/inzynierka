@@ -30,7 +30,14 @@ fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String) {
             Configuration(
                 type = ChartType.SCATTER,
                 dataSets = data,
-                options = ChartOptions(showLine = true),
+                options = ChartOptions(
+                    showLine = true,
+                    scales = mapOf(
+                        "x" to ChartScales(min = 0, max = 5),
+                        "y" to ChartScales(min = 0, max = 1)
+                    ),
+                    animation = AnimationOptions(disabled = true)
+                ),
             ),
             600, 400
         )

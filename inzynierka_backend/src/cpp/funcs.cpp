@@ -358,9 +358,6 @@ std::vector<EcdfEntry> calculate_ecdf_data(const AllErrorsVector& input, const s
             step = log10(step/double(errors.dimension));
         }
 
-        // std::for_each(steps.begin(), steps.back(), [errors](double& step) {
-        //     step = log10(step/double(errors.dimension));
-        // });
         output.push_back(
             EcdfEntry(
                 errors.dimension,
