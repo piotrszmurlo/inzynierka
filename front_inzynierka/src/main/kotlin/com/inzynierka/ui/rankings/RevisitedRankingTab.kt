@@ -34,7 +34,7 @@ fun Container.revisitedRanking(state: RevisitedRankingState) {
                 )
             }
 
-            flexPanel(FlexDirection.ROW, justify = JustifyContent.CENTER, alignItems = AlignItems.CENTER) {
+            flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
                 val sortedDimensions = state.scores?.keys?.sorted()
                 sortedDimensions?.forEach { dim ->
                     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {

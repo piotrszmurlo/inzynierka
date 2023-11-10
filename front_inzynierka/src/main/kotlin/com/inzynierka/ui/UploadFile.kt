@@ -1,6 +1,7 @@
 package com.inzynierka.ui
 
 import com.inzynierka.common.DomainError
+import com.inzynierka.domain.core.UploadAction
 import com.inzynierka.domain.core.UploadFilesState
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -27,10 +28,7 @@ private data class UploadFileForm(
 )
 
 fun Container.uploadFileForm(
-    state: UploadFilesState,
-    onExcessiveFileSizeError: (DomainError) -> Unit,
-    onSubmit: (List<KFile>) -> Unit,
-    onFilesChanged: (KFile?) -> Unit
+    state: UploadFilesState
 ) {
     vPanel(alignItems = AlignItems.CENTER) {
         div {
@@ -39,9 +37,9 @@ fun Container.uploadFileForm(
         }
         val uploadFileForm = formPanel<UploadFileForm> {
             onChangeLaunch {
-                CoroutineScope(Dispatchers.Default).launch {
-                    onFilesChanged(getData().fileToUpload?.getOrNull(0))
-                }
+                AppManager.store.dispatch(
+                    UploadAction.UploadFormOnChangeHandler(getData().fileToUpload?.getOrNull(0))
+                )
             }
             add(UploadFileForm::fileToUpload, upload(multiple = true))
         }
@@ -52,17 +50,18 @@ fun Container.uploadFileForm(
         uploadFileButton.onClick {
             uploadFileForm.getData().fileToUpload?.sumOf { it.size }?.let { totalSize ->
                 if (totalSize > MAX_UPLOAD_SIZE) {
-                    onExcessiveFileSizeError(
-                        DomainError.FileUploadError(
-                            "File size exceeded"
+                    AppManager.store.dispatch(
+                        UploadAction.UploadFileFailed(
+                            DomainError.FileUploadError(
+                                "File size exceeded"
+                            )
                         )
                     )
                     Toast.show("Maximum file size exceeded")
                 } else {
                     CoroutineScope(Dispatchers.Default).launch {
                         uploadFileForm.form.getDataWithFileContent().fileToUpload?.let { files ->
-                            onSubmit(files)
-
+                            AppManager.uploadFiles(files)
                         }
                     }
                 }

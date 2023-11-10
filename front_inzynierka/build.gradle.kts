@@ -55,7 +55,7 @@ kotlin {
         implementation("io.kvision:kvision:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap-upload:$kvisionVersion")
-        implementation("io.kvision:kvision-redux:$kvisionVersion")
+        implementation("io.kvision:kvision-redux-kotlin:$kvisionVersion")
         implementation("io.kvision:kvision-chart:$kvisionVersion")
         implementation("io.kvision:kvision-rest:$kvisionVersion")
         implementation("io.kvision:kvision-toastify:$kvisionVersion")

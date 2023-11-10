@@ -4,4 +4,4 @@ Backend server requirements: Python 3.9 + pipenv (`pip install pipenv`)
 
 To run frontend server, run `./gradlew run` while in front_inzynierka folder
 
-To run backend server, run `pipenv shell`, `pipenv install`, `pipenv run app` while in inzynierka_backend folder
+To run backend server, run `python3 -m pipenv run install` while in inzynierka_backend folder

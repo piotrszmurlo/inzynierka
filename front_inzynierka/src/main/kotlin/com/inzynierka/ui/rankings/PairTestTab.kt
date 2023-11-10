@@ -1,11 +1,9 @@
 package com.inzynierka.ui.rankings
 
-import com.inzynierka.domain.NetworkActions
-import com.inzynierka.domain.core.MainAppAction
-import com.inzynierka.domain.core.MainAppState
 import com.inzynierka.domain.core.PairTestAction
 import com.inzynierka.domain.core.PairTestState
 import com.inzynierka.domain.models.PairTestEntry
+import com.inzynierka.ui.AppManager
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
 import io.kvision.form.formPanel
@@ -14,7 +12,6 @@ import io.kvision.html.Align
 import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
-import io.kvision.redux.ReduxStore
 import io.kvision.table.TableType
 import io.kvision.table.cell
 import io.kvision.table.row
@@ -32,19 +29,15 @@ data class PairTestForm(
 
 fun Container.pairTest(
     pairTestState: PairTestState,
-    store: ReduxStore<MainAppState, MainAppAction>,
-    networkActions: NetworkActions
 ) {
     flexPanel(
         direction = FlexDirection.COLUMN,
-        justify = JustifyContent.CENTER,
         alignItems = AlignItems.CENTER
     ) {
         h5(content = "Compare algorithm using Wilcoxon signed-rank test", align = Align.CENTER)
         val formPanel = formPanel<PairTestForm> {
             flexPanel(
-                direction = FlexDirection.COLUMN,
-                justify = JustifyContent.CENTER,
+                direction = FlexDirection.COLUMN
             ) {
                 alignItems = AlignItems.CENTER
                 h5(content = "Select algorithms", align = Align.CENTER)
@@ -55,7 +48,7 @@ fun Container.pairTest(
                         value = pairTestState.formState.algorithmFirst
                     ).bind(PairTestForm::algorithmFirst)
                         .onChange {
-                            store.dispatch(
+                            AppManager.store.dispatch(
                                 PairTestAction.AlgorithmSelected(
                                     algorithmFirst = this.value!!,
                                     algorithmSecond = form.getData().algorithmSecond!!
@@ -67,7 +60,7 @@ fun Container.pairTest(
                         value = pairTestState.formState.algorithmSecond
                     ).bind(PairTestForm::algorithmSecond)
                         .onChange {
-                            store.dispatch(
+                            AppManager.store.dispatch(
                                 PairTestAction.AlgorithmSelected(
                                     algorithmFirst = form.getData().algorithmFirst!!,
                                     algorithmSecond = this.value!!
@@ -81,7 +74,7 @@ fun Container.pairTest(
                     inline = true,
                     value = "${pairTestState.formState.dimension}"
                 ).bind(PairTestForm::dimension)
-                    .onChange { store.dispatch(PairTestAction.DimensionSelected(this.value!!.toInt())) }
+                    .onChange { AppManager.store.dispatch(PairTestAction.DimensionSelected(this.value!!.toInt())) }
             }
         }
 
@@ -89,14 +82,11 @@ fun Container.pairTest(
             width = 150.px
             onClick {
                 val formData = formPanel.getData()
-                store.dispatch { dispatch, _ ->
-                    networkActions.performPairTest(
-                        dispatch,
-                        formData.algorithmFirst!!,
-                        formData.algorithmSecond!!,
-                        formData.dimension!!.toInt()
-                    )
-                }
+                AppManager.performPairTest(
+                    formData.algorithmFirst!!,
+                    formData.algorithmSecond!!,
+                    formData.dimension!!.toInt()
+                )
             }
         }
         flexPanel(direction = FlexDirection.ROW, alignItems = AlignItems.START) {

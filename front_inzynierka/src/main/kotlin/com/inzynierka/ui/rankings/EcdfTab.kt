@@ -2,6 +2,7 @@ package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
 import com.inzynierka.model.EcdfData
+import com.inzynierka.ui.AppManager
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.chart.*
 import io.kvision.core.AlignItems
@@ -22,11 +23,17 @@ private val DIM_MAX_FES = mapOf(
     20 to DIM_20_MAX_FES
 )
 
-fun Container.ecdfTab(state: EcdfState, perFunctionClicked: () -> Unit, averagedClicked: () -> Unit) {
+fun Container.ecdfTab(state: EcdfState) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 8) {
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER, spacing = 8) {
-            button("Per function", style = ButtonStyle.OUTLINEPRIMARY).onClick { perFunctionClicked() }
-            button("Averaged", style = ButtonStyle.OUTLINEPRIMARY).onClick { averagedClicked() }
+            button(
+                "Per function",
+                style = ButtonStyle.OUTLINEPRIMARY
+            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.PerFunction)) }
+            button(
+                "Averaged",
+                style = ButtonStyle.OUTLINEPRIMARY
+            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) }
         }
         withLoadingSpinner(state.isFetching) {
             when (state.ecdfType) {

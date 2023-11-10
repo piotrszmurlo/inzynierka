@@ -1,35 +1,39 @@
 package com.inzynierka.ui
 
 import com.inzynierka.di.appModule
-import com.inzynierka.domain.NetworkActions
-import com.inzynierka.domain.core.MainAppAction
-import com.inzynierka.domain.core.MainAppState
 import com.inzynierka.domain.core.Tab
-import com.inzynierka.domain.core.mainAppReducer
+import com.inzynierka.ui.rankings.rankings
 import io.kvision.*
+import io.kvision.core.JustifyContent
+import io.kvision.panel.flexPanel
 import io.kvision.panel.root
-import io.kvision.redux.ReduxStore
-import io.kvision.redux.createReduxStore
+import io.kvision.state.bind
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.core.context.GlobalContext.startKoin
 
 
 class App : Application(), KoinComponent {
 
-    private val store: ReduxStore<MainAppState, MainAppAction>
-    private val networkActions: NetworkActions by inject()
-
     init {
         require("css/kvapp.css")
-        val initialMainAppState =
-            MainAppState(tab = Tab.Upload, error = null)
-        store = createReduxStore(::mainAppReducer, initialMainAppState)
     }
 
     override fun start() {
         root("kvapp") {
-            mainAppComponent(store, networkActions)
+            navBar()
+            flexPanel(
+                justify = JustifyContent.CENTER
+            ).bind(AppManager.store) { state ->
+                when (state.tab) {
+                    is Tab.Upload -> {
+                        uploadFileForm(
+                            state.uploadFilesState,
+                        )
+                    }
+
+                    is Tab.ResultsTab -> rankings(state.rankingsState, state.tab)
+                }
+            }
         }
     }
 }
@@ -39,5 +43,5 @@ fun main() {
         modules(appModule)
     }
 
-    startApplication(::App, module.hot, BootstrapModule, BootstrapCssModule, CoreModule, ChartModule, ReduxModule)
+    startApplication(::App, module.hot, BootstrapModule, BootstrapCssModule, CoreModule, ChartModule)
 }
