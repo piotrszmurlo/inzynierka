@@ -23,5 +23,5 @@ python_full_version = "3.9.6"
 
 [scripts]
 app = "uvicorn main:app --reload"
-install = 'bash -c "rm -rf build && sync && pip install . && uvicorn main:app --reload"'
+install = 'bash -c "rm -rf build && sync && pip install . && python3 -m uvicorn main:app --reload"'
 test = 'pytest --cov-report html --cov=src tests'
