@@ -13,11 +13,11 @@ import io.kvision.utils.px
 
 fun Container.rankings(
     state: RankingsState,
-    tab: Tab,
+    tab: Tab.ResultsTab,
 ) {
     flexPanel(direction = FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
         rankingTabs()
-        when (tab as? Tab.ResultsTab) {
+        when (tab) {
             is Tab.ResultsTab.Cec2022 -> {
                 scoreRanking(
                     state.cec2022,
@@ -65,8 +65,6 @@ fun Container.rankings(
             is Tab.ResultsTab.Revisited -> {
                 revisitedRanking(state.revisited)
             }
-
-            null -> {}
         }
     }
 }
