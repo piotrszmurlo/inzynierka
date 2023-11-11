@@ -141,9 +141,6 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
 def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]):
     results = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
     for data_file in data_files:
-        print("GGGGGGGGG")
-        print(data_file.function_number - 1)
-        print("GGGGGGGGG")
         results[data_file.function_number - 1][
             data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
     return extensions.BasicRankingInput(results)

@@ -3,13 +3,13 @@ package com.inzynierka.ui.rankings
 import com.inzynierka.domain.core.*
 import com.inzynierka.model.EcdfData
 import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.tabButtonStyle
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.chart.*
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.html.Align
-import io.kvision.html.ButtonStyle
 import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
@@ -28,11 +28,11 @@ fun Container.ecdfTab(state: EcdfState) {
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER, spacing = 8) {
             button(
                 "Per function",
-                style = ButtonStyle.OUTLINEPRIMARY
+                style = tabButtonStyle(state.ecdfType is EcdfType.PerFunction)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.PerFunction)) }
             button(
                 "Averaged",
-                style = ButtonStyle.OUTLINEPRIMARY
+                style = tabButtonStyle(state.ecdfType is EcdfType.Averaged)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) }
         }
         withLoadingSpinner(state.isFetching) {

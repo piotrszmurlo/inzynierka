@@ -32,7 +32,8 @@ def map_score_ranking_entries_to_pydantic_model(entries: list[extensions.ScoreRa
     return mapped_entries
 
 
-def map_revisited_ranking_entries_to_pydantic_model(entries: list[extensions.RevisitedRankingEntry]) -> list[RevisitedRankingEntry]:
+def map_revisited_ranking_entries_to_pydantic_model(entries: list[extensions.RevisitedRankingEntry]) -> list[
+    RevisitedRankingEntry]:
     mapped_entries = [
         RevisitedRankingEntry(
             dimension=entry.dimension,
@@ -45,6 +46,7 @@ def map_revisited_ranking_entries_to_pydantic_model(entries: list[extensions.Rev
         ) for entry in entries
     ]
     return mapped_entries
+
 
 def map_ecdf_entries_to_pydantic_model(entries: list[extensions.EcdfEntry]) -> list[EcdfEntry]:
     mapped_entries = [

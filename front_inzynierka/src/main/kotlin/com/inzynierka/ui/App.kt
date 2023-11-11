@@ -31,7 +31,9 @@ class App : Application(), KoinComponent {
                         )
                     }
 
-                    is Tab.ResultsTab -> rankings(state.rankingsState, state.tab)
+                    is Tab.ResultsTab -> {
+                        rankings(state.rankingsState, state.tab)
+                    }
                 }
             }
         }

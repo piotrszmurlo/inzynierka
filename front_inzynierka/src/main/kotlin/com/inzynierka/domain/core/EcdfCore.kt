@@ -17,7 +17,7 @@ sealed class EcdfType {
 
 data class EcdfState(
     val isFetching: Boolean = false,
-    val ecdfType: EcdfType = EcdfType.Averaged,
+    val ecdfType: EcdfType = EcdfType.PerFunction,
     val splitData: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>? = null,
     val combinedData: Map<Dimension, List<EcdfData>>? = null,
     val functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? = null

@@ -34,12 +34,14 @@ class Rankings:
         self._cec2022_ranking_scores = None
         self._friedman_ranking_scores = None
         self._revisited_ranking_data = None
+        self._ecdf_data = None
 
     def invalidate_cache(self):
         self._statistics_ranking_data = None
         self._cec2022_ranking_scores = None
         self._friedman_ranking_scores = None
         self._revisited_ranking_data = None
+        self._ecdf_data = None
 
     def get_statistics_ranking_data(self) -> list[StatisticRankingEntry]:
         if self._statistics_ranking_data is None:
@@ -96,12 +98,13 @@ class Rankings:
         return self._revisited_ranking_data
 
     def get_ecdf_data(self):
-        _ecdf_data = get_all_errors_and_evaluations_numbers_for_files(
-            self._file_service.get_files()
-        )
-        res = extensions.calculate_ecdf_data(_ecdf_data, self._thresholds, self.dimensionBudget)
-
-        return map_ecdf_entries_to_pydantic_model(res)
+        if self._ecdf_data is None:
+            _ecdf_data = get_all_errors_and_evaluations_numbers_for_files(
+                self._file_service.get_files()
+            )
+            res = extensions.calculate_ecdf_data(_ecdf_data, self._thresholds, self.dimensionBudget)
+            self._ecdf_data = map_ecdf_entries_to_pydantic_model(res)
+        return self._ecdf_data
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int):
         results = []
@@ -157,3 +160,4 @@ class Rankings:
                     function_number=function_number,
                     winner=None
                 )
+

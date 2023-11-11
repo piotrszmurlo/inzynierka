@@ -14,7 +14,8 @@ fun Container.navBar() {
         nav(rightAlign = true) {
             div {
                 padding = 4.px
-                button("Upload result").onClick {
+                button("Upload result") {
+                }.onClick {
                     AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Upload))
                 }
             }
@@ -22,6 +23,7 @@ fun Container.navBar() {
                 padding = 4.px
                 button("Browse rankings").onClick {
                     AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
+                    AppManager.loadCec2022Scores()
                 }
             }
         }
