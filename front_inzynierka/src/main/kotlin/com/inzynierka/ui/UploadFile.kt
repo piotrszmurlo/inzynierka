@@ -32,7 +32,7 @@ fun Container.uploadFileForm(
 ) {
     vPanel(alignItems = AlignItems.CENTER) {
         div {
-            content = "Select results file to upload"
+            content = "Select all CEC'22 results files for one algorithm to upload"
             padding = 8.px
         }
         formPanel<UploadFileForm> {
