@@ -49,12 +49,15 @@ class SQLAlchemyFileRepository(IFileRepository):
         return self._db.scalars(query).all()
 
     def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str):
-        file = models.LocalFile(
-            algorithm_name=algorithm_name,
-            contents=content,
-            dimension=dimension,
-            function_number=function_number
-        )
-        self._db.add(file)
-        self._db.commit()
-        self._db.refresh(file)
+        try:
+            file = models.LocalFile(
+                algorithm_name=algorithm_name,
+                contents=content,
+                dimension=dimension,
+                function_number=function_number
+            )
+            self._db.add(file)
+            self._db.commit()
+        except:
+            self._db.rollback()
+            raise

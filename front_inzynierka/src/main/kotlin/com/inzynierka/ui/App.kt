@@ -26,9 +26,7 @@ class App : Application(), KoinComponent {
             ).bind(AppManager.store) { state ->
                 when (state.tab) {
                     is Tab.Upload -> {
-                        uploadFileForm(
-                            state.uploadFilesState,
-                        )
+                        uploadFileForm(state.uploadFilesState)
                     }
 
                     is Tab.ResultsTab -> {

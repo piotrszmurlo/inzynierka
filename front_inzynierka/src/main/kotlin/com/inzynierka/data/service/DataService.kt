@@ -24,7 +24,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             Result.Success(
                 BenchmarkData(algorithms, dimensions, functionNumbers)
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -33,7 +33,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getAvailableDimensions()
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -42,7 +42,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getCec2022Scores().map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -51,7 +51,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getFriedmanScores().map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -60,7 +60,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getStatisticsEntries().map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -69,7 +69,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getRevisitedEntries().map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -78,7 +78,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getEcdfData().map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
@@ -87,7 +87,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.postFiles(kFiles)
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(
                 DomainError.FileUploadError(e.parsedRemoteExceptionMessage)
             )
@@ -102,7 +102,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         return try {
             val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension).map { it.toDomain() }
             Result.Success(result)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Result.Error(DomainError.NetworkError(e.message))
         }
     }
