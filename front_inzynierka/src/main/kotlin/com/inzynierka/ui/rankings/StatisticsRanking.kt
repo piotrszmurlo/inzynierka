@@ -1,6 +1,9 @@
 package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.StatisticsRankingState
+import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
+import com.inzynierka.ui.StringResources.SELECT_PRECISION_AND_NOTATION
+import com.inzynierka.ui.StringResources.TOGGLE_NOTATION
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.*
 import io.kvision.form.select.select
@@ -16,7 +19,7 @@ fun Container.statisticsRanking(
     changePrecision: (Int) -> Unit
 ) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 8) {
-        h5(content = "Select precision and notation")
+        h5(content = SELECT_PRECISION_AND_NOTATION)
         select(
             options = listOf("1" to "1", "3" to "3", "5" to "5", "8" to "8"),
             value = state.numberPrecision.toString()
@@ -25,7 +28,7 @@ fun Container.statisticsRanking(
                 changePrecision(this.value?.toInt()!!)
             }
 
-        button(text = "Toggle notation", style = ButtonStyle.OUTLINEPRIMARY)
+        button(text = TOGGLE_NOTATION, style = ButtonStyle.OUTLINEPRIMARY)
             .onClick {
                 toggleNumberNotation()
             }
@@ -38,7 +41,7 @@ fun Container.statisticsRanking(
                         state.scores[dim]?.forEach { functionNumber ->
                             statisticTable(
                                 headerNames = headerNames,
-                                title = "Dimension = ${dim}, Function = ${functionNumber.key}",
+                                title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber.key),
                                 scores = functionNumber.value,
                                 notation = state.numberNotation,
                                 precision = state.numberPrecision

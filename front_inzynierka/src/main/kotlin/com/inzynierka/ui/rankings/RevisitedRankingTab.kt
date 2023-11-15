@@ -2,6 +2,14 @@ package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.RevisitedRankingState
 import com.inzynierka.domain.models.RevisitedRankingEntry
+import com.inzynierka.ui.StringResources.ALGORITHM_NAME
+import com.inzynierka.ui.StringResources.AVERAGE
+import com.inzynierka.ui.StringResources.BUDGET_LEFT
+import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
+import com.inzynierka.ui.StringResources.RANK
+import com.inzynierka.ui.StringResources.SCORE
+import com.inzynierka.ui.StringResources.SUCCESSFUL_TRIALS
+import com.inzynierka.ui.StringResources.THRESHOLDS_ACHIEVED
 import com.inzynierka.ui.toPercentage
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.AlignItems
@@ -24,13 +32,13 @@ fun Container.revisitedRanking(state: RevisitedRankingState) {
             state.averagedScores?.let {
                 revisitedTable(
                     headerNames = listOf(
-                        "Rank",
-                        "Algorithm name",
-                        "Successful trials",
-                        "Thresholds achieved",
-                        "Budget left",
-                        "Score"
-                    ), title = "Average", scores = it
+                        RANK,
+                        ALGORITHM_NAME,
+                        SUCCESSFUL_TRIALS,
+                        THRESHOLDS_ACHIEVED,
+                        BUDGET_LEFT,
+                        SCORE
+                    ), title = AVERAGE, scores = it
                 )
             }
 
@@ -41,14 +49,14 @@ fun Container.revisitedRanking(state: RevisitedRankingState) {
                         state.scores[dim]?.forEach { functionNumber ->
                             revisitedTable(
                                 headerNames = listOf(
-                                    "Rank",
-                                    "Algorithm name",
-                                    "Successful trials",
-                                    "Thresholds achieved",
-                                    "Budget left",
-                                    "Score"
+                                    RANK,
+                                    ALGORITHM_NAME,
+                                    SUCCESSFUL_TRIALS,
+                                    THRESHOLDS_ACHIEVED,
+                                    BUDGET_LEFT,
+                                    SCORE
                                 ),
-                                title = "Dimension = ${dim}, Function = ${functionNumber.key}",
+                                title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber.key),
                                 scores = functionNumber.value
                             )
                         }

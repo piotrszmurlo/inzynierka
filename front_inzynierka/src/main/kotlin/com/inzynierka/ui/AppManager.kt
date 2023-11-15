@@ -4,6 +4,9 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.StringResources.FILE_UPLOAD_ERROR
+import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
+import com.inzynierka.ui.StringResources.TOAST_FILE_UPLOAD_COMPLETED
 import io.kvision.redux.createTypedReduxStore
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
@@ -26,7 +29,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             when (val result = dataService.getStatisticsRankingEntries()) {
                 is Result.Success -> store.dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
                 is Result.Error -> {
-                    Toast.show("Ranking fetch failed")
+                    Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                     store.dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
                 }
             }
@@ -37,13 +40,13 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         store.dispatch(UploadAction.UploadFileStarted)
         when (val result = dataService.postFiles(files)) {
             is Result.Success -> {
-                Toast.show("File upload completed")
+                Toast.show(TOAST_FILE_UPLOAD_COMPLETED)
                 store.dispatch(UploadAction.UploadFileSuccess)
             }
 
             is Result.Error -> {
                 store.dispatch(UploadAction.UploadFileFailed(result.domainError))
-                Toast.show("File upload failed: " + (result.domainError as DomainError.FileUploadError).message)
+                Toast.show(FILE_UPLOAD_ERROR((result.domainError as DomainError.FileUploadError).message))
             }
         }
     }
@@ -53,7 +56,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getFriedmanScores()) {
             is Result.Success -> store.dispatch(FriedmanRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(FriedmanRankingAction.FetchRankingsFailed(result.domainError))
             }
         }
@@ -64,7 +67,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getAvailableBenchmarkData()) {
             is Result.Success -> store.dispatch(PairTestAction.InitializeSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(PairTestAction.InitializeFailed(result.domainError))
             }
         }
@@ -75,7 +78,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getRevisitedRankingEntries()) {
             is Result.Success -> store.dispatch(RevisitedRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(RevisitedRankingAction.FetchRankingsFailed(result.domainError))
             }
         }
@@ -86,7 +89,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getEcdfData()) {
             is Result.Success -> store.dispatch(EcdfAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(EcdfAction.FetchRankingsFailed(result.domainError))
             }
         }
@@ -97,7 +100,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getStatisticsRankingEntries()) {
             is Result.Success -> store.dispatch(MedianRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(MedianRankingAction.FetchRankingsFailed(result.domainError))
             }
         }
@@ -108,7 +111,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         when (val result = dataService.getCec2022Scores()) {
             is Result.Success -> store.dispatch(Cec2022RankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
-                Toast.show("Ranking fetch failed")
+                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(Cec2022RankingAction.FetchRankingsFailed(result.domainError))
             }
         }

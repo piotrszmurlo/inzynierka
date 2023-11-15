@@ -4,6 +4,17 @@ import com.inzynierka.domain.core.PairTestAction
 import com.inzynierka.domain.core.PairTestState
 import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.StringResources.ALGORITHM
+import com.inzynierka.ui.StringResources.COMPARE
+import com.inzynierka.ui.StringResources.EQUAL
+import com.inzynierka.ui.StringResources.FUNCTION_NUMBER
+import com.inzynierka.ui.StringResources.PAIR_TEST_TITLE
+import com.inzynierka.ui.StringResources.RESULT
+import com.inzynierka.ui.StringResources.RESULTS_TABLE
+import com.inzynierka.ui.StringResources.SELECT_ALGORITHMS
+import com.inzynierka.ui.StringResources.SELECT_DIMENSION
+import com.inzynierka.ui.StringResources.SUMMED_UP_RESULTS
+import com.inzynierka.ui.StringResources.SUMMED_UP_WINS
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
 import io.kvision.form.formPanel
@@ -34,13 +45,13 @@ fun Container.pairTest(
         direction = FlexDirection.COLUMN,
         alignItems = AlignItems.CENTER
     ) {
-        h5(content = "Compare algorithm using Wilcoxon signed-rank test", align = Align.CENTER)
+        h5(content = PAIR_TEST_TITLE, align = Align.CENTER)
         val formPanel = formPanel<PairTestForm> {
             flexPanel(
                 direction = FlexDirection.COLUMN
             ) {
                 alignItems = AlignItems.CENTER
-                h5(content = "Select algorithms", align = Align.CENTER)
+                h5(content = SELECT_ALGORITHMS, align = Align.CENTER)
                 flexPanel(direction = FlexDirection.ROW) {
                     justifyContent = JustifyContent.CENTER
                     select(
@@ -68,7 +79,7 @@ fun Container.pairTest(
                             )
                         }
                 }
-                h5(content = "Select dimension", align = Align.CENTER)
+                h5(content = SELECT_DIMENSION, align = Align.CENTER)
                 radioGroup(
                     options = pairTestState.dimensions.map { "$it" to "$it" },
                     inline = true,
@@ -78,7 +89,7 @@ fun Container.pairTest(
             }
         }
 
-        button(text = "Compare", disabled = pairTestState.formState.isSubmitButtonDisabled) {
+        button(text = COMPARE, disabled = pairTestState.formState.isSubmitButtonDisabled) {
             width = 150.px
             onClick {
                 val formData = formPanel.getData()
@@ -93,15 +104,15 @@ fun Container.pairTest(
             paddingTop = 48.px
             pairTestState.results?.let {
                 pairTestTable(
-                    headerNames = listOf("Function number", "Result"),
-                    title = "Results table",
+                    headerNames = listOf(FUNCTION_NUMBER, RESULT),
+                    title = RESULTS_TABLE,
                     results = it
                 )
             }
             pairTestState.resultsSum?.let {
                 pairTestSumTable(
-                    headerNames = listOf("Algorithm", "Sum of wins"),
-                    title = "Summed results",
+                    headerNames = listOf(ALGORITHM, SUMMED_UP_WINS),
+                    title = SUMMED_UP_RESULTS,
                     resultsSum = it
                 )
             }
@@ -124,7 +135,7 @@ fun Container.pairTestTable(
             results.forEach {
                 row {
                     cell("${it.functionNumber}")
-                    cell(it.winner ?: "Equal")
+                    cell(it.winner ?: EQUAL)
                 }
             }
         }

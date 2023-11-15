@@ -3,17 +3,22 @@ package com.inzynierka.ui.rankings
 import com.inzynierka.domain.core.*
 import com.inzynierka.model.EcdfData
 import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.StringResources.AVERAGED
+import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_COMBINED
+import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_GROUP_EQUALS
+import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
+import com.inzynierka.ui.StringResources.ECDF_X_AXIS_LABEL
+import com.inzynierka.ui.StringResources.ECDF_Y_AXIS_LABEL
+import com.inzynierka.ui.StringResources.PER_FUNCTION
 import com.inzynierka.ui.tabButtonStyle
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.chart.*
-import io.kvision.core.AlignItems
-import io.kvision.core.Container
-import io.kvision.core.FlexDirection
-import io.kvision.html.Align
-import io.kvision.html.button
-import io.kvision.html.h5
+import io.kvision.core.*
+import io.kvision.html.*
 import io.kvision.panel.flexPanel
 import io.kvision.utils.obj
+import io.kvision.utils.perc
+import io.kvision.utils.px
 import kotlin.math.log10
 
 private const val DIM_10_MAX_FES = 200_000
@@ -23,15 +28,18 @@ private val DIM_MAX_FES = mapOf(
     20 to DIM_20_MAX_FES
 )
 
+private const val CHART_WIDTH = 600
+private const val CHART_HEIGHT = 400
+
 fun Container.ecdfTab(state: EcdfState) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 8) {
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER, spacing = 8) {
             button(
-                "Per function",
+                PER_FUNCTION,
                 style = tabButtonStyle(state.ecdfType is EcdfType.PerFunction)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.PerFunction)) }
             button(
-                "Averaged",
+                AVERAGED,
                 style = tabButtonStyle(state.ecdfType is EcdfType.Averaged)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) }
         }
@@ -49,8 +57,14 @@ fun Container.perFunctionEcdfs(data: Map<Dimension, Map<FunctionNumber, List<Ecd
         data?.forEach { (dimension, entries) ->
             flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
                 entries.forEach { (functionNumber, ecdfData) ->
-                    val title = "Dimension = $dimension, Function Number = $functionNumber"
+                    val title = DIMENSION_FUNCTION_NUMBER_EQUALS(dimension, functionNumber)
                     ecdfChart(ecdfData, title, dimension)
+                    tag(type = TAG.HR) {
+                        border = Border(width = 5.px)
+                        this.color = Color.rgb(0, 0, 0)
+                        this.width = 100.perc
+                        this.height = 1.px
+                    }
                 }
             }
         }
@@ -63,7 +77,7 @@ fun Container.averagedEcdfs(
 ) {
     flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
         combinedData?.forEach { (dimension, data) ->
-            ecdfChart(data, "Dimension = $dimension, combined functions", dimension)
+            ecdfChart(data, DIMENSION_FUNCTION_COMBINED(dimension), dimension)
         }
     }
     flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
@@ -72,7 +86,7 @@ fun Container.averagedEcdfs(
                 functionGroupsData.forEach { (functionGroup, data) ->
                     ecdfChart(
                         data,
-                        "Dimension = $dimension, Function Group: ${functionGroup.name.lowercase()}",
+                        DIMENSION_FUNCTION_GROUP_EQUALS(dimension, functionGroup.name.lowercase()),
                         dimension
                     )
                 }
@@ -108,13 +122,28 @@ fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String, dimension: 
                             min = DIM_MAX_FES[dimension]?.toDouble()
                                 ?.let { maxFes -> log10(maxFes * 0.001 / dimension) },
                             max = DIM_MAX_FES[dimension]?.toDouble()
-                                ?.let { maxFes -> log10(maxFes / dimension.toDouble()) }),
-                        "y" to ChartScales(min = 0, max = 1)
+                                ?.let { maxFes -> log10(maxFes / dimension.toDouble()) },
+                            title = ScaleTitleOptions(
+                                display = true,
+                                text = ECDF_X_AXIS_LABEL,
+                                font = ChartFont(size = 20)
+                            )
+                        ),
+                        "y" to ChartScales(
+                            min = 0,
+                            max = 1,
+                            title = ScaleTitleOptions(
+                                display = true,
+                                text = ECDF_Y_AXIS_LABEL,
+                                font = ChartFont(size = 20)
+                            )
+                        )
                     ),
                     animation = AnimationOptions(disabled = true)
                 ),
             ),
-            600, 400
+            chartWidth = CHART_WIDTH,
+            chartHeight = CHART_HEIGHT
         )
     }
 }

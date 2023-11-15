@@ -5,6 +5,8 @@ import com.inzynierka.domain.core.Tab
 import com.inzynierka.ui.rankings.rankings
 import io.kvision.*
 import io.kvision.core.JustifyContent
+import io.kvision.i18n.DefaultI18nManager
+import io.kvision.i18n.I18n
 import io.kvision.panel.flexPanel
 import io.kvision.panel.root
 import io.kvision.state.bind
@@ -16,9 +18,16 @@ class App : Application(), KoinComponent {
 
     init {
         require("css/kvapp.css")
+
     }
 
     override fun start() {
+        I18n.language = "en"
+        I18n.manager = DefaultI18nManager(
+            mapOf(
+                "en" to require("i18n/messages-en.json"),
+            )
+        )
         root("kvapp") {
             navBar()
             flexPanel(

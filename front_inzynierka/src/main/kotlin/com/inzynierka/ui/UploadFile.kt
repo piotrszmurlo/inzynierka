@@ -3,6 +3,11 @@ package com.inzynierka.ui
 import com.inzynierka.common.DomainError
 import com.inzynierka.domain.core.UploadAction
 import com.inzynierka.domain.core.UploadFilesState
+import com.inzynierka.ui.StringResources.SELECTED_FILES
+import com.inzynierka.ui.StringResources.SELECT_FILES
+import com.inzynierka.ui.StringResources.TOAST_MAXIMUM_FILE_SIZE_EXCEEDED
+import com.inzynierka.ui.StringResources.UPLOAD_FILES
+import com.inzynierka.ui.StringResources.UPLOAD_FILE_TAB_TITLE
 import io.kvision.core.*
 import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
@@ -32,7 +37,7 @@ fun Container.uploadFileForm(
 ) {
     vPanel(alignItems = AlignItems.CENTER) {
         div {
-            content = "Select all CEC'22 results files for one algorithm to upload"
+            content = UPLOAD_FILE_TAB_TITLE
             padding = 8.px
         }
         formPanel<UploadFileForm> {
@@ -42,11 +47,11 @@ fun Container.uploadFileForm(
                         AppManager.store.dispatch(
                             UploadAction.UploadFileFailed(
                                 DomainError.FileUploadError(
-                                    "File size exceeded"
+                                    TOAST_MAXIMUM_FILE_SIZE_EXCEEDED
                                 )
                             )
                         )
-                        Toast.show("Maximum file size exceeded")
+                        Toast.show(TOAST_MAXIMUM_FILE_SIZE_EXCEEDED)
                     } else {
                         CoroutineScope(Dispatchers.Default).launch {
                             getDataWithFileContent().filesToUpload?.let { files ->
@@ -65,10 +70,10 @@ fun Container.uploadFileForm(
             add(UploadFileForm::filesToUpload, uploadForm)
             flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
                 flexPanel(FlexDirection.ROW, spacing = 8) {
-                    button("Select files").onClick {
+                    button(SELECT_FILES).onClick {
                         uploadForm.input.id?.let { id -> document.getElementById(id)?.click() }
                     }
-                    val uploadFileButton = button("upload files") {
+                    val uploadFileButton = button(UPLOAD_FILES) {
                         disabled = state.uploadButtonDisabled || state.isUploading
                     }
                     uploadFileButton.onClick {
@@ -76,7 +81,7 @@ fun Container.uploadFileForm(
                     }
                 }
                 state.selectedFiles?.let {
-                    div("Selected Files: ")
+                    div(SELECTED_FILES)
                     it.forEach { filename ->
                         div(filename)
                     }

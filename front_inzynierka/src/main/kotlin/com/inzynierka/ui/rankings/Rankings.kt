@@ -2,6 +2,23 @@ package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
 import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.StringResources.ALGORITHM
+import com.inzynierka.ui.StringResources.BEST
+import com.inzynierka.ui.StringResources.CEC2022_RANKING_TABLE_HEADER
+import com.inzynierka.ui.StringResources.CEC2022_TAB_LABEL
+import com.inzynierka.ui.StringResources.COMBINED_CEC2022_RANKING_TABLE_HEADER
+import com.inzynierka.ui.StringResources.COMPARE_TWO_ALGORITHMS_TAB_LABEL
+import com.inzynierka.ui.StringResources.ECDF_TAB_LABEL
+import com.inzynierka.ui.StringResources.FRIEDMAN_RANKING_TABLE_HEADER
+import com.inzynierka.ui.StringResources.FRIEDMAN_TAB_LABEL
+import com.inzynierka.ui.StringResources.MEAN
+import com.inzynierka.ui.StringResources.MEAN_TAB_LABEL
+import com.inzynierka.ui.StringResources.MEDIAN
+import com.inzynierka.ui.StringResources.MEDIAN_TAB_LABEL
+import com.inzynierka.ui.StringResources.RANK
+import com.inzynierka.ui.StringResources.REVISITED_TAB_LABEL
+import com.inzynierka.ui.StringResources.STDEV
+import com.inzynierka.ui.StringResources.WORST
 import com.inzynierka.ui.tabButtonStyle
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -21,22 +38,22 @@ fun Container.rankings(
             is Tab.ResultsTab.Cec2022 -> {
                 scoreRanking(
                     state.cec2022,
-                    scoreHeaderTitle = "CEC 2022 score",
-                    combinedScoreHeaderTitle = "combined CEC 2022 score"
+                    scoreHeaderTitle = CEC2022_RANKING_TABLE_HEADER,
+                    combinedScoreHeaderTitle = COMBINED_CEC2022_RANKING_TABLE_HEADER
                 )
             }
 
             is Tab.ResultsTab.Friedman -> {
                 scoreRanking(
                     state.friedman,
-                    scoreHeaderTitle = "Average trial rank",
-                    combinedScoreHeaderTitle = "Average trial rank"
+                    scoreHeaderTitle = FRIEDMAN_RANKING_TABLE_HEADER,
+                    combinedScoreHeaderTitle = FRIEDMAN_RANKING_TABLE_HEADER
                 )
             }
 
             is Tab.ResultsTab.Mean -> {
                 statisticsRanking(
-                    headerNames = listOf("Rank", "Algorithm", "Mean", "Median", "Stddev", "Best", "Worst"),
+                    headerNames = listOf(RANK, ALGORITHM, MEAN, MEDIAN, STDEV, BEST, WORST),
                     state = state.mean,
                     toggleNumberNotation = { AppManager.store.dispatch(MeanRankingAction.ToggleNumberNotation) },
                     changePrecision = { AppManager.store.dispatch(MeanRankingAction.ChangePrecision(it)) }
@@ -45,7 +62,7 @@ fun Container.rankings(
 
             is Tab.ResultsTab.Median -> {
                 statisticsRanking(
-                    headerNames = listOf("Rank", "Algorithm", "Mean", "Median", "Stddev", "Best", "Worst"),
+                    headerNames = listOf(RANK, ALGORITHM, MEAN, MEDIAN, STDEV, BEST, WORST),
                     state = state.median,
                     toggleNumberNotation = { AppManager.store.dispatch(MedianRankingAction.ToggleNumberNotation) },
                     changePrecision = { AppManager.store.dispatch(MedianRankingAction.ChangePrecision(it)) }
@@ -75,7 +92,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         padding = 16.px
         paddingBottom = 32.px
         button(
-            text = "CEC 2022",
+            text = CEC2022_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.Cec2022)
         )
             .onClickLaunch {
@@ -83,7 +100,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.loadCec2022Scores()
             }
         button(
-            text = "Mean",
+            text = MEAN_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.Mean)
         )
             .onClickLaunch {
@@ -91,7 +108,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.loadMeanRanking()
             }
         button(
-            text = "Median",
+            text = MEDIAN_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.Median)
         )
             .onClickLaunch {
@@ -99,7 +116,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.loadMedianRanking()
             }
         button(
-            text = "ECDF",
+            text = ECDF_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.Ecdf)
         )
             .onClickLaunch {
@@ -107,7 +124,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.loadEcdfData()
             }
         button(
-            text = "Friedman",
+            text = FRIEDMAN_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.Friedman)
         )
             .onClickLaunch {
@@ -115,7 +132,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.loadFriedmanScores()
             }
         button(
-            "Compare two algorithms",
+            text = COMPARE_TWO_ALGORITHMS_TAB_LABEL,
             style = tabButtonStyle(tab is Tab.ResultsTab.PairTest)
         )
             .onClickLaunch {
@@ -123,7 +140,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
                 AppManager.getAvailableBenchmarkData()
             }
         button(
-            text = "Revisited Ranking",
+            text = REVISITED_TAB_LABEL,
             style = tabButtonStyle(
                 tab is Tab.ResultsTab.Revisited
             )
