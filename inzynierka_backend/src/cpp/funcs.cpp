@@ -189,7 +189,11 @@ double strict_stod(const std::string& s) {
     return result;
 }
 
-std::string parse_results(std::string input, int maxBudget) {
+const int FINAL_ERROR_INDEX = 16;
+const int EVALUATION_ROW_INDEX = 17;
+const int MAX_COLUM_COUNT = 30;
+
+std::string parse_results(std::string input,std::string fileName, int maxBudget) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
     std::stringstream result("");
@@ -200,15 +204,21 @@ std::string parse_results(std::string input, int maxBudget) {
     int rowNumber = 1;
     std::vector<double> finalErrors;
     while (ss >> word) {
-        value = strict_stod(word);
-        if (value < MIN_VALUE) { value = MIN_VALUE; }
-        if (rowNumber == 16) {
-            finalErrors.push_back(value);
-        } else if (rowNumber == 17) {
-            if ((finalErrors[columnCount] != MIN_VALUE) && (value != maxBudget)) throw std::invalid_argument("Unexpected evaluation number in data(max budget not recorded in a failed trial): " + std::to_string(value));
-            if (value > maxBudget) throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value));
+        try {
+            value = strict_stod(word);
         }
-        if (++columnCount == 30) {
+        catch(std::invalid_argument) {
+            throw std::invalid_argument("Unexpected character found in data: " + word + " in file: " + fileName);
+        }
+        if (value < MIN_VALUE) { value = MIN_VALUE; }
+        if (rowNumber == FINAL_ERROR_INDEX) {
+            finalErrors.push_back(value);
+        } else if (rowNumber == EVALUATION_ROW_INDEX) {
+            if ((finalErrors[columnCount] != MIN_VALUE) && (value != maxBudget)) throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial failed, max budget must be recorded)");
+            if ((finalErrors[columnCount] == MIN_VALUE) && (value == maxBudget)) throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial succeeded, record actual used budget, not max budget)");
+            if (value > maxBudget) throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value) + " in file: " + fileName);
+        }
+        if (++columnCount == MAX_COLUM_COUNT) {
             result << value << "\n";
             columnCount = 0;
             ++rowNumber;

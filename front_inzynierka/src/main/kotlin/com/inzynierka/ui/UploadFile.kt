@@ -99,7 +99,7 @@ fun Container.selectedFilesList(selectedFilenames: List<String>) {
     flexPanel(FlexDirection.ROW, spacing = 16) {
         selectedFilenames
             .sortedBy { filename ->
-                filename.filter { it.isDigit() }.toInt()
+                filename.filter { it.isDigit() }.toIntOrNull()
             }
             .chunked(FILE_LIST_COLUMN_SIZE)
             .forEach { filenames ->
