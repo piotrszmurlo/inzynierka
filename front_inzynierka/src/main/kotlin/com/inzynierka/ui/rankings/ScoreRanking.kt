@@ -13,18 +13,21 @@ import io.kvision.panel.flexPanel
 fun Container.scoreRanking(state: ScoreRankingState, scoreHeaderTitle: String, combinedScoreHeaderTitle: String) {
     withLoadingSpinner(state.isFetching) {
         flexPanel(direction = FlexDirection.ROW) {
-            state.scores?.forEach {
-                scoreRankingTable(
-                    headerNames = listOf(RANK, ALGORITHM, scoreHeaderTitle),
-                    title = DIMENSION_EQUALS(it.key),
-                    scores = it.value
-                )
+            val sortedDimensions = state.scores?.keys?.sorted()
+            sortedDimensions?.forEach { dimension ->
+                state.scores[dimension]?.let { scores ->
+                    scoreRankingTable(
+                        headerNames = listOf(RANK, ALGORITHM, scoreHeaderTitle),
+                        title = DIMENSION_EQUALS(dimension),
+                        scores = scores
+                    )
+                }
             }
-            state.combinedScores?.let {
+            state.combinedScores?.let { combinedScores ->
                 scoreRankingTable(
                     headerNames = listOf(RANK, ALGORITHM, combinedScoreHeaderTitle),
                     title = COMBINED_RANKING_TABLE_HEADER,
-                    scores = it
+                    scores = combinedScores
                 )
             }
         }

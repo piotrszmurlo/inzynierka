@@ -38,14 +38,17 @@ fun Container.statisticsRanking(
                 val sortedDimensions = state.scores?.keys?.sorted()
                 sortedDimensions?.forEach { dim ->
                     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
-                        state.scores[dim]?.forEach { functionNumber ->
-                            statisticTable(
-                                headerNames = headerNames,
-                                title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber.key),
-                                scores = functionNumber.value,
-                                notation = state.numberNotation,
-                                precision = state.numberPrecision
-                            )
+                        val sortedFunctionNumbers = state.scores[dim]?.keys?.sorted()
+                        sortedFunctionNumbers?.forEach { functionNumber ->
+                            state.scores[dim]?.get(functionNumber)?.let { scores ->
+                                statisticTable(
+                                    headerNames = headerNames,
+                                    title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber),
+                                    scores = scores,
+                                    notation = state.numberNotation,
+                                    precision = state.numberPrecision
+                                )
+                            }
                         }
                     }
                 }

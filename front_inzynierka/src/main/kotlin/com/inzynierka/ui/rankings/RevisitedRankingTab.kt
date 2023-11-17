@@ -29,7 +29,7 @@ import io.kvision.utils.toFixedNoRound
 fun Container.revisitedRanking(state: RevisitedRankingState) {
     withLoadingSpinner(state.isFetching) {
         flexPanel(FlexDirection.COLUMN) {
-            state.averagedScores?.let {
+            state.averagedScores?.let { scores ->
                 revisitedTable(
                     headerNames = listOf(
                         RANK,
@@ -38,7 +38,7 @@ fun Container.revisitedRanking(state: RevisitedRankingState) {
                         THRESHOLDS_ACHIEVED,
                         BUDGET_LEFT,
                         SCORE
-                    ), title = AVERAGE, scores = it
+                    ), title = AVERAGE, scores = scores
                 )
             }
 
@@ -46,19 +46,22 @@ fun Container.revisitedRanking(state: RevisitedRankingState) {
                 val sortedDimensions = state.scores?.keys?.sorted()
                 sortedDimensions?.forEach { dim ->
                     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
-                        state.scores[dim]?.forEach { functionNumber ->
-                            revisitedTable(
-                                headerNames = listOf(
-                                    RANK,
-                                    ALGORITHM_NAME,
-                                    SUCCESSFUL_TRIALS,
-                                    THRESHOLDS_ACHIEVED,
-                                    BUDGET_LEFT,
-                                    SCORE
-                                ),
-                                title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber.key),
-                                scores = functionNumber.value
-                            )
+                        val sortedFunctionNumbers = state.scores[dim]?.keys?.sorted()
+                        sortedFunctionNumbers?.forEach { functionNumber ->
+                            state.scores[dim]?.get(functionNumber)?.let { scores ->
+                                revisitedTable(
+                                    headerNames = listOf(
+                                        RANK,
+                                        ALGORITHM_NAME,
+                                        SUCCESSFUL_TRIALS,
+                                        THRESHOLDS_ACHIEVED,
+                                        BUDGET_LEFT,
+                                        SCORE
+                                    ),
+                                    title = DIMENSION_FUNCTION_NUMBER_EQUALS(dim, functionNumber),
+                                    scores = scores
+                                )
+                            }
                         }
                     }
                 }

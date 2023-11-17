@@ -10,15 +10,18 @@ import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
 import com.inzynierka.ui.StringResources.ECDF_X_AXIS_LABEL
 import com.inzynierka.ui.StringResources.ECDF_Y_AXIS_LABEL
 import com.inzynierka.ui.StringResources.PER_FUNCTION
+import com.inzynierka.ui.divider
 import com.inzynierka.ui.tabButtonStyle
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.chart.*
-import io.kvision.core.*
-import io.kvision.html.*
+import io.kvision.core.AlignItems
+import io.kvision.core.Container
+import io.kvision.core.FlexDirection
+import io.kvision.html.Align
+import io.kvision.html.button
+import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.utils.obj
-import io.kvision.utils.perc
-import io.kvision.utils.px
 import kotlin.math.log10
 
 private const val DIM_10_MAX_FES = 200_000
@@ -54,16 +57,15 @@ fun Container.ecdfTab(state: EcdfState) {
 
 fun Container.perFunctionEcdfs(data: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>?) {
     flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
-        data?.forEach { (dimension, entries) ->
+        val sortedDimensions = data?.keys?.sorted()
+        sortedDimensions?.forEach { dimension ->
             flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
-                entries.forEach { (functionNumber, ecdfData) ->
+                val sortedFunctionNumbers = data[dimension]?.keys?.sorted()
+                sortedFunctionNumbers?.forEach { functionNumber ->
                     val title = DIMENSION_FUNCTION_NUMBER_EQUALS(dimension, functionNumber)
-                    ecdfChart(ecdfData, title, dimension)
-                    tag(type = TAG.HR) {
-                        border = Border(width = 5.px)
-                        this.color = Color.rgb(0, 0, 0)
-                        this.width = 100.perc
-                        this.height = 1.px
+                    data[dimension]?.get(functionNumber)?.let { ecdfData ->
+                        ecdfChart(ecdfData, title, dimension)
+                        divider()
                     }
                 }
             }

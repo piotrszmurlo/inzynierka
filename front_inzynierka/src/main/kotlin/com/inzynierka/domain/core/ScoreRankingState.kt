@@ -3,7 +3,7 @@ package com.inzynierka.domain.core
 import com.inzynierka.domain.models.ScoreRankingEntry
 
 data class ScoreRankingState(
-    val scores: Map<Int, List<ScoreRankingEntry>>? = null,
+    val scores: Map<Dimension, List<ScoreRankingEntry>>? = null,
     val combinedScores: List<ScoreRankingEntry>? = null,
     val isFetching: Boolean = false
 )
