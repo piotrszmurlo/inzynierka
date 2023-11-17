@@ -1,10 +1,10 @@
 package com.inzynierka.ui
 
-import com.inzynierka.common.DomainError
 import com.inzynierka.domain.core.UploadAction
 import com.inzynierka.domain.core.UploadFilesState
 import com.inzynierka.ui.StringResources.SELECTED_FILES
 import com.inzynierka.ui.StringResources.SELECT_FILES
+import com.inzynierka.ui.StringResources.TOAST_FILE_UPLOAD_COMPLETED
 import com.inzynierka.ui.StringResources.TOAST_MAXIMUM_FILE_SIZE_EXCEEDED
 import com.inzynierka.ui.StringResources.UPLOAD_FILES
 import com.inzynierka.ui.StringResources.UPLOAD_FILE_TAB_TITLE
@@ -26,6 +26,7 @@ import web.dom.document
 
 private const val MAX_UPLOAD_SIZE = 200_000
 private const val FILE_LIST_COLUMN_SIZE = 6
+private const val UPLOAD_FORM_ID = "UploadFormId"
 
 @Serializable
 private data class UploadFileForm(
@@ -47,13 +48,6 @@ fun Container.uploadFileForm(
             onChangeLaunch {
                 getData().filesToUpload?.sumOf { it.size }?.let { totalSize ->
                     if (totalSize > MAX_UPLOAD_SIZE) {
-                        AppManager.store.dispatch(
-                            UploadAction.UploadFileFailed(
-                                DomainError.FileUploadError(
-                                    TOAST_MAXIMUM_FILE_SIZE_EXCEEDED
-                                )
-                            )
-                        )
                         Toast.show(TOAST_MAXIMUM_FILE_SIZE_EXCEEDED)
                     } else {
                         CoroutineScope(Dispatchers.Default).launch {
@@ -67,7 +61,7 @@ fun Container.uploadFileForm(
                 }
             }
             val uploadForm = upload(multiple = true) {
-                input.id = "UploadFormId"
+                input.id = UPLOAD_FORM_ID
                 style { display = Display.NONE }
             }
             add(UploadFileForm::filesToUpload, uploadForm)
@@ -77,7 +71,7 @@ fun Container.uploadFileForm(
                         uploadForm.input.id?.let { id -> document.getElementById(id)?.click() }
                     }
                     val uploadFileButton = button(UPLOAD_FILES) {
-                        disabled = state.uploadButtonDisabled || state.isUploading
+                        disabled = state.uploadButtonDisabled
                     }
                     uploadFileButton.onClick {
                         state.kFiles?.let { files -> AppManager.uploadFiles(files) }
@@ -88,6 +82,14 @@ fun Container.uploadFileForm(
                 }
             }
         }
+    }
+    state.error?.let {
+        Toast.show(StringResources.FILE_UPLOAD_ERROR(state.error.message))
+        AppManager.store.dispatch(UploadAction.ResultHandled)
+    }
+    state.success?.let {
+        Toast.show(TOAST_FILE_UPLOAD_COMPLETED)
+        AppManager.store.dispatch(UploadAction.ResultHandled)
     }
 }
 

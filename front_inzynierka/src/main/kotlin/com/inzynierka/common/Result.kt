@@ -5,3 +5,4 @@ sealed class Result<out T : Any> {
     data class Error(val domainError: DomainError) : Result<Nothing>()
 }
 
+

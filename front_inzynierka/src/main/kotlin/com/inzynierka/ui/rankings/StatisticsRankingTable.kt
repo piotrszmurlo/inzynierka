@@ -2,6 +2,7 @@ package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.NumberNotation
 import com.inzynierka.domain.models.StatisticsRankingEntry
+import com.inzynierka.ui.format
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
@@ -13,7 +14,6 @@ import io.kvision.table.cell
 import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
-import js.core.toExponential
 
 fun Container.statisticTable(
     headerNames: List<String>,
@@ -40,18 +40,6 @@ fun Container.statisticTable(
                     cell(it.max.format(notation, precision))
                 }
             }
-        }
-    }
-}
-
-fun Double.format(notation: NumberNotation, precision: Int): String {
-    return when (notation) {
-        is NumberNotation.Decimal -> {
-            this.toExponential(precision).toDouble().toString()
-        }
-
-        is NumberNotation.Scientific -> {
-            this.toExponential(precision)
         }
     }
 }

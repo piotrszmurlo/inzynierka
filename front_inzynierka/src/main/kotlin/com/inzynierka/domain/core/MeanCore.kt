@@ -6,12 +6,18 @@ import com.inzynierka.domain.models.StatisticsRankingEntry
 typealias Dimension = Int
 typealias FunctionNumber = Int
 
+val AVAILABLE_PRECISIONS = listOf(1, 2, 3, 4, 5, 6, 7, 8)
+
 data class StatisticsRankingState(
     val isFetching: Boolean = false,
     val scores: Map<Dimension, Map<FunctionNumber, List<StatisticsRankingEntry>>>? = null,
     val numberNotation: NumberNotation = NumberNotation.Scientific,
-    val numberPrecision: Int = 3
-)
+    val numberPrecision: Int = 3,
+    val error: DomainError? = null
+) {
+    val availablePrecisions
+        get() = AVAILABLE_PRECISIONS
+}
 
 sealed class NumberNotation {
     object Scientific : NumberNotation()
@@ -19,6 +25,7 @@ sealed class NumberNotation {
 }
 
 sealed class MeanRankingAction : RankingsAction() {
+    object ErrorHandled : MeanRankingAction()
     object FetchRankingsStarted : MeanRankingAction()
     object ToggleNumberNotation : MeanRankingAction()
     data class ChangePrecision(val precision: Int) : MeanRankingAction()
@@ -39,4 +46,5 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
     }
 
     is MeanRankingAction.ChangePrecision -> state.copy(numberPrecision = action.precision)
+    is MeanRankingAction.ErrorHandled -> state.copy(error = null)
 }

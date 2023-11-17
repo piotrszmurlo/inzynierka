@@ -1,12 +1,9 @@
 package com.inzynierka.ui
 
-import com.inzynierka.common.DomainError
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
-import com.inzynierka.ui.StringResources.FILE_UPLOAD_ERROR
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
-import com.inzynierka.ui.StringResources.TOAST_FILE_UPLOAD_COMPLETED
 import io.kvision.redux.createTypedReduxStore
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
@@ -40,13 +37,11 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         store.dispatch(UploadAction.UploadFileStarted)
         when (val result = dataService.postFiles(files)) {
             is Result.Success -> {
-                Toast.show(TOAST_FILE_UPLOAD_COMPLETED)
                 store.dispatch(UploadAction.UploadFileSuccess)
             }
 
             is Result.Error -> {
                 store.dispatch(UploadAction.UploadFileFailed(result.domainError))
-                Toast.show(FILE_UPLOAD_ERROR((result.domainError as DomainError.FileUploadError).message))
             }
         }
     }

@@ -3,20 +3,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: \n"
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:57
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:61
 msgid "AE comparison"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:21
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:25
 msgid "Algorithm"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:22
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:26
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:30
 msgid "Algorithm name"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:27
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:31
 msgid "Average"
 msgstr ""
 
@@ -24,19 +24,19 @@ msgstr ""
 msgid "Average rank"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:37
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:41
 msgid "Averaged"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:31
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:35
 msgid "Best"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:56
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:60
 msgid "Browse rankings"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:25
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:29
 msgid "Budget left"
 msgstr ""
 
@@ -56,11 +56,11 @@ msgstr ""
 msgid "Combined score"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:51
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:55
 msgid "Compare"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:52
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:56
 msgid "Compare algorithm using Wilcoxon signed-rank test"
 msgstr ""
 
@@ -68,19 +68,19 @@ msgstr ""
 msgid "Compare two algorithms"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:73
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:77
 msgid "Dimension = %1"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:68
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:72
 msgid "Dimension = %1, All functions combined"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:65
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:69
 msgid "Dimension = %1, Function Group: %2"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:71
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:75
 msgid "Dimension = %1, Function Number = %2"
 msgstr ""
 
@@ -88,27 +88,31 @@ msgstr ""
 msgid "ECDF"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:48
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:21
+msgid "Empirical Cumulative Distribution Functions."
+msgstr ""
+
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:52
 msgid "Equal"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:35
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:39
 msgid "f-evaluations / dimension (log10)"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:59
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:63
 msgid "Failed to load ranking data"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:60
-msgid "File upload completed"
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:64
+msgid "Files upload completed"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:62
-msgid "File upload failed: "
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:66
+msgid "Files upload failed: %1"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:34
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:38
 msgid "Fraction of thresholds achieved"
 msgstr ""
 
@@ -116,37 +120,41 @@ msgstr ""
 msgid "Friedman"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:46
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:50
 msgid "Function Number"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:61
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:65
 msgid "Maximum file size exceeded"
 msgstr ""
 
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:11
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:28
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:32
 msgid "Mean"
 msgstr ""
 
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:10
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:29
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:33
 msgid "Median"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:36
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:40
 msgid "Per function"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:20
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:24
 msgid "Rank"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:47
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:23
+msgid "Ranking method proposed in \"Revisiting CEC 2022 ranking for bound constrained single objective optimization\" article"
+msgstr ""
+
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:51
 msgid "Result"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:45
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:49
 msgid "Results table"
 msgstr ""
 
@@ -154,62 +162,71 @@ msgstr ""
 msgid "Revisited"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:40
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:44
 msgid "Select algorithms"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:44
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:48
+#: src/main/kotlin/com/inzynierka/ui/Utils.kt:21
 msgid "Select all CEC'22 results files for one algorithm to upload"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:39
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:43
 msgid "Select dimension"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:41
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:45
 msgid "Select files"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:54
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:58
 msgid "Select precision and notation"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:43
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:47
 msgid "Selected Files: "
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:30
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:34
 msgid "Stdev"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:23
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:27
 msgid "Successful trials"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:50
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:54
 msgid "Sum of wins"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:49
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:53
 msgid "Summed up results"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:24
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:19
+msgid "This ranking is based on CEC'22 official evaluation criteria."
+msgstr ""
+
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:20
+msgid "This ranking is based on Friedman test."
+msgstr ""
+
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:28
 msgid "Thresholds achieved"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:53
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:57
 msgid "Toggle Notation"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:42
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:46
 msgid "Upload files"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:55
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:59
 msgid "Upload Results"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:32
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:36
 msgid "Worst"
 msgstr ""

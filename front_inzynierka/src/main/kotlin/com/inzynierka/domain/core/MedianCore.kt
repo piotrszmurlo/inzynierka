@@ -6,6 +6,7 @@ import com.inzynierka.domain.models.StatisticsRankingEntry
 
 sealed class MedianRankingAction : RankingsAction() {
     object FetchRankingsStarted : MedianRankingAction()
+    object ErrorHandled : MedianRankingAction()
     data class FetchRankingsSuccess(val scores: List<StatisticsRankingEntry>) : MedianRankingAction()
     data class FetchRankingsFailed(val error: DomainError?) : MedianRankingAction()
     object ToggleNumberNotation : MedianRankingAction()
@@ -28,6 +29,7 @@ fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = 
         state.copy(numberNotation = toggleNotation(state.numberNotation))
     }
 
+    is MedianRankingAction.ErrorHandled -> state.copy(error = null)
 }
 
 fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<StatisticsRankingEntry>): Map<Int, Map<Int, List<StatisticsRankingEntry>>> {

@@ -63,6 +63,7 @@ fun Container.rankings(
                 statisticsRanking(
                     headerNames = listOf(RANK, ALGORITHM, MEAN, MEDIAN, STDEV, BEST, WORST),
                     state = state.mean,
+                    onHandleError = { AppManager.store.dispatch(MeanRankingAction.ErrorHandled) },
                     toggleNumberNotation = { AppManager.store.dispatch(MeanRankingAction.ToggleNumberNotation) },
                     changePrecision = { AppManager.store.dispatch(MeanRankingAction.ChangePrecision(it)) }
                 )
@@ -72,6 +73,7 @@ fun Container.rankings(
                 statisticsRanking(
                     headerNames = listOf(RANK, ALGORITHM, MEAN, MEDIAN, STDEV, BEST, WORST),
                     state = state.median,
+                    onHandleError = { AppManager.store.dispatch(MedianRankingAction.ErrorHandled) },
                     toggleNumberNotation = { AppManager.store.dispatch(MedianRankingAction.ToggleNumberNotation) },
                     changePrecision = { AppManager.store.dispatch(MedianRankingAction.ChangePrecision(it)) }
                 )
@@ -82,7 +84,6 @@ fun Container.rankings(
             }
 
             is Tab.ResultsTab.Ecdf -> {
-
                 ecdfTab(
                     state = state.ecdf
                 )

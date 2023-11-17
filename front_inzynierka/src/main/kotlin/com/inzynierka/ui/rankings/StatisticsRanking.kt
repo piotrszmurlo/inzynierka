@@ -3,8 +3,10 @@ package com.inzynierka.ui.rankings
 import com.inzynierka.domain.core.StatisticsRankingState
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
 import com.inzynierka.ui.StringResources.SELECT_PRECISION_AND_NOTATION
+import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
 import com.inzynierka.ui.StringResources.TOGGLE_NOTATION
 import com.inzynierka.ui.divider
+import com.inzynierka.ui.show
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -15,17 +17,19 @@ import io.kvision.html.ButtonStyle
 import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
+import io.kvision.toast.Toast
 
 fun Container.statisticsRanking(
     state: StatisticsRankingState,
     headerNames: List<String>,
+    onHandleError: () -> Unit,
     toggleNumberNotation: () -> Unit,
-    changePrecision: (Int) -> Unit
+    changePrecision: (Int) -> Unit,
 ) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 8) {
         h5(content = SELECT_PRECISION_AND_NOTATION)
         select(
-            options = listOf("1" to "1", "3" to "3", "5" to "5", "8" to "8"),
+            options = state.availablePrecisions.map { it.toString() to it.toString() },
             value = state.numberPrecision.toString()
         )
             .onChange {
@@ -58,5 +62,9 @@ fun Container.statisticsRanking(
                 }
             }
         }
+    }
+    state.error?.let {
+        Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
+        onHandleError()
     }
 }

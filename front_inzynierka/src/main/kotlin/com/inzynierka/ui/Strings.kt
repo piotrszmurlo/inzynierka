@@ -61,9 +61,9 @@ object StringResources {
     var NAVBAR_TITLE = tr("AE comparison")
 
     var TOAST_FAILED_TO_LOAD_RANKING = tr("Failed to load ranking data")
-    var TOAST_FILE_UPLOAD_COMPLETED = tr("File upload completed")
+    var TOAST_FILE_UPLOAD_COMPLETED = tr("Files upload completed")
     var TOAST_MAXIMUM_FILE_SIZE_EXCEEDED = tr("Maximum file size exceeded")
-    fun FILE_UPLOAD_ERROR(message: String?) = gettext("File upload failed: ", message)
+    fun FILE_UPLOAD_ERROR(message: String?) = gettext("Files upload failed: %1", message)
 
     fun DIMENSION_FUNCTION_GROUP_EQUALS(dim: Int, functionGroup: String) =
         gettext("Dimension = %1, Function Group: %2", dim, functionGroup)

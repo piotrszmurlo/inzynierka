@@ -28,6 +28,8 @@ import io.kvision.table.table
 import io.kvision.utils.px
 import io.kvision.utils.toFixedNoRound
 
+private const val REVISITED_RANKING_PRECISION = 3
+
 fun Container.revisitedRanking(state: RevisitedRankingState) {
     h5(REVISITED_DESCRIPTION)
     divider()
@@ -86,10 +88,10 @@ fun Container.revisitedTable(headerNames: List<String>, title: String, scores: L
                 row {
                     cell("${it.rank}")
                     cell(it.algorithmName)
-                    cell(it.successfulTrialsPercentage.toPercentage(3))
-                    cell(it.thresholdsAchievedPercentage.toPercentage(3))
-                    cell(it.budgetLeftPercentage.toPercentage(3))
-                    cell(it.score.toFixedNoRound(3))
+                    cell(it.successfulTrialsPercentage.toPercentage(REVISITED_RANKING_PRECISION))
+                    cell(it.thresholdsAchievedPercentage.toPercentage(REVISITED_RANKING_PRECISION))
+                    cell(it.budgetLeftPercentage.toPercentage(REVISITED_RANKING_PRECISION))
+                    cell(it.score.toFixedNoRound(REVISITED_RANKING_PRECISION))
                 }
             }
         }
