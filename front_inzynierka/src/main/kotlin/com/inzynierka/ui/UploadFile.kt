@@ -13,9 +13,8 @@ import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
 import io.kvision.form.upload.upload
 import io.kvision.html.button
-import io.kvision.html.div
+import io.kvision.html.h5
 import io.kvision.panel.flexPanel
-import io.kvision.panel.vPanel
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
 import io.kvision.utils.px
@@ -25,7 +24,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import web.dom.document
 
-const val MAX_UPLOAD_SIZE = 200_000
+private const val MAX_UPLOAD_SIZE = 200_000
+private const val FILE_LIST_COLUMN_SIZE = 6
 
 @Serializable
 private data class UploadFileForm(
@@ -35,11 +35,14 @@ private data class UploadFileForm(
 fun Container.uploadFileForm(
     state: UploadFilesState
 ) {
-    vPanel(alignItems = AlignItems.CENTER) {
-        div {
-            content = UPLOAD_FILE_TAB_TITLE
-            padding = 8.px
-        }
+    flexPanel(
+        alignItems = AlignItems.CENTER,
+        spacing = 24,
+        alignContent = AlignContent.SPACEAROUND,
+        direction = FlexDirection.COLUMN
+    ) {
+        paddingTop = 32.px
+        h5(UPLOAD_FILE_TAB_TITLE)
         formPanel<UploadFileForm> {
             onChangeLaunch {
                 getData().filesToUpload?.sumOf { it.size }?.let { totalSize ->
@@ -65,8 +68,8 @@ fun Container.uploadFileForm(
             }
             val uploadForm = upload(multiple = true) {
                 input.id = "UploadFormId"
+                style { display = Display.NONE }
             }
-                .apply { style { display = Display.NONE } }
             add(UploadFileForm::filesToUpload, uploadForm)
             flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
                 flexPanel(FlexDirection.ROW, spacing = 8) {
@@ -81,12 +84,28 @@ fun Container.uploadFileForm(
                     }
                 }
                 state.selectedFiles?.let {
-                    div(SELECTED_FILES)
-                    it.forEach { filename ->
-                        div(filename)
-                    }
+                    selectedFilesList(it)
                 }
             }
         }
+    }
+}
+
+fun Container.selectedFilesList(selectedFilenames: List<String>) {
+    divider()
+    h5(SELECTED_FILES)
+    flexPanel(FlexDirection.ROW, spacing = 16) {
+        selectedFilenames
+            .sortedBy { filename ->
+                filename.filter { it.isDigit() }.toInt()
+            }
+            .chunked(FILE_LIST_COLUMN_SIZE)
+            .forEach { filenames ->
+                flexPanel(FlexDirection.COLUMN) {
+                    filenames.forEach { filename ->
+                        h5(filename)
+                    }
+                }
+            }
     }
 }

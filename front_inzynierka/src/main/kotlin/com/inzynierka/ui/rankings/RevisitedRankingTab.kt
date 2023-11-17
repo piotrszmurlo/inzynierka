@@ -7,9 +7,11 @@ import com.inzynierka.ui.StringResources.AVERAGE
 import com.inzynierka.ui.StringResources.BUDGET_LEFT
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
 import com.inzynierka.ui.StringResources.RANK
+import com.inzynierka.ui.StringResources.REVISITED_DESCRIPTION
 import com.inzynierka.ui.StringResources.SCORE
 import com.inzynierka.ui.StringResources.SUCCESSFUL_TRIALS
 import com.inzynierka.ui.StringResources.THRESHOLDS_ACHIEVED
+import com.inzynierka.ui.divider
 import com.inzynierka.ui.toPercentage
 import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.AlignItems
@@ -27,6 +29,8 @@ import io.kvision.utils.px
 import io.kvision.utils.toFixedNoRound
 
 fun Container.revisitedRanking(state: RevisitedRankingState) {
+    h5(REVISITED_DESCRIPTION)
+    divider()
     withLoadingSpinner(state.isFetching) {
         flexPanel(FlexDirection.COLUMN) {
             state.averagedScores?.let { scores ->

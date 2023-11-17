@@ -2,7 +2,7 @@ package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
 import com.inzynierka.model.EcdfData
-import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.*
 import com.inzynierka.ui.StringResources.AVERAGED
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_COMBINED
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_GROUP_EQUALS
@@ -10,9 +10,6 @@ import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
 import com.inzynierka.ui.StringResources.ECDF_X_AXIS_LABEL
 import com.inzynierka.ui.StringResources.ECDF_Y_AXIS_LABEL
 import com.inzynierka.ui.StringResources.PER_FUNCTION
-import com.inzynierka.ui.divider
-import com.inzynierka.ui.tabButtonStyle
-import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.chart.*
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
@@ -35,7 +32,8 @@ private const val CHART_WIDTH = 600
 private const val CHART_HEIGHT = 400
 
 fun Container.ecdfTab(state: EcdfState) {
-    flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 8) {
+    flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 16) {
+        h5(StringResources.ECDF_DESCRIPTION)
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER, spacing = 8) {
             button(
                 PER_FUNCTION,
@@ -46,6 +44,7 @@ fun Container.ecdfTab(state: EcdfState) {
                 style = tabButtonStyle(state.ecdfType is EcdfType.Averaged)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) }
         }
+        divider()
         withLoadingSpinner(state.isFetching) {
             when (state.ecdfType) {
                 is EcdfType.PerFunction -> perFunctionEcdfs(state.splitData)

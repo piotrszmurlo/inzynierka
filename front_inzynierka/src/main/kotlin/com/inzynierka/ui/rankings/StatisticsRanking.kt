@@ -4,8 +4,12 @@ import com.inzynierka.domain.core.StatisticsRankingState
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_NUMBER_EQUALS
 import com.inzynierka.ui.StringResources.SELECT_PRECISION_AND_NOTATION
 import com.inzynierka.ui.StringResources.TOGGLE_NOTATION
+import com.inzynierka.ui.divider
 import com.inzynierka.ui.withLoadingSpinner
-import io.kvision.core.*
+import io.kvision.core.AlignItems
+import io.kvision.core.Container
+import io.kvision.core.FlexDirection
+import io.kvision.core.onChange
 import io.kvision.form.select.select
 import io.kvision.html.ButtonStyle
 import io.kvision.html.button
@@ -32,12 +36,12 @@ fun Container.statisticsRanking(
             .onClick {
                 toggleNumberNotation()
             }
-
+        divider()
         withLoadingSpinner(state.isFetching) {
-            flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
+            flexPanel(FlexDirection.ROW) {
                 val sortedDimensions = state.scores?.keys?.sorted()
                 sortedDimensions?.forEach { dim ->
-                    flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
+                    flexPanel(FlexDirection.COLUMN) {
                         val sortedFunctionNumbers = state.scores[dim]?.keys?.sorted()
                         sortedFunctionNumbers?.forEach { functionNumber ->
                             state.scores[dim]?.get(functionNumber)?.let { scores ->

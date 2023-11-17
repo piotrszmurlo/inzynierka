@@ -4,11 +4,13 @@ import com.inzynierka.domain.core.*
 import com.inzynierka.ui.AppManager
 import com.inzynierka.ui.StringResources.ALGORITHM
 import com.inzynierka.ui.StringResources.BEST
+import com.inzynierka.ui.StringResources.CEC2022_RANKING_DESCRIPTION
 import com.inzynierka.ui.StringResources.CEC2022_RANKING_TABLE_HEADER
 import com.inzynierka.ui.StringResources.CEC2022_TAB_LABEL
 import com.inzynierka.ui.StringResources.COMBINED_CEC2022_RANKING_TABLE_HEADER
 import com.inzynierka.ui.StringResources.COMPARE_TWO_ALGORITHMS_TAB_LABEL
 import com.inzynierka.ui.StringResources.ECDF_TAB_LABEL
+import com.inzynierka.ui.StringResources.FRIEDMAN_RANKING_DESCRIPTION
 import com.inzynierka.ui.StringResources.FRIEDMAN_RANKING_TABLE_HEADER
 import com.inzynierka.ui.StringResources.FRIEDMAN_TAB_LABEL
 import com.inzynierka.ui.StringResources.MEAN
@@ -19,12 +21,14 @@ import com.inzynierka.ui.StringResources.RANK
 import com.inzynierka.ui.StringResources.REVISITED_TAB_LABEL
 import com.inzynierka.ui.StringResources.STDEV
 import com.inzynierka.ui.StringResources.WORST
+import com.inzynierka.ui.divider
 import com.inzynierka.ui.tabButtonStyle
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.onClickLaunch
 import io.kvision.html.button
+import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.utils.px
 
@@ -36,6 +40,8 @@ fun Container.rankings(
         rankingTabs(tab)
         when (tab) {
             is Tab.ResultsTab.Cec2022 -> {
+                h5(CEC2022_RANKING_DESCRIPTION)
+                divider()
                 scoreRanking(
                     state.cec2022,
                     scoreHeaderTitle = CEC2022_RANKING_TABLE_HEADER,
@@ -44,6 +50,8 @@ fun Container.rankings(
             }
 
             is Tab.ResultsTab.Friedman -> {
+                h5(FRIEDMAN_RANKING_DESCRIPTION)
+                divider()
                 scoreRanking(
                     state.friedman,
                     scoreHeaderTitle = FRIEDMAN_RANKING_TABLE_HEADER,
@@ -74,6 +82,7 @@ fun Container.rankings(
             }
 
             is Tab.ResultsTab.Ecdf -> {
+
                 ecdfTab(
                     state = state.ecdf
                 )

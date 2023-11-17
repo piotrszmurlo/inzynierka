@@ -15,6 +15,7 @@ import com.inzynierka.ui.StringResources.SELECT_ALGORITHMS
 import com.inzynierka.ui.StringResources.SELECT_DIMENSION
 import com.inzynierka.ui.StringResources.SUMMED_UP_RESULTS
 import com.inzynierka.ui.StringResources.SUMMED_UP_WINS
+import com.inzynierka.ui.divider
 import io.kvision.core.*
 import io.kvision.form.check.radioGroup
 import io.kvision.form.formPanel
@@ -43,9 +44,10 @@ fun Container.pairTest(
 ) {
     flexPanel(
         direction = FlexDirection.COLUMN,
-        alignItems = AlignItems.CENTER
+        alignItems = AlignItems.CENTER,
     ) {
         h5(content = PAIR_TEST_TITLE, align = Align.CENTER)
+        divider()
         val formPanel = formPanel<PairTestForm> {
             flexPanel(
                 direction = FlexDirection.COLUMN
