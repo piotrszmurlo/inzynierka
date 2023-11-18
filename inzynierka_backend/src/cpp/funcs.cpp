@@ -53,7 +53,7 @@ double roundToMinValue(const double& input) {
 
 
 //trials must be sorted from best to worst
-double _median(const TrialsVector& sortedTrials) {
+double median4sorted(const TrialsVector& sortedTrials) {
     int numberOfTrials = sortedTrials.size();
     if (numberOfTrials % 2 != 0) {
         return sortedTrials[numberOfTrials/2].finalError;
@@ -234,7 +234,7 @@ using BasicRankingInput = std::vector<std::unordered_map<int, std::unordered_map
 
 std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
-    for (size_t function = 0; function < input.size(); function++) {
+    for (size_t function = 0; function < input.size(); ++function) {
         for (auto& dimension : input[function]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
@@ -243,7 +243,7 @@ std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRank
                 double min = trialsVector.front().finalError;
                 double max = trialsVector.back().finalError;
                 int functionNumber = function + 1;
-                double median = _median(trialsVector);
+                double median = median4sorted(trialsVector);
                 double meanError = roundToMinValue(mean(trialsVector));
                 double stdev = roundToMinValue(stddev(trialsVector, meanError));
                 int numberOfEvaluations = (*std::min_element(trialsVector.begin(), trialsVector.end(), [](const Trial& a, const Trial& b) {
