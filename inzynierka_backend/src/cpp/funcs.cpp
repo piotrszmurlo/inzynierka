@@ -6,61 +6,14 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include "structs.cpp"
+#include "utils.cpp"
+
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
-#define MIN_VALUE 1e-8
 
-
-double median(std::vector<double> &input) {
-  if (input.empty()) {
-    throw std::invalid_argument("Input data is empty");
-  }
-  auto n = input.size() / 2;
-  std::nth_element(input.begin(), input.begin() + n, input.end());
-  auto median = input[n];
-  if (!(input.size() % 2)) {
-    auto max = max_element(input.begin(), input.begin() + n);
-    median = (*max + median) * 0.5;
-  }
-  return median;
-}
-
-
-double mean(const TrialsVector& input) {
-    double sum = std::accumulate(input.begin(), input.end(), 0.0, [](double a, Trial b){
-        return a + b.finalError;
-    });
-    return sum / input.size();
-}
-
-double stddev(const TrialsVector& input, double mean) {
-    std::vector<double> differences(input.size());
-    std::transform(input.begin(), input.end(), differences.begin(), [mean](Trial a) {
-        return a.finalError - mean;
-    });
-    double sumOfSquares = std::inner_product(differences.begin(), differences.end(), differences.begin(), 0.0);
-    return std::sqrt(sumOfSquares / input.size());
-}
-
-double roundToMinValue(const double& input) {
-    if (input < MIN_VALUE) {
-        return MIN_VALUE; 
-    } else {
-        return input;
-    }
-}
-
-
-//trials must be sorted from best to worst
-double median4sorted(const TrialsVector& sortedTrials) {
-    int numberOfTrials = sortedTrials.size();
-    if (numberOfTrials % 2 != 0) {
-        return sortedTrials[numberOfTrials/2].finalError;
-    } else {
-        return ((sortedTrials[numberOfTrials/2].finalError) + (sortedTrials[(numberOfTrials/2) - 1].finalError))/2;
-    }
-}
+const int FINAL_ERROR_INDEX = 16;
+const int EVALUATION_ROW_INDEX = 17;
+const int MAX_COLUM_COUNT = 30;
 
 std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
@@ -71,12 +24,12 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
 
         // rank trials
         int equalValuesCount = 1;
-        for (auto j = 0; j < trial.size(); j++) {
+        for (auto j = 0; j < trial.size(); ++j) {
             if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
                 ++equalValuesCount;
             } else {
                 double score = (2 * j + 3 - equalValuesCount) / double(2);
-                for (int k = 0; k < equalValuesCount; k++) {
+                for (int k = 0; k < equalValuesCount; ++k) {
                     if (scores.find(trial[j - k].algorithmName) != scores.end()) {
                         scores[trial[j - k].algorithmName] += score;
                     } else {
@@ -111,12 +64,12 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
 
         // rank trials
         int equalValuesCount = 1;
-        for (auto j = 0; j < trial.size(); j++) {
+        for (auto j = 0; j < trial.size(); ++j) {
             if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
                 ++equalValuesCount;
             } else {
                 double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
-                for (int k = 0; k < equalValuesCount; k++) {
+                for (int k = 0; k < equalValuesCount; ++k) {
                     if (scores.find(trial[j - k].algorithmName) != scores.end()) {
                         scores[trial[j - k].algorithmName] += score;
                     } else {
@@ -182,18 +135,9 @@ std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVec
 }
 
 
-double strict_stod(const std::string& s) {
-    std::size_t pos;
-    const auto result = std::stod(s, &pos);
-    if (pos != s.size()) throw std::invalid_argument("Unexpected character found in data: " + s);
-    return result;
-}
 
-const int FINAL_ERROR_INDEX = 16;
-const int EVALUATION_ROW_INDEX = 17;
-const int MAX_COLUM_COUNT = 30;
 
-std::string parse_results(std::string input,std::string fileName, int maxBudget) {
+std::string parse_cec2022_results(std::string input, std::string fileName, int maxBudget) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
     std::stringstream result("");
@@ -207,10 +151,12 @@ std::string parse_results(std::string input,std::string fileName, int maxBudget)
         try {
             value = strict_stod(word);
         }
-        catch(std::invalid_argument) {
+        catch (std::invalid_argument) {
             throw std::invalid_argument("Unexpected character found in data: " + word + " in file: " + fileName);
         }
-        if (value < MIN_VALUE) { value = MIN_VALUE; }
+        if (value < MIN_VALUE) { 
+            value = MIN_VALUE; 
+        }
         if (rowNumber == FINAL_ERROR_INDEX) {
             finalErrors.push_back(value);
         } else if (rowNumber == EVALUATION_ROW_INDEX) {
@@ -304,7 +250,7 @@ double budgetLeftPercentage(const TrialsVector& input, const double maxBudget) {
 std::vector<RevisitedRankingEntry> calculate_revisited_ranking(const BasicRankingInput& input, const std::vector<double> thresholds, std::unordered_map<int, int> maxBudgets, double weight) {
     double weightSquared = pow(weight, 2);
     std::vector<RevisitedRankingEntry> output = std::vector<RevisitedRankingEntry>();
-    for (size_t function = 0; function < input.size(); function++) {
+    for (size_t function = 0; function < input.size(); ++function) {
         for (auto& dimension : input[function]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
@@ -343,10 +289,10 @@ double thresholdsAchievedFraction(const std::vector<double>& input, const std::v
     return double(thresholdAchieved) / (thresholds.size() * input.size());
 }
 
-std::vector<double>  getRecordedErrorSteps(int dimension, int maxBudget) {
+std::vector<double> getRecordedErrorSteps(int dimension, int maxBudget) {
     std::vector<double> output;
     for (int i = 0; i < 16; ++i) {
-        output.push_back(pow(10, (i / double(5)) - 3 ) * maxBudget);
+        output.push_back(floor(pow(10, (i / double(5)) - 3 ) * maxBudget));
     }
     return output;
 }
@@ -365,7 +311,7 @@ std::vector<EcdfEntry> calculate_ecdf_data(const AllErrorsVector& input, const s
         mean = mean / double(errors.numberOfEvaluations.size());
         std::vector<double> steps = getRecordedErrorSteps(errors.dimension, maxBudgets[errors.dimension]);
         for (auto& step : steps) {
-            step = log10(step/double(errors.dimension));
+            step = floor(step / errors.dimension);
         }
 
         output.push_back(

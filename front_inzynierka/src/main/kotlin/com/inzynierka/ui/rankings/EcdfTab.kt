@@ -19,7 +19,6 @@ import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
 import io.kvision.utils.obj
-import kotlin.math.log10
 
 private const val DIM_10_MAX_FES = 200_000
 private const val DIM_20_MAX_FES = 1_000_000
@@ -121,9 +120,9 @@ fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String, dimension: 
                     scales = mapOf(
                         "x" to ChartScales(
                             min = DIM_MAX_FES[dimension]?.toDouble()
-                                ?.let { maxFes -> log10(maxFes * 0.001 / dimension) },
+                                ?.let { maxFes -> maxFes * 0.001 / dimension },
                             max = DIM_MAX_FES[dimension]?.toDouble()
-                                ?.let { maxFes -> log10(maxFes / dimension.toDouble()) },
+                                ?.let { maxFes -> maxFes / dimension.toDouble() },
                             title = ScaleTitleOptions(
                                 display = true,
                                 text = ECDF_X_AXIS_LABEL,

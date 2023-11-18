@@ -36,7 +36,7 @@ object StringResources {
     var WORST = tr("Worst")
 
     var ECDF_Y_AXIS_LABEL = tr("Fraction of thresholds achieved")
-    var ECDF_X_AXIS_LABEL = tr("f-evaluations / dimension (log10)")
+    var ECDF_X_AXIS_LABEL = tr("f-evaluations / dimension")
     var PER_FUNCTION = tr("Per function")
     var AVERAGED = tr("Averaged")
 

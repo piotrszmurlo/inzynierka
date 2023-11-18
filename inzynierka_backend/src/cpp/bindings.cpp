@@ -22,7 +22,7 @@ PYBIND11_MODULE(python_extensions, m) {
     m.doc() = R"pbdoc(
         Pybind11 C++ extensions
         -----------------------
-
+        Contains functions for parsing CEC'22 benchmark results files and calculating rankings based on them.
         .. currentmodule:: python_extensions
 
         .. autosummary::
@@ -30,26 +30,19 @@ PYBIND11_MODULE(python_extensions, m) {
 
            parse_results
            calculate_cec2022_scores
-           calculate_average
-           calculate_median
            calculate_friedman_scores
+           calculate_statistics_entries
+           calculate_revisited_ranking
+           calculate_ecdf_data
     )pbdoc";
 
-    m.def("parse_results", &parse_results, R"pbdoc(
-        Parse results file content
+    m.def("parse_cec2022_results", &parse_cec2022_results, R"pbdoc(
+        Parse CEC'22 results file content. Returns data in adjusted format.
+        Throws std::invalid_argument_exception if there are errors in data
     )pbdoc");
 
     m.def("calculate_cec2022_scores", &calculate_cec2022_scores, R"pbdoc(
-        Calculate score
-    )pbdoc");
-
-
-    m.def("calculate_average", &calculate_average, R"pbdoc(
-        Calculate average
-    )pbdoc");
-
-    m.def("calculate_median", &calculate_median, R"pbdoc(
-        Calculate median
+        Calculate scores based on official CEC'22 benchmark evaluation criteria.
     )pbdoc");
 
     m.def("calculate_friedman_scores", &calculate_friedman_scores, R"pbdoc(
@@ -57,16 +50,16 @@ PYBIND11_MODULE(python_extensions, m) {
     )pbdoc");
 
     m.def("calculate_statistics_entries", &calculate_statistics_entries, R"pbdoc(
-        calculate_statistics_entries
+        Calculates statistics ranking data
     )pbdoc");
 
     m.def("calculate_revisited_ranking", &calculate_revisited_ranking, R"pbdoc(
-        calculate_revisited_ranking
+        Calculates revisited ranking data
     )pbdoc");
 
 
     m.def("calculate_ecdf_data", &calculate_ecdf_data, R"pbdoc(
-        calculate_ecdf_data
+        Returns data necessary for plotting ECDFs.
     )pbdoc");
 
     py::class_<Trial>(m, "Trial")

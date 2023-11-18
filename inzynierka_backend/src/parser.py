@@ -36,7 +36,7 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
 
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
-        parsed_contents = extensions.parse_results(raw_contents, filename, DIM2BUDGET[dimension])
+        parsed_contents = extensions.parse_cec2022_results(raw_contents, filename, DIM2BUDGET[dimension])
     except ValueError as e:
         raise ParseError(e.args[0])
     return algorithm_name, function_number, dimension, parsed_contents
