@@ -55,44 +55,6 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
     return output;
 }
 
-std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
-    const int totalNumberOfFunctions = input.size();
-    std::vector<ScoreRankingEntry> output;
-    std::unordered_map<std::string, double> scores;
-        for (auto& trial : input) {
-        std::sort(trial.rbegin(), trial.rend());
-
-        // rank trials
-        int equalValuesCount = 1;
-        for (auto j = 0; j < trial.size(); ++j) {
-            if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
-                ++equalValuesCount;
-            } else {
-                double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
-                for (int k = 0; k < equalValuesCount; ++k) {
-                    if (scores.find(trial[j - k].algorithmName) != scores.end()) {
-                        scores[trial[j - k].algorithmName] += score;
-                    } else {
-                        scores[trial[j - k].algorithmName] = score;
-                    }
-                }
-                equalValuesCount = 1;
-            }
-        }
-    }
-
-    int totalTrials = totalNumberOfFunctions * numberOfTrials;
-    for (auto& it: scores) {
-        output.push_back(
-            ScoreRankingEntry(
-                dimension,
-                it.first,
-                it.second / totalTrials
-            )
-        );
-    }
-    return output;
-}
 
 std::unordered_map<std::string, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {
     if (input.empty()) {
@@ -115,6 +77,65 @@ std::unordered_map<std::string, double> calculate_average(const int& numberOfTri
         it.second /= totalTrials;
     }
     return averages;
+}
+
+
+std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, BasicRankingInput& input) {
+    const int totalNumberOfFunctions = input.size();
+    std::vector<ScoreRankingEntry> output;
+    std::unordered_map<Dimension, std::unordered_map<AlgorithmName, double>> scores;
+    std::unordered_map<Dimension, std::unordered_map<FunctionNumber, TrialsVector>> dim2averagedTrial;
+    
+    for (size_t function = 0; function < input.size(); ++function) {
+        for (auto& dimension : input[function]) {
+            for (auto& algorithm : dimension.second) {
+                std::string algorithmName = algorithm.first;
+                TrialsVector trialsVector = algorithm.second;
+                dim2averagedTrial[dimension.first][function].push_back(
+                    Trial(
+                        algorithmName,
+                        function,
+                        0,
+                        mean(trialsVector),
+                        std::accumulate(trialsVector.begin(), trialsVector.end(), 0, [](int a, Trial& b) {
+                            return a + b.numberOfEvaluations;
+                        }) / double(trialsVector.size())
+                    )
+                );
+            }
+        }
+    }
+    for (auto& dimension : dim2averagedTrial) {
+        for (auto& functionNumber : dimension.second) {
+            TrialsVector averageTrials = functionNumber.second;
+            std::sort(averageTrials.rbegin(), averageTrials.rend());
+            int equalValuesCount = 1;
+            for (auto j = 0; j < averageTrials.size(); ++j) {
+                if (j != averageTrials.size() - 1 && averageTrials[j] == averageTrials[j + 1]) {
+                    ++equalValuesCount;
+                } else {
+                    double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
+                    for (int k = 0; k < equalValuesCount; ++k) {
+                        scores[dimension.first][averageTrials[j - k].algorithmName] += score;
+                    }
+                    equalValuesCount = 1;
+                }
+            }
+        }
+    }
+
+    for (auto& dimension : scores) {
+        for (auto& rankedAlgorithms : dimension.second) {
+            output.push_back(
+                ScoreRankingEntry(
+                    dimension.first,
+                    rankedAlgorithms.first,
+                    rankedAlgorithms.second / totalNumberOfFunctions
+                )
+            );
+        }
+    }
+    return output;
 }
 
 std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVector& input) {
@@ -176,7 +197,6 @@ std::string parse_cec2022_results(std::string input, std::string fileName, int m
     return result.str();
 }
 
-using BasicRankingInput = std::vector<std::unordered_map<int, std::unordered_map<std::string, TrialsVector>>>;
 
 std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();

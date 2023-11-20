@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "structs.cpp"
 
-const int MIN_VALUE =  1e-8;
+const double MIN_VALUE =  1e-8;
 
 double median(std::vector<double> &input) {
   if (input.empty()) {
@@ -59,7 +59,6 @@ double median4sorted(const TrialsVector& sortedTrials) {
         return ((sortedTrials[numberOfTrials/2].finalError) + (sortedTrials[(numberOfTrials/2) - 1].finalError))/2;
     }
 }
-
 
 double strict_stod(const std::string& s) {
     std::size_t pos;
