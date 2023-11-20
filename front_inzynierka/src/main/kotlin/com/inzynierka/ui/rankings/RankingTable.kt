@@ -1,6 +1,8 @@
 package com.inzynierka.ui.rankings
 
+import com.inzynierka.domain.core.NumberNotation
 import com.inzynierka.domain.models.ScoreRankingEntry
+import com.inzynierka.ui.format
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.JustifyContent
@@ -13,6 +15,7 @@ import io.kvision.table.row
 import io.kvision.table.table
 import io.kvision.utils.px
 
+private const val SCORE_PRECISION = 6
 fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores: List<ScoreRankingEntry>) {
     flexPanel(FlexDirection.COLUMN, justify = JustifyContent.CENTER) {
         padding = 16.px
@@ -23,9 +26,9 @@ fun Container.scoreRankingTable(headerNames: List<String>, title: String, scores
         ) {
             scores.forEach {
                 row {
-                    cell("${it.rank}")
+                    it.rank?.let { rank -> cell("$rank") }
                     cell(it.algorithmName)
-                    cell("${it.score}".substring(0, 8))
+                    cell(it.score.format(NumberNotation.Decimal, SCORE_PRECISION))
                 }
             }
         }

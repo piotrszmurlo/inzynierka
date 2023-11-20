@@ -24,7 +24,7 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
 
         // rank trials
         int equalValuesCount = 1;
-        for (auto j = 0; j < trial.size(); ++j) {
+        for (size_t j = 0; j < trial.size(); ++j) {
             if (j != trial.size() - 1 && trial[j] == trial[j + 1]) {
                 ++equalValuesCount;
             } else {
@@ -48,6 +48,7 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
             ScoreRankingEntry(
                 dimension,
                 it.first,
+                std::nullopt,
                 it.second - correctionTerm
             )
         );
@@ -81,9 +82,8 @@ std::unordered_map<std::string, double> calculate_average(const int& numberOfTri
 
 
 std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, BasicRankingInput& input) {
-    const int totalNumberOfFunctions = input.size();
     std::vector<ScoreRankingEntry> output;
-    std::unordered_map<Dimension, std::unordered_map<AlgorithmName, double>> scores;
+    std::unordered_map<Dimension, std::unordered_map<FunctionNumber, std::unordered_map<AlgorithmName, double>>> scores;
     std::unordered_map<Dimension, std::unordered_map<FunctionNumber, TrialsVector>> dim2averagedTrial;
     
     for (size_t function = 0; function < input.size(); ++function) {
@@ -91,10 +91,10 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
-                dim2averagedTrial[dimension.first][function].push_back(
+                dim2averagedTrial[dimension.first][function + 1].push_back(
                     Trial(
                         algorithmName,
-                        function,
+                        function + 1,
                         0,
                         mean(trialsVector),
                         std::accumulate(trialsVector.begin(), trialsVector.end(), 0, [](int a, Trial& b) {
@@ -105,18 +105,19 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
             }
         }
     }
+
     for (auto& dimension : dim2averagedTrial) {
         for (auto& functionNumber : dimension.second) {
             TrialsVector averageTrials = functionNumber.second;
             std::sort(averageTrials.rbegin(), averageTrials.rend());
             int equalValuesCount = 1;
-            for (auto j = 0; j < averageTrials.size(); ++j) {
+            for (size_t j = 0; j < averageTrials.size(); ++j) {
                 if (j != averageTrials.size() - 1 && averageTrials[j] == averageTrials[j + 1]) {
                     ++equalValuesCount;
                 } else {
                     double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
                     for (int k = 0; k < equalValuesCount; ++k) {
-                        scores[dimension.first][averageTrials[j - k].algorithmName] += score;
+                        scores[dimension.first][functionNumber.first][averageTrials[j - k].algorithmName] = score;
                     }
                     equalValuesCount = 1;
                 }
@@ -125,14 +126,17 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
     }
 
     for (auto& dimension : scores) {
-        for (auto& rankedAlgorithms : dimension.second) {
-            output.push_back(
-                ScoreRankingEntry(
-                    dimension.first,
-                    rankedAlgorithms.first,
-                    rankedAlgorithms.second / totalNumberOfFunctions
-                )
-            );
+        for (auto& functionNumber : dimension.second) {
+            for (auto& rankedAlgorithms : functionNumber.second) {
+                output.push_back(
+                    ScoreRankingEntry(
+                        dimension.first,
+                        rankedAlgorithms.first,
+                        functionNumber.first,
+                        rankedAlgorithms.second
+                    )
+                );
+            }
         }
     }
     return output;

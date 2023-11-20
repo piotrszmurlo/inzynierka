@@ -12,7 +12,7 @@ object StringResources {
     var ECDF_TAB_LABEL = tr("ECDF")
     var REVISITED_TAB_LABEL = tr("Revisited")
 
-    var COMBINED_RANKING_TABLE_HEADER = tr("Combined score")
+    var COMBINED_RANKING_TABLE_HEADER = tr("Combined")
     var CEC2022_RANKING_TABLE_HEADER = tr("CEC 2022 score")
     var COMBINED_CEC2022_RANKING_TABLE_HEADER = tr("Combined CEC 2022 score")
     var FRIEDMAN_RANKING_TABLE_HEADER = tr("Average rank")
@@ -27,7 +27,7 @@ object StringResources {
     var SUCCESSFUL_TRIALS = tr("Successful trials")
     var THRESHOLDS_ACHIEVED = tr("Thresholds achieved")
     var BUDGET_LEFT = tr("Budget left")
-    var SCORE = tr("Algorithm name")
+    var SCORE = tr("Score")
     var AVERAGE = tr("Average")
     var MEAN = tr("Mean")
     var MEDIAN = tr("Median")

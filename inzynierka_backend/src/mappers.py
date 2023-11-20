@@ -26,7 +26,8 @@ def map_score_ranking_entries_to_pydantic_model(entries: list[extensions.ScoreRa
         ScoreRankingEntry(
             dimension=entry.dimension,
             algorithm_name=entry.algorithm_name,
-            score=entry.score,
+            function_number=entry.function_number,
+            score=entry.score
         ) for entry in entries
     ]
     return mapped_entries

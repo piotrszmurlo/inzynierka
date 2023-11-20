@@ -1,23 +1,20 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
+import com.inzynierka.domain.models.RankingType
 import com.inzynierka.model.EcdfData
 
 sealed class EcdfAction : RankingsAction() {
     object FetchRankingsStarted : EcdfAction()
-    data class EcdfTypeChanged(val type: EcdfType) : EcdfAction()
+    data class EcdfTypeChanged(val type: RankingType) : EcdfAction()
     data class FetchRankingsSuccess(val data: List<EcdfData>) : EcdfAction()
     data class FetchRankingsFailed(val error: DomainError?) : EcdfAction()
 }
 
-sealed class EcdfType {
-    object Averaged : EcdfType()
-    object PerFunction : EcdfType()
-}
 
 data class EcdfState(
     val isFetching: Boolean = false,
-    val ecdfType: EcdfType = EcdfType.PerFunction,
+    val rankingType: RankingType = RankingType.PerFunction,
     val splitData: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>? = null,
     val combinedData: Map<Dimension, List<EcdfData>>? = null,
     val functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? = null
@@ -53,7 +50,7 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
         )
     }
 
-    is EcdfAction.EcdfTypeChanged -> state.copy(ecdfType = action.type)
+    is EcdfAction.EcdfTypeChanged -> state.copy(rankingType = action.type)
 }
 
 fun List<EcdfData>.averageThresholdsAchieved(): EcdfData {

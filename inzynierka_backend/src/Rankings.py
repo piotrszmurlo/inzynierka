@@ -72,15 +72,13 @@ class Rankings:
     def get_friedman_ranking_scores(self):
         if self._friedman_ranking_scores is None:
             self._friedman_ranking_scores = []
-            for dimension in ALL_DIMENSIONS:
-                errors = get_final_error_and_evaluation_number_for_files(
-                    self._file_service.get_files_for_dimension(dimension)
-                )
-                score_entries = extensions.calculate_friedman_scores(
-                    TRIALS_COUNT, dimension, errors
-                )
-                self._friedman_ranking_scores.extend(
-                    map_score_ranking_entries_to_pydantic_model(score_entries))
+            errors = get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(
+                self._file_service.get_files()
+            )
+            score_entries = extensions.calculate_friedman_scores(
+                TRIALS_COUNT, errors
+            )
+            self._friedman_ranking_scores = map_score_ranking_entries_to_pydantic_model(score_entries)
         return self._friedman_ranking_scores
 
     def get_revisited_ranking_entries(self):

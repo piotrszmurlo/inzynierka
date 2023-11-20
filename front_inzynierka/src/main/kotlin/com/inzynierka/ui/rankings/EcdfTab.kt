@@ -1,6 +1,7 @@
 package com.inzynierka.ui.rankings
 
 import com.inzynierka.domain.core.*
+import com.inzynierka.domain.models.RankingType
 import com.inzynierka.model.EcdfData
 import com.inzynierka.ui.*
 import com.inzynierka.ui.StringResources.AVERAGED
@@ -36,18 +37,18 @@ fun Container.ecdfTab(state: EcdfState) {
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER, spacing = 8) {
             button(
                 PER_FUNCTION,
-                style = tabButtonStyle(state.ecdfType is EcdfType.PerFunction)
-            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.PerFunction)) }
+                style = tabButtonStyle(state.rankingType is RankingType.PerFunction)
+            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(RankingType.PerFunction)) }
             button(
                 AVERAGED,
-                style = tabButtonStyle(state.ecdfType is EcdfType.Averaged)
-            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(EcdfType.Averaged)) }
+                style = tabButtonStyle(state.rankingType is RankingType.Averaged)
+            ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(RankingType.Averaged)) }
         }
         divider()
         withLoadingSpinner(state.isFetching) {
-            when (state.ecdfType) {
-                is EcdfType.PerFunction -> perFunctionEcdfs(state.splitData)
-                is EcdfType.Averaged -> averagedEcdfs(state.combinedData, state.functionGroupData)
+            when (state.rankingType) {
+                is RankingType.PerFunction -> perFunctionEcdfs(state.splitData)
+                is RankingType.Averaged -> averagedEcdfs(state.combinedData, state.functionGroupData)
             }
         }
     }

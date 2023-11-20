@@ -40,6 +40,7 @@ class StatisticRankingEntry(BaseModel):
 class ScoreRankingEntry(BaseModel):
     dimension: int
     algorithm_name: str
+    function_number: Optional[int]
     score: float
 
 

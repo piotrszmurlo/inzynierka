@@ -48,12 +48,12 @@ msgstr ""
 msgid "CEC 2022 score"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:17
-msgid "Combined CEC 2022 score"
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:15
+msgid "Combined"
 msgstr ""
 
-#: src/main/kotlin/com/inzynierka/ui/Strings.kt:15
-msgid "Combined score"
+#: src/main/kotlin/com/inzynierka/ui/Strings.kt:17
+msgid "Combined CEC 2022 score"
 msgstr ""
 
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:55
@@ -97,7 +97,7 @@ msgid "Equal"
 msgstr ""
 
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:39
-msgid "f-evaluations / dimension (log10)"
+msgid "f-evaluations / dimension"
 msgstr ""
 
 #: src/main/kotlin/com/inzynierka/ui/Strings.kt:63

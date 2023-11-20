@@ -11,7 +11,6 @@ import com.inzynierka.ui.StringResources.COMBINED_CEC2022_RANKING_TABLE_HEADER
 import com.inzynierka.ui.StringResources.COMPARE_TWO_ALGORITHMS_TAB_LABEL
 import com.inzynierka.ui.StringResources.ECDF_TAB_LABEL
 import com.inzynierka.ui.StringResources.FRIEDMAN_RANKING_DESCRIPTION
-import com.inzynierka.ui.StringResources.FRIEDMAN_RANKING_TABLE_HEADER
 import com.inzynierka.ui.StringResources.FRIEDMAN_TAB_LABEL
 import com.inzynierka.ui.StringResources.MEAN
 import com.inzynierka.ui.StringResources.MEAN_TAB_LABEL
@@ -52,11 +51,7 @@ fun Container.rankings(
             is Tab.ResultsTab.Friedman -> {
                 h5(FRIEDMAN_RANKING_DESCRIPTION)
                 divider()
-                scoreRanking(
-                    state.friedman,
-                    scoreHeaderTitle = FRIEDMAN_RANKING_TABLE_HEADER,
-                    combinedScoreHeaderTitle = FRIEDMAN_RANKING_TABLE_HEADER
-                )
+                friedmanTab(state.friedman)
             }
 
             is Tab.ResultsTab.Mean -> {

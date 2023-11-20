@@ -107,9 +107,10 @@ PYBIND11_MODULE(python_extensions, m) {
         );
 
     py::class_<ScoreRankingEntry>(m, "ScoreRankingEntry")
-        .def(py::init<const int, const std::string, const double>())
+        .def(py::init<const int, const std::string, std::optional<FunctionNumber>,const double>())
         .def_readwrite("dimension", &ScoreRankingEntry::dimension)
         .def_readwrite("algorithm_name", &ScoreRankingEntry::algorithmName)
+        .def_readwrite("function_number", &ScoreRankingEntry::functionNumber)
         .def_readwrite("score", &ScoreRankingEntry::score);
 
     py::class_<RevisitedRankingEntry>(m, "RevisitedRankingEntry")

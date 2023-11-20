@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
+#include <optional>
 
 struct Trial {
     Trial(
@@ -95,14 +95,17 @@ struct ScoreRankingEntry {
     ScoreRankingEntry(
         const int dimension,
         const std::string algorithmName,
+        const std::optional<int> functionNumber,
         const double score
     ):
         dimension(dimension),
         algorithmName(algorithmName),
+        functionNumber(functionNumber),
         score(score) {}
 
     int dimension;
     std::string algorithmName;
+    std::optional<int> functionNumber;
     double score;
 };
 
@@ -157,3 +160,7 @@ struct EcdfEntry {
 using TrialsVector = std::vector<Trial>;
 using FunctionTrialsVector = std::vector<TrialsVector>;
 using AllErrorsVector = std::vector<AllErrors>;
+using Dimension = int;
+using FunctionNumber = int;
+using AlgorithmName = std::string;
+using BasicRankingInput = std::vector<std::unordered_map<Dimension, std::unordered_map<AlgorithmName, TrialsVector>>>;

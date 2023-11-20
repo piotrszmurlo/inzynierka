@@ -3,7 +3,7 @@ package com.inzynierka.domain.core
 data class RankingsState(
     val cec2022: ScoreRankingState = ScoreRankingState(),
     val pairTest: PairTestState = PairTestState(),
-    val friedman: ScoreRankingState = ScoreRankingState(),
+    val friedman: FriedmanRankingState = FriedmanRankingState(),
     val mean: StatisticsRankingState = StatisticsRankingState(),
     val median: StatisticsRankingState = StatisticsRankingState(),
     val revisited: RevisitedRankingState = RevisitedRankingState(),
