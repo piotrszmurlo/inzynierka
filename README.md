@@ -17,3 +17,7 @@ To run backend server, run while in inzynierka_backend folder:
 modify database connection by changing SQLALCHEMY_DATABASE_URL in SQLAlchemyFileRepository.py::9
 
 `dialect+driver://username:password@host:port/database`
+
+To run backend tests (python and c++ tests), run `./run_tests.sh` while in inzynierka_backend folder:
+
+Generated coverage report path: /inzynierka_backend/htmlcov/index.html
