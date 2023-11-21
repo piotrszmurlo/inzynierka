@@ -15,7 +15,6 @@ object StringResources {
     var COMBINED_RANKING_TABLE_HEADER = tr("Combined")
     var CEC2022_RANKING_TABLE_HEADER = tr("CEC 2022 score")
     var COMBINED_CEC2022_RANKING_TABLE_HEADER = tr("Combined CEC 2022 score")
-    var FRIEDMAN_RANKING_TABLE_HEADER = tr("Average rank")
     var CEC2022_RANKING_DESCRIPTION = tr("This ranking is based on CEC'22 official evaluation criteria.")
     var FRIEDMAN_RANKING_DESCRIPTION = tr("This ranking is based on Friedman test.")
     var ECDF_DESCRIPTION = tr("Empirical Cumulative Distribution Functions.")

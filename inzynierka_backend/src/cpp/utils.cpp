@@ -6,6 +6,8 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <cmath>
+
 #include "structs.cpp"
 
 const double MIN_VALUE =  1e-8;
@@ -23,7 +25,6 @@ double median(std::vector<double> &input) {
   }
   return median;
 }
-
 
 double mean(const TrialsVector& input) {
     double sum = std::accumulate(input.begin(), input.end(), 0.0, [](double a, Trial b){

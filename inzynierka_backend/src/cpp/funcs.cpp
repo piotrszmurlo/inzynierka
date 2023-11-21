@@ -18,7 +18,7 @@ const int MAX_COLUM_COUNT = 30;
 std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
     std::vector<ScoreRankingEntry> output;
-    std::unordered_map<std::string, double> scores;
+    std::unordered_map<AlgorithmName, double> scores;
     for (auto& trial : input) {
         std::sort(trial.begin(), trial.end());
 
@@ -57,14 +57,14 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
 }
 
 
-std::unordered_map<std::string, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {
+std::unordered_map<AlgorithmName, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {
     if (input.empty()) {
         throw std::invalid_argument("Input data is empty");
     }
     const int totalNumberOfFunctions = input.size();
-    std::unordered_map<std::string, double> averages;
-    for (auto trials : input) {
-        for (auto trial : trials) {
+    std::unordered_map<AlgorithmName, double> averages;
+    for (auto& trials : input) {
+        for (auto& trial : trials) {
             if (averages.find(trial.algorithmName) != averages.end()) {
                 averages[trial.algorithmName] += trial.finalError;
             } else {
@@ -84,14 +84,14 @@ std::unordered_map<std::string, double> calculate_average(const int& numberOfTri
 std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, BasicRankingInput& input) {
     std::vector<ScoreRankingEntry> output;
     std::unordered_map<Dimension, std::unordered_map<FunctionNumber, std::unordered_map<AlgorithmName, double>>> scores;
-    std::unordered_map<Dimension, std::unordered_map<FunctionNumber, TrialsVector>> dim2averagedTrial;
+    std::unordered_map<Dimension, std::unordered_map<FunctionNumber, TrialsVector>> averagedTrials;
     
     for (size_t function = 0; function < input.size(); ++function) {
         for (auto& dimension : input[function]) {
             for (auto& algorithm : dimension.second) {
                 std::string algorithmName = algorithm.first;
                 TrialsVector trialsVector = algorithm.second;
-                dim2averagedTrial[dimension.first][function + 1].push_back(
+                averagedTrials[dimension.first][function + 1].push_back(
                     Trial(
                         algorithmName,
                         function + 1,
@@ -106,7 +106,7 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
         }
     }
 
-    for (auto& dimension : dim2averagedTrial) {
+    for (auto& dimension : averagedTrials) {
         for (auto& functionNumber : dimension.second) {
             TrialsVector averageTrials = functionNumber.second;
             std::sort(averageTrials.rbegin(), averageTrials.rend());
@@ -115,9 +115,9 @@ std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTria
                 if (j != averageTrials.size() - 1 && averageTrials[j] == averageTrials[j + 1]) {
                     ++equalValuesCount;
                 } else {
-                    double score = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
+                    double rank = (2 * j + 3 - equalValuesCount) / double(2); // average rank for equal trials
                     for (int k = 0; k < equalValuesCount; ++k) {
-                        scores[dimension.first][functionNumber.first][averageTrials[j - k].algorithmName] = score;
+                        scores[dimension.first][functionNumber.first][averageTrials[j - k].algorithmName] = rank;
                     }
                     equalValuesCount = 1;
                 }

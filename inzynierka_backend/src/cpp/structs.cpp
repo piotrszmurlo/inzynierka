@@ -2,6 +2,15 @@
 #include <sstream>
 #include <vector>
 #include <optional>
+const double EPSILON = 1e-3;
+
+double equals(const double lhs, const double rhs) {
+    return std::abs(lhs - rhs) < EPSILON;
+}
+
+double greater(const double lhs, const double rhs) {
+    return lhs - rhs > EPSILON;
+}
 
 struct Trial {
     Trial(
@@ -24,13 +33,13 @@ struct Trial {
     int numberOfEvaluations;
 
     bool operator==(const Trial &other) const {
-        return finalError == other.finalError && numberOfEvaluations == other.numberOfEvaluations;
+        return equals(finalError, other.finalError) && numberOfEvaluations == other.numberOfEvaluations;
     }
 
     // std::sort will sort from worst trial to best trial
     bool operator<(const Trial &other) const {
         if (finalError != other.finalError) {
-            return finalError > other.finalError;
+            return greater(finalError, other.finalError);
         } else {
             return numberOfEvaluations > other.numberOfEvaluations;
         }
