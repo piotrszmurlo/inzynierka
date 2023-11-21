@@ -5,7 +5,6 @@ import io.kvision.core.Border
 import io.kvision.core.Container
 import io.kvision.html.ButtonStyle
 import io.kvision.html.tag
-import io.kvision.i18n.tr
 import io.kvision.toast.Toast
 import io.kvision.toast.ToastOptions
 import io.kvision.toast.ToastPosition
@@ -18,7 +17,6 @@ fun tabButtonStyle(isActive: Boolean): ButtonStyle {
 }
 
 fun Toast.show(message: String) {
-    console.log(tr("Select all CEC'22 results files for one algorithm to upload"))
     danger(
         message.substringAfterLast("###"),
         options = ToastOptions(ToastPosition.TOPLEFT, close = true, duration = 10000)
