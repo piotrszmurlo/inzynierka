@@ -524,11 +524,11 @@ TEST_CASE("calculate friedman with some equal trials in different algorithm", "[
         if (result[i].algorithmName == "alg1") {
             REQUIRE(result[i].dimension == 10);
             REQUIRE(result[i].functionNumber == 1);
-            REQUIRE(result[i].score - (3 + 1/double(3)) < EPSILON);
+            REQUIRE(result[i].score - (3 + 1 / double(3)) < EPSILON);
         } else if (result[i].algorithmName == "alg2") {
             REQUIRE(result[i].dimension == 10);
             REQUIRE(result[i].functionNumber == 1);
-            REQUIRE(result[i].score - (3 + 2/double(3)) < EPSILON);
+            REQUIRE(result[i].score - (3 + 2 / double(3)) < EPSILON);
         } else {
             FAIL("Unexpected result");
         }
@@ -537,4 +537,102 @@ TEST_CASE("calculate friedman with some equal trials in different algorithm", "[
     REQUIRE(input.size() == 1);
     REQUIRE(trialsVector1.size() == 3);
     REQUIRE(trialsVector2.size() == 3);
+}
+
+TEST_CASE("parse correct input scientific notation", "[parser]") {
+    std::string fileName = "jSObinexpEig_3_20";
+
+    std::ifstream input("tests/test_data/correct_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    std::ifstream parsed("tests/test_data/processed_input/" + fileName + "_parsed_contents.txt");
+    std::stringstream exprectedBuffer;
+    exprectedBuffer << parsed.rdbuf();
+
+    REQUIRE_FALSE(inputBuffer.str() == "");
+    REQUIRE_FALSE(exprectedBuffer.str() == "");
+
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 1000000);
+
+    REQUIRE(result == exprectedBuffer.str());
+}
+
+TEST_CASE("parse correct input with zeros", "[parser]") {
+    std::string fileName = "NL-SHADE-LBC_1_10";
+
+    std::ifstream input("tests/test_data/correct_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    std::ifstream parsed("tests/test_data/processed_input/" + fileName + "_parsed_contents.txt");
+    std::stringstream exprectedBuffer;
+    exprectedBuffer << parsed.rdbuf();
+
+    REQUIRE_FALSE(inputBuffer.str() == "");
+    REQUIRE_FALSE(exprectedBuffer.str() == "");
+
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 200000);
+
+    REQUIRE(result == exprectedBuffer.str());
+}
+
+TEST_CASE("parse correct input mixed notation", "[parser]") {
+    std::string fileName = "NL-SHADE-RSP-MID_10_20";
+
+    std::ifstream input("tests/test_data/correct_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    std::ifstream parsed("tests/test_data/processed_input/" + fileName + "_parsed_contents.txt");
+    std::stringstream exprectedBuffer;
+    exprectedBuffer << parsed.rdbuf();
+
+    REQUIRE_FALSE(inputBuffer.str() == "");
+    REQUIRE_FALSE(exprectedBuffer.str() == "");
+
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 1000000);
+
+    REQUIRE(result == exprectedBuffer.str());
+}
+
+TEST_CASE("parse incorrect input comma delimited incorrect budget recorded", "[parser]") {
+    std::string fileName = "ZOCMAES_1_10";
+
+    std::ifstream input("tests/test_data/incorrect_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    REQUIRE_FALSE(inputBuffer.str() == "");
+    REQUIRE_THROWS_AS(
+        parse_cec2022_results(inputBuffer.str(), fileName, 200000),
+        std::invalid_argument
+    );
+}
+
+
+TEST_CASE("parse incorrect input unexpected character in data", "[parser]") {
+    std::string fileName = "empty_file_1_10";
+
+    std::ifstream input("tests/test_data/incorrect_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    REQUIRE_THROWS_AS(
+        parse_cec2022_results(inputBuffer.str(), fileName, 1000000),
+        std::invalid_argument
+    );
+}
+
+TEST_CASE("parse incorrect input budget recorded when trial succeeded", "[parser]") {
+    std::string fileName = "EA4eigN100_10_1_10";
+
+    std::ifstream input("tests/test_data/incorrect_input/" + fileName + ".txt");
+    std::stringstream inputBuffer;
+    inputBuffer << input.rdbuf();
+
+    REQUIRE_THROWS_AS(
+        parse_cec2022_results(inputBuffer.str(), fileName, 200000),
+        std::invalid_argument
+    );
 }

@@ -13,7 +13,8 @@
 
 const int FINAL_ERROR_INDEX = 16;
 const int EVALUATION_ROW_INDEX = 17;
-const int MAX_COLUM_COUNT = 30;
+const int MAX_COLUMN_COUNT = 30;
+const int PRECISION = 8;
 
 std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
     const int totalNumberOfFunctions = input.size();
@@ -56,7 +57,6 @@ std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrial
     return output;
 }
 
-
 std::unordered_map<AlgorithmName, double> calculate_average(const int& numberOfTrials, FunctionTrialsVector& input) {
     if (input.empty()) {
         throw std::invalid_argument("Input data is empty");
@@ -79,7 +79,6 @@ std::unordered_map<AlgorithmName, double> calculate_average(const int& numberOfT
     }
     return averages;
 }
-
 
 std::vector<ScoreRankingEntry> calculate_friedman_scores(const int& numberOfTrials, BasicRankingInput& input) {
     std::vector<ScoreRankingEntry> output;
@@ -159,20 +158,19 @@ std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVec
     return medians;
 }
 
-
-
-
 std::string parse_cec2022_results(std::string input, std::string fileName, int maxBudget) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
     std::stringstream result("");
-    result << std::setprecision(8);
+    result << std::setprecision(PRECISION);
     std::string word;
     double value;
     int columnCount = 0;
     int rowNumber = 1;
+    int totalValuesCount = 0;
     std::vector<double> finalErrors;
     while (ss >> word) {
+        ++totalValuesCount;
         try {
             value = strict_stod(word);
         }
@@ -185,11 +183,17 @@ std::string parse_cec2022_results(std::string input, std::string fileName, int m
         if (rowNumber == FINAL_ERROR_INDEX) {
             finalErrors.push_back(value);
         } else if (rowNumber == EVALUATION_ROW_INDEX) {
-            if ((finalErrors[columnCount] != MIN_VALUE) && (value != maxBudget)) throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial failed, max budget must be recorded)");
-            if ((finalErrors[columnCount] == MIN_VALUE) && (value == maxBudget)) throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial succeeded, record actual used budget, not max budget)");
-            if (value > maxBudget) throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value) + " in file: " + fileName);
+            if ((finalErrors[columnCount] != MIN_VALUE) && (value != maxBudget)) {
+                throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial failed, max budget must be recorded)");
+            }
+            if ((finalErrors[columnCount] == MIN_VALUE) && (value == maxBudget)) {
+                throw std::invalid_argument("Unexpected evaluation count in data: " + std::to_string(value) + " in file: " + fileName + " (If trial succeeded, record actual used budget, not max budget)");
+            }
+            if (value > maxBudget) {
+                throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value) + " in file: " + fileName);
+            }
         }
-        if (++columnCount == MAX_COLUM_COUNT) {
+        if (++columnCount == MAX_COLUMN_COUNT) {
             result << value << "\n";
             columnCount = 0;
             ++rowNumber;
@@ -197,10 +201,12 @@ std::string parse_cec2022_results(std::string input, std::string fileName, int m
             result << value << " ";
         }
     }
+    if (totalValuesCount != MAX_COLUMN_COUNT * (EVALUATION_ROW_INDEX)) {
+        throw std::invalid_argument("Incorrect data format in file: " + fileName +". Provide a file with 17x30 matrix");
+    }
 
     return result.str();
 }
-
 
 std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRankingInput& input) {
     std::vector<StatisticsRankingEntry> output = std::vector<StatisticsRankingEntry>();
@@ -239,7 +245,6 @@ std::vector<StatisticsRankingEntry> calculate_statistics_entries(const BasicRank
     return output;
 }
 
-
 double successfulTrialsPercentage(const TrialsVector& input) {
     int successfulTrialsCount = 0;
     for (auto& trial: input) {
@@ -269,7 +274,6 @@ double budgetLeftPercentage(const TrialsVector& input, const double maxBudget) {
     }
     return double(budgetLeftSum) / (maxBudget * input.size());
 }
-
 
 std::vector<RevisitedRankingEntry> calculate_revisited_ranking(const BasicRankingInput& input, const std::vector<double> thresholds, std::unordered_map<int, int> maxBudgets, double weight) {
     double weightSquared = pow(weight, 2);
@@ -350,4 +354,3 @@ std::vector<EcdfEntry> calculate_ecdf_data(const AllErrorsVector& input, const s
     }
     return output;
 }
-
