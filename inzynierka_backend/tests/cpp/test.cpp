@@ -9,8 +9,6 @@
 #include <catch2/catch.hpp>
 #include "../../src/cpp/funcs.cpp"
 
-double EPSILON = 10e-8;
-
 TEST_CASE("median uneven vector size", "[median]") {
     std::vector<double> vector;
     vector.push_back(1.3);
@@ -238,8 +236,23 @@ TEST_CASE("calculate cec2022 without equal trials", "[cec2022]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 7);
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 8);
+    ScoreRankingEntry expectedAlg1 = ScoreRankingEntry(10, "alg1", std::nullopt, 7);
+    std::vector<ScoreRankingEntry> result = calculate_cec2022_scores(3, 10, vector);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 7);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 8);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -257,8 +270,22 @@ TEST_CASE("calculate cec2022 only equal trials", "[cec2022]") {
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 7.5);
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 7.5);
+    std::vector<ScoreRankingEntry> result = calculate_cec2022_scores(3, 10, vector);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 7.5);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 7.5);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -276,8 +303,21 @@ TEST_CASE("calculate cec2022 some equal trials in same algorithm", "[cec2022]") 
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 9);
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 6);
+    std::vector<ScoreRankingEntry> result = calculate_cec2022_scores(3, 10, vector);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 9);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 6);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -295,8 +335,23 @@ TEST_CASE("calculate cec2022 some equal trials in different algorithm", "[cec202
 
     vector.push_back(trialsVector1);
 
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg1"] == 8);
-    REQUIRE(calculate_cec2022_scores(3, vector)["alg2"] == 7);
+    std::vector<ScoreRankingEntry> result = calculate_cec2022_scores(3, 10, vector);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 8);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == std::nullopt);
+            REQUIRE(result[i].score == 7);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
+
     REQUIRE(vector.size() == 1);
     REQUIRE(trialsVector1.size() == 6);
 }
@@ -363,59 +418,123 @@ TEST_CASE("TrialsVector is properly sorted", "[utils]") {
 
 
 TEST_CASE("calculate friedman without equal trials", "[friedman]") {
-    FunctionTrialsVector vector;
+    BasicRankingInput input;
     TrialsVector trialsVector1;
+    TrialsVector trialsVector2;
+    std::unordered_map<Dimension, std::unordered_map<AlgorithmName, TrialsVector>> functionInput;
+
     trialsVector1.push_back(Trial("alg1", 1, 1, 5, 100));
     trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
     trialsVector1.push_back(Trial("alg1", 1, 3, 2, 100));
 
-    trialsVector1.push_back(Trial("alg2", 1, 1, 1, 100));
-    trialsVector1.push_back(Trial("alg2", 1, 2, 6, 150));
-    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 50));
+    trialsVector2.push_back(Trial("alg2", 1, 1, 1, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 2, 6, 150));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 3, 50));
 
-    vector.push_back(trialsVector1);
+    functionInput[10]["alg1"] = trialsVector1;
+    functionInput[10]["alg2"] = trialsVector2;
 
-    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] - (3 + 2/double(3)) < EPSILON);
-    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] - (3 + 1/double(3)) < EPSILON);
-    REQUIRE(vector.size() == 1);
-    REQUIRE(trialsVector1.size() == 6);
+    input.push_back(functionInput);
+
+    std::vector<ScoreRankingEntry> result = calculate_friedman_scores(3, input);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score - (3 + 2 / double(3)) < EPSILON);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score - (3 + 1 / double(3)) < EPSILON);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
+    REQUIRE(input.size() == 1);
+    REQUIRE(trialsVector1.size() == 3);
+    REQUIRE(trialsVector2.size() == 3);
 }
 
 
 TEST_CASE("calculate friedman with equal only trials", "[friedman]") {
-    FunctionTrialsVector vector;
+    BasicRankingInput input;
     TrialsVector trialsVector1;
+    TrialsVector trialsVector2;
+    std::unordered_map<Dimension, std::unordered_map<AlgorithmName, TrialsVector>> functionInput;
+
     trialsVector1.push_back(Trial("alg1", 1, 1, 3, 100));
     trialsVector1.push_back(Trial("alg1", 1, 2, 3, 100));
     trialsVector1.push_back(Trial("alg1", 1, 3, 3, 100));
 
-    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(Trial("alg2", 1, 2, 3, 100));
-    trialsVector1.push_back(Trial("alg2", 1, 3, 3, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 2, 3, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 3, 100));
 
-    vector.push_back(trialsVector1);
+    functionInput[10]["alg1"] = trialsVector1;
+    functionInput[10]["alg2"] = trialsVector2;
 
-    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] == 3.5);
-    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] == 3.5);
-    REQUIRE(vector.size() == 1);
-    REQUIRE(trialsVector1.size() == 6);
+    input.push_back(functionInput);
+
+    std::vector<ScoreRankingEntry> result = calculate_friedman_scores(3, input);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score == 1.5);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score == 1.5);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
+    REQUIRE(input.size() == 1);
+    REQUIRE(trialsVector1.size() == 3);
+    REQUIRE(trialsVector2.size() == 3);
+
 }
 
 TEST_CASE("calculate friedman with some equal trials in different algorithm", "[friedman]") {
-    FunctionTrialsVector vector;
+    BasicRankingInput input;
     TrialsVector trialsVector1;
+    TrialsVector trialsVector2;
+    std::unordered_map<Dimension, std::unordered_map<AlgorithmName, TrialsVector>> functionInput;
+    
     trialsVector1.push_back(Trial("alg1", 1, 1, 1, 100));
     trialsVector1.push_back(Trial("alg1", 1, 2, 1, 100));
     trialsVector1.push_back(Trial("alg1", 1, 3, 3, 150));
 
-    trialsVector1.push_back(Trial("alg2", 1, 1, 3, 100));
-    trialsVector1.push_back(Trial("alg2", 1, 2, 1, 100));
-    trialsVector1.push_back(Trial("alg2", 1, 3, 2, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 1, 3, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 2, 1, 100));
+    trialsVector2.push_back(Trial("alg2", 1, 3, 2, 100));
 
-    vector.push_back(trialsVector1);
+    functionInput[10]["alg1"] = trialsVector1;
+    functionInput[10]["alg2"] = trialsVector2;
 
-    REQUIRE(calculate_friedman_scores(3, vector)["alg1"] - (3 + 1/double(3)) < EPSILON);
-    REQUIRE(calculate_friedman_scores(3, vector)["alg2"] - (3 + 2/double(3)) < EPSILON);
-    REQUIRE(vector.size() == 1);
-    REQUIRE(trialsVector1.size() == 6);
+    input.push_back(functionInput);
+
+    std::vector<ScoreRankingEntry> result = calculate_friedman_scores(3, input);
+
+    for (int i = 0; i < 2; ++i) {
+        if (result[i].algorithmName == "alg1") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score - (3 + 1/double(3)) < EPSILON);
+        } else if (result[i].algorithmName == "alg2") {
+            REQUIRE(result[i].dimension == 10);
+            REQUIRE(result[i].functionNumber == 1);
+            REQUIRE(result[i].score - (3 + 2/double(3)) < EPSILON);
+        } else {
+            FAIL("Unexpected result");
+        }
+    }
+
+    REQUIRE(input.size() == 1);
+    REQUIRE(trialsVector1.size() == 3);
+    REQUIRE(trialsVector2.size() == 3);
 }
