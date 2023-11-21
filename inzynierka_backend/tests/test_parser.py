@@ -81,7 +81,7 @@ def test_parse_file_name_missing_segments4():
 def test_parse_remote_results_file_correct_input():
     file_name = 'jSObinexpEig_3_20.txt'
     with open(f"{TEST_DATA_DIR}/correct_input/jSObinexpEig_3_20.txt", 'rb') as input_file, \
-         open(f"{TEST_DATA_DIR}/processed_input/jSObinexpEig_3_20_parsed_contents", 'r') as parsed_file:
+         open(f"{TEST_DATA_DIR}/processed_input/jSObinexpEig_3_20_parsed_contents.txt", 'r') as parsed_file:
         b64_contents = base64.b64encode(input_file.read())
         expected_parsed_contents = parsed_file.read()
         assert ('jSObinexpEig', 3, 20, expected_parsed_contents) == parse_remote_results_file(file_name, b64_contents)
