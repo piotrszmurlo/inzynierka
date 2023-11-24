@@ -25,6 +25,7 @@ interface IDataService {
      * @return [Result] Unit or DomainError if an error occurred
      **/
     suspend fun postFiles(kFiles: List<KFile>): Result<Unit>
+    suspend fun deleteFilesForAlgorithm(algorithmName: String): Result<Unit>
 
     suspend fun getPairTest(algorithm1: String, algorithm2: String, dimension: Int): Result<List<PairTestEntry>>
 }

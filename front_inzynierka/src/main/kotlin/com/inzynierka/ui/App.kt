@@ -2,6 +2,7 @@ package com.inzynierka.ui
 
 import com.inzynierka.di.appModule
 import com.inzynierka.domain.core.Tab
+import com.inzynierka.ui.console.adminConsole
 import com.inzynierka.ui.rankings.rankings
 import io.kvision.*
 import io.kvision.core.JustifyContent
@@ -28,11 +29,11 @@ class App : Application(), KoinComponent {
                 "en" to require("i18n/messages-en.json"),
             )
         )
-        root("kvapp") {
-            navBar()
+        root("kvapp").bind(AppManager.store) { state ->
+            navBar(state.tab)
             flexPanel(
                 justify = JustifyContent.CENTER
-            ).bind(AppManager.store) { state ->
+            ) {
                 when (state.tab) {
                     is Tab.Upload -> {
                         uploadFileForm(state.uploadFilesState)
@@ -40,6 +41,10 @@ class App : Application(), KoinComponent {
 
                     is Tab.ResultsTab -> {
                         rankings(state.rankingsState, state.tab)
+                    }
+
+                    Tab.AdminConsole -> {
+                        adminConsole(state.adminConsoleState)
                     }
                 }
             }

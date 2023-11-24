@@ -31,8 +31,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun getAvailableDimensions(): Result<List<Int>> {
         return try {
-            val result = dataRepository.getAvailableDimensions()
-            Result.Success(result)
+            Result.Success(dataRepository.getAvailableDimensions())
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
@@ -49,8 +48,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>> {
         return try {
-            val result = dataRepository.getFriedmanScores().map { it.toDomain() }
-            Result.Success(result)
+            Result.Success(dataRepository.getFriedmanScores().map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
@@ -67,8 +65,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>> {
         return try {
-            val result = dataRepository.getRevisitedEntries().map { it.toDomain() }
-            Result.Success(result)
+            Result.Success(dataRepository.getRevisitedEntries().map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
@@ -76,8 +73,7 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun getEcdfData(): Result<List<EcdfData>> {
         return try {
-            val result = dataRepository.getEcdfData().map { it.toDomain() }
-            Result.Success(result)
+            Result.Success(dataRepository.getEcdfData().map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
@@ -85,8 +81,17 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
 
     override suspend fun postFiles(kFiles: List<KFile>): Result<Unit> {
         return try {
-            val result = dataRepository.postFiles(kFiles)
-            Result.Success(result)
+            Result.Success(dataRepository.postFiles(kFiles))
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
+    override suspend fun deleteFilesForAlgorithm(algorithmName: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.deleteFilesForAlgorithm(algorithmName))
         } catch (e: Throwable) {
             Result.Error(
                 DomainError(e.parsedRemoteExceptionMessage)

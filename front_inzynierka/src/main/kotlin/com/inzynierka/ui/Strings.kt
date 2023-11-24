@@ -58,8 +58,13 @@ object StringResources {
     var UPLOAD_RESULTS_LABEL = tr("Upload Results")
     var BROWSE_RANKINGS_LABEL = tr("Browse rankings")
     var NAVBAR_TITLE = tr("AE comparison")
+    var ADMIN_CONSOLE_LABEL = tr("Admin console")
+    var DELETE_ALGORITHM_BUTTON_LABEL = tr("Delete algorithm data")
+    var DELETE_ALGORITHM_DESCRIPTION = tr("Select an algorithm to delete its' data")
 
     var TOAST_FAILED_TO_LOAD_RANKING = tr("Failed to load ranking data")
+    var TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE = tr("Failed to load admin console data")
+    var TOAST_FAILED_TO_DELETE_ALGORITHM_DATA = tr("Failed to delete algorithm data")
     var TOAST_FILE_UPLOAD_COMPLETED = tr("Files upload completed")
     var TOAST_MAXIMUM_FILE_SIZE_EXCEEDED = tr("Maximum file size exceeded")
     fun FILE_UPLOAD_ERROR(message: String?) = gettext("Files upload failed: %1", message)

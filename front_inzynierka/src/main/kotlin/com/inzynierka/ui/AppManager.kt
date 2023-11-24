@@ -3,6 +3,8 @@ package com.inzynierka.ui
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
+import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
 import io.kvision.redux.createTypedReduxStore
 import io.kvision.toast.Toast
@@ -17,8 +19,8 @@ import org.koin.core.component.inject
 object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()), KoinComponent {
 
     private val initialMainAppState = MainAppState(tab = Tab.Upload, error = null)
-    val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
     private val dataService: IDataService by inject()
+    val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
 
     fun loadMeanRanking() {
         launch {
@@ -97,6 +99,32 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(MedianRankingAction.FetchRankingsFailed(result.domainError))
+            }
+        }
+    }
+
+    fun loadAdminConsole() = launch {
+        store.dispatch(AdminConsoleAction.FetchAlgorithmsStarted)
+        when (val result = dataService.getAvailableBenchmarkData()) {
+            is Result.Success -> store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(result.data.algorithms))
+            is Result.Error -> {
+                Toast.show(TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE)
+                store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
+            }
+        }
+    }
+
+    fun deleteAlgorithmData(algorithmName: String) = launch {
+        store.dispatch(AdminConsoleAction.DeleteAlgorithmStarted)
+        when (dataService.deleteFilesForAlgorithm(algorithmName)) {
+            is Result.Success -> {
+                loadAdminConsole()
+                store.dispatch(AdminConsoleAction.DeleteAlgorithmSuccess)
+            }
+
+            is Result.Error -> {
+                Toast.show(TOAST_FAILED_TO_DELETE_ALGORITHM_DATA)
+                store.dispatch(AdminConsoleAction.DeleteAlgorithmFailed)
             }
         }
     }

@@ -6,6 +6,7 @@ import org.koin.core.component.KoinComponent
 
 sealed class Tab {
     object Upload : Tab()
+    object AdminConsole : Tab()
     sealed class ResultsTab : Tab() {
         object PairTest : ResultsTab()
         object Cec2022 : ResultsTab()
@@ -21,7 +22,8 @@ data class MainAppState(
     val tab: Tab,
     val error: DomainError?,
     val uploadFilesState: UploadFilesState = UploadFilesState(),
-    val rankingsState: RankingsState = RankingsState()
+    val rankingsState: RankingsState = RankingsState(),
+    val adminConsoleState: AdminConsoleState = AdminConsoleState()
 ) : KoinComponent
 
 
@@ -43,4 +45,5 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
     )
 
     is RankingsAction -> state.copy(rankingsState = rankingsReducer(state.rankingsState, action))
+    is AdminConsoleAction -> state.copy(adminConsoleState = adminConsoleReducer(state.adminConsoleState, action))
 }

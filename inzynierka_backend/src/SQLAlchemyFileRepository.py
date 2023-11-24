@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, delete
 from sqlalchemy.orm import sessionmaker, Session
 
 from src import models
@@ -57,6 +57,15 @@ class SQLAlchemyFileRepository(IFileRepository):
                 function_number=function_number
             )
             self._db.add(file)
+            self._db.commit()
+        except:
+            self._db.rollback()
+            raise
+
+    def delete_files_for_algorithm_name(self, algorithm_name: str):
+        try:
+            query = delete(models.LocalFile).where(models.LocalFile.algorithm_name == algorithm_name)
+            self._db.execute(query)
             self._db.commit()
         except:
             self._db.rollback()

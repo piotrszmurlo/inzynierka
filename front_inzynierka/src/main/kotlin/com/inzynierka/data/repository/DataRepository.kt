@@ -44,6 +44,10 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         return client.get(urlString = "functions").body()
     }
 
+    override suspend fun deleteFilesForAlgorithm(algorithmName: String) {
+        return client.delete(urlString = "file/$algorithmName").body()
+    }
+
     override suspend fun postFiles(kFiles: List<KFile>) {
         client.submitFormWithBinaryData(
             url = "file",

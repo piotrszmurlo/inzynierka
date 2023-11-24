@@ -31,3 +31,6 @@ class FileService:
             function_number=function_number
         )
 
+    def delete_files(self, algorithm_name: str):
+        return self._repository.delete_files_for_algorithm_name(algorithm_name)
+

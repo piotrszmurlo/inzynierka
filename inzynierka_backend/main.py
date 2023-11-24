@@ -89,6 +89,12 @@ async def get_ecdf_data():
     return rankings.get_ecdf_data()
 
 
+@app.delete("/file/{algorithm_name}")
+async def delete_files(algorithm_name: str):
+    file_service.delete_files(algorithm_name)
+    rankings.invalidate_cache()
+
+
 @app.post("/file")
 async def post_file(files: list[UploadFile]):
     try:

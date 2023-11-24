@@ -30,3 +30,7 @@ class IFileRepository(ABC):
     @abstractmethod
     def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str):
         raise NotImplementedError
+
+    @abstractmethod
+    def delete_files_for_algorithm_name(self, algorithm_name: str):
+        raise NotImplementedError
