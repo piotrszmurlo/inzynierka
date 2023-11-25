@@ -99,6 +99,36 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
+    override suspend fun loginUser(email: String, password: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.loginUser(email, password))
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
+    override suspend fun registerUser(email: String, password: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.registerUser(email, password))
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
+    override suspend fun isCurrentUserAdmin(): Result<Boolean> {
+        return try {
+            Result.Success(dataRepository.isCurrentUserAdmin().isAdmin)
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
     override suspend fun getPairTest(
         algorithm1: String,
         algorithm2: String,

@@ -14,6 +14,9 @@ interface IDataRepository {
     suspend fun getAvailableFunctionNumbers(): List<Int>
     suspend fun postFiles(kFiles: List<KFile>)
     suspend fun deleteFilesForAlgorithm(algorithmName: String)
+    suspend fun loginUser(email: String, password: String)
+    suspend fun registerUser(email: String, password: String)
+    suspend fun isCurrentUserAdmin(): UserData
     suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,

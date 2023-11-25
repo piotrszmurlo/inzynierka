@@ -3,6 +3,7 @@ package com.inzynierka.ui
 import com.inzynierka.di.appModule
 import com.inzynierka.domain.core.Tab
 import com.inzynierka.ui.console.adminConsole
+import com.inzynierka.ui.login.login
 import com.inzynierka.ui.rankings.rankings
 import io.kvision.*
 import io.kvision.core.JustifyContent
@@ -19,7 +20,6 @@ class App : Application(), KoinComponent {
 
     init {
         require("css/kvapp.css")
-
     }
 
     override fun start() {
@@ -30,7 +30,7 @@ class App : Application(), KoinComponent {
             )
         )
         root("kvapp").bind(AppManager.store) { state ->
-            navBar(state.tab)
+            navBar(state.isUserLoggedIn, state.loginState.isUserAdmin, state.tab)
             flexPanel(
                 justify = JustifyContent.CENTER
             ) {
@@ -43,8 +43,12 @@ class App : Application(), KoinComponent {
                         rankings(state.rankingsState, state.tab)
                     }
 
-                    Tab.AdminConsole -> {
+                    is Tab.AdminConsole -> {
                         adminConsole(state.adminConsoleState)
+                    }
+
+                    is Tab.Login -> {
+                        login(state.loginState)
                     }
                 }
             }

@@ -65,6 +65,7 @@ kotlin {
         implementation("io.ktor:ktor-client-js:$ktorVersion")
         implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
         implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+        implementation("io.ktor:ktor-client-auth:$ktorVersion")
         implementation("io.kvision:kvision-react:$kvisionVersion")
         implementation("io.kvision:kvision-i18n:${kvisionVersion}")
         implementation(npm("react-spinners", "0.13.8"))

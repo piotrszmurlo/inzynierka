@@ -3,6 +3,8 @@ package com.inzynierka.ui
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.StringResources.LOGIN_FAILED_TOAST
+import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
@@ -18,7 +20,7 @@ import org.koin.core.component.inject
 
 object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()), KoinComponent {
 
-    private val initialMainAppState = MainAppState(tab = Tab.Upload, error = null)
+    private val initialMainAppState = MainAppState(tab = Tab.Upload)
     private val dataService: IDataService by inject()
     val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
 
@@ -136,6 +138,43 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(Cec2022RankingAction.FetchRankingsFailed(result.domainError))
+            }
+        }
+    }
+
+    fun loginUser(email: String, password: String) = launch {
+        store.dispatch(LoginAction.Login)
+        when (val result = dataService.loginUser(email, password)) {
+            is Result.Success -> {
+                when (val isAdmin = dataService.isCurrentUserAdmin()) {
+                    is Result.Success -> {
+                        store.dispatch(LoginAction.LoginSuccess(isAdmin.data))
+                    }
+
+                    is Result.Error -> store.dispatch(LoginAction.LoginSuccess(false))
+                }
+                store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+            }
+
+            is Result.Error -> {
+                Toast.show(LOGIN_FAILED_TOAST)
+                store.dispatch(LoginAction.LoginFailed(result.domainError))
+            }
+        }
+    }
+
+    fun registerUser(email: String, password: String) = launch {
+        store.dispatch(LoginAction.Register)
+        when (val result = dataService.registerUser(email, password)) {
+            is Result.Success -> {
+                Toast.show(REGISTER_SUCCESS_TOAST)
+                store.dispatch(LoginAction.RegisterSuccess)
+                store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+            }
+
+            is Result.Error -> {
+                Toast.show(LOGIN_FAILED_TOAST)
+                store.dispatch(LoginAction.RegisterFailed(result.domainError))
             }
         }
     }

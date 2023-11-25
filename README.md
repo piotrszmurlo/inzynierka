@@ -21,3 +21,9 @@ modify database connection by changing SQLALCHEMY_DATABASE_URL in SQLAlchemyFile
 To run backend tests (python and c++ tests), run `./run_tests.sh` while in inzynierka_backend folder:
 
 Generated coverage report path: /inzynierka_backend/htmlcov/index.html
+
+Building frontend app for production:
+
+`./gradlew clean zip`
+
+The package containing all of application files (index.html + main.bundle.js) will be saved as build/libs/template-1.0.0-SNAPSHOT.zip.

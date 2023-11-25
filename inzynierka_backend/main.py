@@ -3,13 +3,23 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.params import Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import jwt, JWTError
 from sqlalchemy.exc import IntegrityError
+from starlette import status
+
 from src import models
 from src.FileService import FileService
 from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
-from src.models import ParseError
-from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, check_filenames_integrity
+from src.SQLAlchemyUserRepository import SQLAlchemyUserRepository
+from src.UserService import UserService
+from src.auth_helpers import SECRET_KEY, ALGORITHM, TokenData, Token, authenticate_user, create_access_token, \
+    get_password_hash
+from src.models import ParseError, User
+from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, \
+    check_filenames_integrity
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -17,6 +27,10 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 file_repository = SQLAlchemyFileRepository(SessionLocal())
 file_service = FileService(file_repository)
+
+user_repository = SQLAlchemyUserRepository(SessionLocal())
+user_service = UserService(user_repository)
+
 rankings = Rankings(file_service)
 
 origins = [
@@ -32,9 +46,83 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = user_repository.get_user(email=token_data.email)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(
+        current_user: Annotated[User, Depends(get_current_user)]
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user = authenticate_user(user_repository, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(
+        data={"sub": user.email}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/register", response_model=Token)
+async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user = user_repository.get_user(form_data.username)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User already exists"
+        )
+    user_repository.create_user(email=form_data.username, password_hash=get_password_hash(form_data.password),
+                                disabled=True, is_admin=False)
+    access_token = create_access_token(
+        data={"sub": form_data.username}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me")
+async def get_current_user_data(current_user: Annotated[User, Depends(get_current_user)]):
+    return User(email=current_user.email, disabled=current_user.disabled, is_admin=current_user.is_admin)
+
+@app.get("/users")
+async def get_all_users(current_user: Annotated[User, Depends(get_current_active_user)]):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Current user does not have permission to perform this action"
+        )
+    return user_service.get_users()
 
 @app.get("/algorithms")
 async def get_available_algorithms():
+
     return file_service.get_algorithm_names()
 
 
@@ -90,13 +178,18 @@ async def get_ecdf_data():
 
 
 @app.delete("/file/{algorithm_name}")
-async def delete_files(algorithm_name: str):
+async def delete_files(algorithm_name: str, current_user: Annotated[User, Depends(get_current_active_user)]):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Current user does not have permission to perform this action"
+        )
     file_service.delete_files(algorithm_name)
     rankings.invalidate_cache()
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile]):
+async def post_file(files: list[UploadFile], current_user: Annotated[User, Depends(get_current_active_user)]):
     try:
         if len(files) != FUNCTIONS_COUNT * len(ALL_DIMENSIONS):
             raise ParseError(
@@ -112,7 +205,8 @@ async def post_file(files: list[UploadFile]):
                 )
             )
         for algorithm_name, function_number, dimension, content in parsed_file_tuples:
-            file_service.create_file(algorithm_name=algorithm_name, function_number=function_number, dimension=dimension, content=content)
+            file_service.create_file(algorithm_name=algorithm_name, function_number=function_number,
+                                     dimension=dimension, content=content)
         rankings.invalidate_cache()
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')

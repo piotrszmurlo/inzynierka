@@ -8,7 +8,26 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.kvision.types.KFile
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
+data class BearerToken(
+    @SerialName("access_token")
+    val accessToken: String,
+    @SerialName("token_type")
+    val tokenType: String
+)
+
+@Serializable
+data class UserData(
+    val email: String,
+    val disabled: Boolean,
+    @SerialName("is_admin")
+    val isAdmin: Boolean
+)
+
+private var bearerToken: BearerToken? = null
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
@@ -45,7 +64,37 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     }
 
     override suspend fun deleteFilesForAlgorithm(algorithmName: String) {
-        return client.delete(urlString = "file/$algorithmName").body()
+        return client.delete(urlString = "file/$algorithmName") {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }.body()
+    }
+
+    override suspend fun loginUser(email: String, password: String) {
+        val token = client.submitForm(
+            url = "token",
+            formParameters = Parameters.build {
+                append("username", email)
+                append("password", password)
+            }
+        ).body<BearerToken>()
+        bearerToken = token
+    }
+
+    override suspend fun registerUser(email: String, password: String) {
+        val token = client.submitForm(
+            url = "register",
+            formParameters = Parameters.build {
+                append("username", email)
+                append("password", password)
+            }
+        ).body<BearerToken>()
+        bearerToken = token
+    }
+
+    override suspend fun isCurrentUserAdmin(): UserData {
+        return client.get(urlString = "/users/me") {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }.body()
     }
 
     override suspend fun postFiles(kFiles: List<KFile>) {
@@ -59,7 +108,9 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
                     })
                 }
             }
-        )
+        ) {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
     }
 
     override suspend fun getPairTest(

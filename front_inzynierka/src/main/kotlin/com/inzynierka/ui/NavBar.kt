@@ -4,6 +4,7 @@ import com.inzynierka.domain.core.MainAppAction
 import com.inzynierka.domain.core.Tab
 import com.inzynierka.ui.StringResources.ADMIN_CONSOLE_LABEL
 import com.inzynierka.ui.StringResources.BROWSE_RANKINGS_LABEL
+import com.inzynierka.ui.StringResources.LOGIN_LABEL
 import com.inzynierka.ui.StringResources.NAVBAR_TITLE
 import com.inzynierka.ui.StringResources.UPLOAD_RESULTS_LABEL
 import io.kvision.core.Container
@@ -13,7 +14,7 @@ import io.kvision.navbar.nav
 import io.kvision.navbar.navbar
 import io.kvision.utils.px
 
-fun Container.navBar(activeTab: Tab) {
+fun Container.navBar(isLoggedIn: Boolean, isAdmin: Boolean, activeTab: Tab) {
     navbar(NAVBAR_TITLE) {
         nav(rightAlign = true) {
             div {
@@ -30,11 +31,21 @@ fun Container.navBar(activeTab: Tab) {
                     AppManager.loadCec2022Scores()
                 }
             }
-            div {
-                padding = 4.px
-                button(ADMIN_CONSOLE_LABEL, style = tabButtonStyle(activeTab is Tab.AdminConsole)).onClick {
-                    AppManager.store.dispatch(MainAppAction.TabSelected(Tab.AdminConsole))
-                    AppManager.loadAdminConsole()
+            if (isAdmin) {
+                div {
+                    padding = 4.px
+                    button(ADMIN_CONSOLE_LABEL, style = tabButtonStyle(activeTab is Tab.AdminConsole)).onClick {
+                        AppManager.store.dispatch(MainAppAction.TabSelected(Tab.AdminConsole))
+                        AppManager.loadAdminConsole()
+                    }
+                }
+            }
+            if (!isLoggedIn) {
+                div {
+                    padding = 4.px
+                    button(LOGIN_LABEL, style = tabButtonStyle(activeTab is Tab.Login)).onClick {
+                        AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Login))
+                    }
                 }
             }
         }
