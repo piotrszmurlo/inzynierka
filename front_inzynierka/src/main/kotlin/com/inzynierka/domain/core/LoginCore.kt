@@ -14,10 +14,7 @@ data class LoginState(
     val isUserLoggedIn: Boolean = false,
     val isUserAdmin: Boolean = false,
     val isRegisteringOrLoggingIn: Boolean = false
-) {
-    val loginButtonDisabled
-        get() = !emailValid || email.isNullOrBlank() || !passwordValid || password.isNullOrBlank() || isRegisteringOrLoggingIn
-}
+)
 
 sealed class LoginAction : MainAppAction() {
     object Login : LoginAction()
@@ -48,7 +45,6 @@ fun loginReducer(state: LoginState, action: LoginAction) = when (action) {
     is LoginAction.Login -> state.copy(isRegisteringOrLoggingIn = true)
     is LoginAction.LoginFailed -> state.copy(isRegisteringOrLoggingIn = false)
     is LoginAction.LoginSuccess -> {
-        console.log(action.isUserAdmin)
         state.copy(
             email = "",
             password = "",
@@ -70,6 +66,6 @@ fun isEmailValid(email: String?): Boolean {
 
 fun isPasswordValid(password: String?): Boolean {
     return password?.let {
-        it.all { char -> char.isLetterOrDigit() } && it.isNotBlank()
+        it.length >= 8 && it.all { char -> !char.isWhitespace() } && it.isNotBlank()
     } ?: false
 }

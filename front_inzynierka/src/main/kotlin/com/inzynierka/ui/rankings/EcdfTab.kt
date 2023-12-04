@@ -77,14 +77,18 @@ fun Container.averagedEcdfs(
     functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>?
 ) {
     flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
-        combinedData?.forEach { (dimension, data) ->
-            ecdfChart(data, DIMENSION_FUNCTION_COMBINED(dimension), dimension)
+        val sortedDimensions = combinedData?.keys?.sorted()
+        sortedDimensions?.forEach { dimension ->
+            combinedData[dimension]?.let {
+                ecdfChart(it, DIMENSION_FUNCTION_COMBINED(dimension), dimension)
+            }
         }
     }
     flexPanel(FlexDirection.ROW, alignItems = AlignItems.CENTER) {
-        functionGroupData?.forEach { (dimension, functionGroupsData) ->
+        val sortedDimensions = combinedData?.keys?.sorted()
+        sortedDimensions?.forEach { dimension ->
             flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
-                functionGroupsData.forEach { (functionGroup, data) ->
+                functionGroupData?.get(dimension)?.forEach { (functionGroup, data) ->
                     ecdfChart(
                         data,
                         DIMENSION_FUNCTION_GROUP_EQUALS(dimension, functionGroup.name.lowercase()),

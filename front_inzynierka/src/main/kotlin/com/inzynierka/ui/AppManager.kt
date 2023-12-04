@@ -4,6 +4,7 @@ import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.ui.StringResources.LOGIN_FAILED_TOAST
+import com.inzynierka.ui.StringResources.REGISTER_ERROR_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
@@ -173,7 +174,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             }
 
             is Result.Error -> {
-                Toast.show(LOGIN_FAILED_TOAST)
+                Toast.show(REGISTER_ERROR_TOAST)
                 store.dispatch(LoginAction.RegisterFailed(result.domainError))
             }
         }
