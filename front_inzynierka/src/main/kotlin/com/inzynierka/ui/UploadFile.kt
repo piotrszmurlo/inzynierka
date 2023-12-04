@@ -2,6 +2,7 @@ package com.inzynierka.ui
 
 import com.inzynierka.domain.core.UploadAction
 import com.inzynierka.domain.core.UploadFilesState
+import com.inzynierka.ui.StringResources.OVERWRITE_FILES_DIALOG_TEXT
 import com.inzynierka.ui.StringResources.SELECTED_FILES
 import com.inzynierka.ui.StringResources.SELECT_FILES
 import com.inzynierka.ui.StringResources.TOAST_FILE_UPLOAD_COMPLETED
@@ -14,6 +15,7 @@ import io.kvision.form.getDataWithFileContent
 import io.kvision.form.upload.upload
 import io.kvision.html.button
 import io.kvision.html.h5
+import io.kvision.modal.Confirm
 import io.kvision.panel.flexPanel
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
@@ -74,7 +76,7 @@ fun Container.uploadFileForm(
                         disabled = state.uploadButtonDisabled
                     }
                     uploadFileButton.onClick {
-                        state.kFiles?.let { files -> AppManager.uploadFiles(files) }
+                        state.kFiles?.let { files -> AppManager.uploadFiles(files, false) }
                     }
                 }
                 state.selectedFiles?.let {
@@ -84,7 +86,13 @@ fun Container.uploadFileForm(
         }
     }
     state.error?.let {
-        Toast.show(StringResources.FILE_UPLOAD_ERROR(state.error.message))
+        if (it.message?.contains("File already exists") == true) {
+            Confirm.show(text = OVERWRITE_FILES_DIALOG_TEXT) {
+                state.kFiles?.let { files -> AppManager.uploadFiles(files, true) }
+            }
+        } else {
+            Toast.show(StringResources.FILE_UPLOAD_ERROR(it.message))
+        }
         AppManager.store.dispatch(UploadAction.ResultHandled)
     }
     state.success?.let {

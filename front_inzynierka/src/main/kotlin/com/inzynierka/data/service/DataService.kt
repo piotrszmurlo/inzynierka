@@ -79,9 +79,9 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun postFiles(kFiles: List<KFile>): Result<Unit> {
+    override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean): Result<Unit> {
         return try {
-            Result.Success(dataRepository.postFiles(kFiles))
+            Result.Success(dataRepository.postFiles(kFiles, overwriteExisting))
         } catch (e: Throwable) {
             Result.Error(
                 DomainError(e.parsedRemoteExceptionMessage)

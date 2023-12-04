@@ -15,8 +15,9 @@ from src.Rankings import Rankings
 from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, SessionLocal
 from src.SQLAlchemyUserRepository import SQLAlchemyUserRepository
 from src.UserService import UserService
-from src.auth_helpers import SECRET_KEY, ALGORITHM, TokenData, Token, authenticate_user, create_access_token, \
+from src.auth_helpers import TokenData, Token, authenticate_user, create_access_token, \
     get_password_hash
+from src.config import settings
 from src.models import ParseError, User
 from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, \
     check_filenames_integrity
@@ -33,14 +34,9 @@ user_service = UserService(user_repository)
 
 rankings = Rankings(file_service)
 
-origins = [
-    "localhost:3000",
-    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,7 +52,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.HASH_ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -189,7 +185,7 @@ async def delete_files(algorithm_name: str, current_user: Annotated[User, Depend
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile], current_user: Annotated[User, Depends(get_current_active_user)]):
+async def post_file(files: list[UploadFile], overwrite: bool, current_user: Annotated[User, Depends(get_current_active_user)]):
     try:
         if len(files) != FUNCTIONS_COUNT * len(ALL_DIMENSIONS):
             raise ParseError(
@@ -204,6 +200,8 @@ async def post_file(files: list[UploadFile], current_user: Annotated[User, Depen
                     file.filename, await file.read()
                 )
             )
+        if overwrite:
+            file_service.delete_files(parsed_file_tuples[0][0])
         for algorithm_name, function_number, dimension, content in parsed_file_tuples:
             file_service.create_file(algorithm_name=algorithm_name, function_number=function_number,
                                      dimension=dimension, content=content)

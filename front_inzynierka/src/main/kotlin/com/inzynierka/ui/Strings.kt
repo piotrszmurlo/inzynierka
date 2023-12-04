@@ -67,6 +67,7 @@ object StringResources {
     var EMAIL_PLACEHOLDER = tr("example@email.com")
     var PASSWORD = tr("Password")
     var REGISTER_LABEL = tr("Register")
+    var OVERWRITE_FILES_DIALOG_TEXT = tr("Selected files already exist. Overwrite these files?")
     var PASSWORD_TOOLTIP = tr("Minimum 8 characters, no whitespace allowed")
     var LOGOUT_LABEL = tr("Log out")
     var DELETE_ALGORITHM_BUTTON_LABEL = tr("Delete algorithm data")

@@ -5,10 +5,10 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from src import IUserRepository
+from src.config import settings
 
-SECRET_KEY = "bb844a9b17b380f503b8a91da46979c6935c933c90fef56f31eef6ee84792fc8"
-ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class Token(BaseModel):
     access_token: str
@@ -17,6 +17,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Union[str, None] = None
+
 
 def get_password_hash(password):
     return pwd_context.hash(password)
@@ -33,7 +34,7 @@ def authenticate_user(repository: IUserRepository, email: str, password: str):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.HASH_ALGORITHM)
     return encoded_jwt
 
 

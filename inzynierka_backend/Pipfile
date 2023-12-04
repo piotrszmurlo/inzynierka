@@ -16,6 +16,7 @@ scipy = "*"
 cryptography = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+pydantic-settings = "*"
 
 [dev-packages]
 

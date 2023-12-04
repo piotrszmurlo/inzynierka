@@ -12,7 +12,7 @@ interface IDataRepository {
     suspend fun getAvailableAlgorithms(): List<String>
     suspend fun getAvailableDimensions(): List<Int>
     suspend fun getAvailableFunctionNumbers(): List<Int>
-    suspend fun postFiles(kFiles: List<KFile>)
+    suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean)
     suspend fun deleteFilesForAlgorithm(algorithmName: String)
     suspend fun loginUser(email: String, password: String)
     suspend fun registerUser(email: String, password: String)

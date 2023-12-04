@@ -27,7 +27,7 @@ sealed class UploadAction : MainAppAction() {
 fun uploadReducer(state: UploadFilesState, action: UploadAction) = when (action) {
     is UploadAction.UploadFileStarted -> state.copy(isUploading = true)
     is UploadAction.UploadFileSuccess -> state.copy(isUploading = false, kFiles = null, success = true)
-    is UploadAction.UploadFileFailed -> state.copy(isUploading = false, error = action.error, kFiles = null)
+    is UploadAction.UploadFileFailed -> state.copy(isUploading = false, error = action.error)
     is UploadAction.UploadFormOnChangeHandler -> state.copy(kFiles = action.kFiles)
-    is UploadAction.ResultHandled -> state.copy(error = null, success = null)
+    is UploadAction.ResultHandled -> state.copy(error = null, success = null, kFiles = null)
 }

@@ -97,7 +97,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         }.body()
     }
 
-    override suspend fun postFiles(kFiles: List<KFile>) {
+    override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean) {
         client.submitFormWithBinaryData(
             url = "file",
             formData = formData {
@@ -109,6 +109,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
                 }
             }
         ) {
+            parameter("overwrite", overwriteExisting)
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
         }
     }

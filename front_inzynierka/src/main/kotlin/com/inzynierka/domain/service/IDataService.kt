@@ -24,7 +24,7 @@ interface IDataService {
      * uploads [kFiles] to the server
      * @return [Result] Unit or DomainError if an error occurred
      **/
-    suspend fun postFiles(kFiles: List<KFile>): Result<Unit>
+    suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean): Result<Unit>
     suspend fun deleteFilesForAlgorithm(algorithmName: String): Result<Unit>
     suspend fun loginUser(email: String, password: String): Result<Unit>
     suspend fun registerUser(email: String, password: String): Result<Unit>

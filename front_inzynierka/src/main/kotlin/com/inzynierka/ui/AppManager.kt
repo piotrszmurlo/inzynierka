@@ -38,9 +38,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun uploadFiles(files: List<KFile>) = launch {
+    fun uploadFiles(files: List<KFile>, overwriteExisting: Boolean) = launch {
         store.dispatch(UploadAction.UploadFileStarted)
-        when (val result = dataService.postFiles(files)) {
+        when (val result = dataService.postFiles(files, overwriteExisting)) {
             is Result.Success -> {
                 store.dispatch(UploadAction.UploadFileSuccess)
             }

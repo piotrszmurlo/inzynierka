@@ -5,9 +5,9 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from src import models
 from src.IFileRepository import IFileRepository
+from src.config import settings
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:inzynierka123@localhost:3306/inzynierka"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
