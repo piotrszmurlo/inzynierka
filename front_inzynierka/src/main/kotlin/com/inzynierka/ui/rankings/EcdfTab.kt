@@ -12,9 +12,7 @@ import com.inzynierka.ui.StringResources.ECDF_X_AXIS_LABEL
 import com.inzynierka.ui.StringResources.ECDF_Y_AXIS_LABEL
 import com.inzynierka.ui.StringResources.PER_FUNCTION
 import io.kvision.chart.*
-import io.kvision.core.AlignItems
-import io.kvision.core.Container
-import io.kvision.core.FlexDirection
+import io.kvision.core.*
 import io.kvision.html.Align
 import io.kvision.html.button
 import io.kvision.html.h5
@@ -30,6 +28,23 @@ private val DIM_MAX_FES = mapOf(
 
 private const val CHART_WIDTH = 600
 private const val CHART_HEIGHT = 400
+
+private val colors = listOf(
+    0xFF0000, 0x00FF00, 0x0000FF, 0x4682B4, 0xFF00FF,
+    0x00FFFF, 0xFFA500, 0x800080, 0x008000, 0xFFC0CB,
+    0xFFD700, 0x00FF7F, 0xFF6347, 0x40E0D0, 0xFFE4E1,
+    0xFFFF00, 0x8B4513, 0x7CFC00, 0x9370DB, 0x7B68EE,
+    0xFF1493, 0x228B22, 0x800000, 0xFF4500, 0x9400D3,
+    0x8A2BE2, 0xA0522D, 0xFFD700, 0x800000, 0x483D8B,
+    0xFF69B4, 0xCD5C5C, 0x6A5ACD, 0x98FB98, 0x8B008B,
+    0xFF7F50, 0x8B0000, 0x008B8B, 0xFFA07A, 0x32CD32,
+    0x20B2AA, 0x00FF00, 0x00FF7F, 0x6B8E23, 0x008000,
+    0x3CB371, 0x48D1CC, 0xADFF2F, 0x00FA9A, 0x2E8B57
+).map { Color.hex(it) }
+
+private val pointStyles = listOf(
+    PointStyle.CIRCLE, PointStyle.RECT, PointStyle.RECTROT, PointStyle.RECTROUNDED, PointStyle.TRIANGLE
+)
 
 fun Container.ecdfTab(state: EcdfState) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER, spacing = 16) {
@@ -103,7 +118,7 @@ fun Container.averagedEcdfs(
 fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String, dimension: Dimension) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
         h5(content = title, align = Align.CENTER)
-        val data = ecdfDataList.map { ecdfData ->
+        val data = ecdfDataList.mapIndexed { index, ecdfData ->
             DataSets(
                 data = (ecdfData.functionEvaluations zip ecdfData.thresholdAchievedFractions)
                     .map {
@@ -112,10 +127,15 @@ fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String, dimension: 
                             y = it.second
                         }
                     },
+                borderColor = listOf(colors[index % colors.size]),
+                backgroundColor = listOf(colors[index % colors.size]),
+                pointStyle = listOf(pointStyles[index % pointStyles.size]),
+                pointRadius = listOf(5),
+                pointBorderColor = listOf(Color.name(Col.BLACK)),
+                pointHoverRadius = listOf(8),
                 label = ecdfData.algorithmName
             )
         }
-
         chart(
             Configuration(
                 type = ChartType.SCATTER,
@@ -132,7 +152,8 @@ fun Container.ecdfChart(ecdfDataList: List<EcdfData>, title: String, dimension: 
                                 display = true,
                                 text = ECDF_X_AXIS_LABEL,
                                 font = ChartFont(size = 20)
-                            )
+                            ),
+                            type = ScalesType.LOGARITHMIC
                         ),
                         "y" to ChartScales(
                             min = 0,

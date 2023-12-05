@@ -134,12 +134,14 @@ fun Container.pairTestTable(
             headerNames = headerNames,
             types = setOf(TableType.BORDERED, TableType.STRIPED, TableType.HOVER),
         ) {
-            results.forEach {
-                row {
-                    cell("${it.functionNumber}")
-                    cell(it.winner ?: EQUAL)
+            results
+                .sortedBy { it.functionNumber }
+                .forEach {
+                    row {
+                        cell("${it.functionNumber}")
+                        cell(it.winner ?: EQUAL)
+                    }
                 }
-            }
         }
     }
 }
