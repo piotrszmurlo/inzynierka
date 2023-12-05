@@ -2,16 +2,20 @@ package com.inzynierka.ui.console
 
 import com.inzynierka.domain.core.AdminConsoleAction
 import com.inzynierka.domain.core.AdminConsoleState
+import com.inzynierka.domain.core.LoginAction
 import com.inzynierka.ui.AppManager
 import com.inzynierka.ui.StringResources.ADMIN_CONSOLE_LABEL
 import com.inzynierka.ui.StringResources.DELETE_ALGORITHM_BUTTON_LABEL
 import com.inzynierka.ui.StringResources.DELETE_ALGORITHM_DESCRIPTION
+import com.inzynierka.ui.StringResources.PROMOTE_USERS_DESCRIPTION
+import com.inzynierka.ui.StringResources.PROMOTE_USER_BUTTON_LABEL
 import com.inzynierka.ui.divider
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
 import io.kvision.core.onChange
 import io.kvision.form.select.select
+import io.kvision.form.text.text
 import io.kvision.html.ButtonStyle
 import io.kvision.html.button
 import io.kvision.html.h5
@@ -23,7 +27,35 @@ fun Container.adminConsole(state: AdminConsoleState) {
         paddingTop = 32.px
         h5(ADMIN_CONSOLE_LABEL)
         divider()
-        removeAlgorithmForm(state)
+        flexPanel(FlexDirection.ROW, alignItems = AlignItems.STRETCH, spacing = 16) {
+            removeAlgorithmForm(state)
+            promoteUsers(state)
+        }
+    }
+}
+
+fun Container.promoteUsers(state: AdminConsoleState) {
+    flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
+        paddingTop = 32.px
+        h5(PROMOTE_USERS_DESCRIPTION)
+        val textField = text(
+            value = state.userEmail
+        ) {
+            paddingTop = 24.px
+            width = 250.px
+        }
+        button(
+            PROMOTE_USER_BUTTON_LABEL,
+            style = ButtonStyle.DANGER,
+            disabled = state.deleteButtonDisabled
+        ) {
+            width = 250.px
+        }.onClick {
+            AppManager.store.dispatch(LoginAction.EmailChanged(textField.value))
+            textField.value?.let { email ->
+                AppManager.promoteUserToAdmin(email)
+            }
+        }
     }
 }
 

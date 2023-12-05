@@ -17,6 +17,8 @@ interface IDataRepository {
     suspend fun loginUser(email: String, password: String)
     suspend fun registerUser(email: String, password: String)
     suspend fun isCurrentUserAdmin(): UserData
+    suspend fun promoteUserToAdmin(email: String)
+
     suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,

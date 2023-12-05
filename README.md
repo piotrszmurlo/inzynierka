@@ -14,7 +14,7 @@ To run backend server, run while in inzynierka_backend folder:
 
 `pipenv [...]` instead of `python3 -m pipenv [...]` if installed globally
 
-modify database connection by changing SQLALCHEMY_DATABASE_URL in SQLAlchemyFileRepository.py::9
+modify database connection by changing DATABASE_URL in `.env` file
 
 `dialect+driver://username:password@host:port/database`
 

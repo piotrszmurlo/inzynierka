@@ -68,12 +68,12 @@ fun Container.loginForm(state: LoginState) {
                     TooltipOptions(
                         title = PASSWORD_TOOLTIP,
                         placement = Placement.RIGHT,
-                        triggers = listOf(Trigger.HOVER)
+                        triggers = listOf(Trigger.HOVER, Trigger.MANUAL),
+                        animation = false
                     )
                 )
             }.bind(LoginForm::password)
         }
-
         button(
             LOGIN_LABEL
         ).onClick {

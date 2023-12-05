@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from src import models
 from src.IUserRepository import IUserRepository
@@ -17,6 +17,11 @@ class SQLAlchemyUserRepository(IUserRepository):
     def get_users(self):
         query = select(models.UserTable)
         return self._db.scalars(query).all()
+
+    def promote_user_to_admin(self, email):
+        query = update(models.UserTable).where(models.UserTable.email == email).values(is_admin = True)
+        self._db.execute(query)
+        self._db.commit()
 
     def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
         try:

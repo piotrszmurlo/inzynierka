@@ -97,6 +97,13 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         }.body()
     }
 
+    override suspend fun promoteUserToAdmin(email: String) {
+        return client.post(urlString = "/users/promote") {
+            parameter("email", email)
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }.body()
+    }
+
     override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean) {
         client.submitFormWithBinaryData(
             url = "file",

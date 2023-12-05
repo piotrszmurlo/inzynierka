@@ -109,6 +109,16 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
+    override suspend fun promoteUserToAdmin(email: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.promoteUserToAdmin(email))
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
     override suspend fun registerUser(email: String, password: String): Result<Unit> {
         return try {
             Result.Success(dataRepository.registerUser(email, password))

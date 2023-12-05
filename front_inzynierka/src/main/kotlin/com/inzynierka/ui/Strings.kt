@@ -16,7 +16,7 @@ object StringResources {
     var CEC2022_RANKING_TABLE_HEADER = tr("CEC 2022 score")
     var COMBINED_CEC2022_RANKING_TABLE_HEADER = tr("Combined CEC 2022 score")
     var CEC2022_RANKING_DESCRIPTION = tr("This ranking is based on CEC'22 official evaluation criteria.")
-    var FRIEDMAN_RANKING_DESCRIPTION = tr("This ranking is based on Friedman test.")
+    var FRIEDMAN_RANKING_DESCRIPTION = tr("Friedman ranking.")
     var ECDF_DESCRIPTION = tr("Empirical Cumulative Distribution Functions.")
     var REVISITED_DESCRIPTION =
         tr("Ranking method proposed in \"Revisiting CEC 2022 ranking for bound constrained single objective optimization\" article")
@@ -72,12 +72,17 @@ object StringResources {
     var LOGOUT_LABEL = tr("Log out")
     var DELETE_ALGORITHM_BUTTON_LABEL = tr("Delete algorithm data")
     var DELETE_ALGORITHM_DESCRIPTION = tr("Select an algorithm to delete its' data")
+    var PROMOTE_USERS_DESCRIPTION = tr("Provide user's email to promote for site admin")
 
     var TOAST_FAILED_TO_LOAD_RANKING = tr("Failed to load ranking data")
     var TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE = tr("Failed to load admin console data")
+    var TOAST_FAILED_TO_PROMOTE_USER = tr("User with given email not found")
+    var TOAST_PROMOTE_USER_SUCCESS = tr("User promoted to admin successfully")
     var TOAST_FAILED_TO_DELETE_ALGORITHM_DATA = tr("Failed to delete algorithm data")
+    var TOAST_DELETE_ALGORITHM_DATA_SUCCESS = tr("Sucessfully deleted algorithm data")
     var TOAST_FILE_UPLOAD_COMPLETED = tr("Files upload completed")
     var TOAST_MAXIMUM_FILE_SIZE_EXCEEDED = tr("Maximum file size exceeded")
+    var PROMOTE_USER_BUTTON_LABEL = tr("Promote user to admin")
     fun FILE_UPLOAD_ERROR(message: String?) = gettext("Files upload failed: %1", message)
 
     fun DIMENSION_FUNCTION_GROUP_EQUALS(dim: Int, functionGroup: String) =

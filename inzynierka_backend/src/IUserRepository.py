@@ -12,5 +12,9 @@ class IUserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def promote_user_to_admin(self, email):
+        raise NotImplementedError
+
+    @abstractmethod
     def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
         raise NotImplementedError

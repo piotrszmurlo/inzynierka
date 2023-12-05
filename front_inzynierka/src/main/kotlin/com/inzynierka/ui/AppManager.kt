@@ -6,9 +6,12 @@ import com.inzynierka.domain.service.IDataService
 import com.inzynierka.ui.StringResources.LOGIN_FAILED_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_ERROR_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
+import com.inzynierka.ui.StringResources.TOAST_DELETE_ALGORITHM_DATA_SUCCESS
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
+import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_PROMOTE_USER
+import com.inzynierka.ui.StringResources.TOAST_PROMOTE_USER_SUCCESS
 import io.kvision.redux.createTypedReduxStore
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
@@ -117,10 +120,26 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
+    fun promoteUserToAdmin(email: String) = launch {
+        store.dispatch(AdminConsoleAction.PromoteUserStarted)
+        when (dataService.promoteUserToAdmin(email)) {
+            is Result.Success -> {
+                Toast.show(TOAST_PROMOTE_USER_SUCCESS)
+                store.dispatch(AdminConsoleAction.PromoteUserSuccess)
+            }
+
+            is Result.Error -> {
+                Toast.show(TOAST_FAILED_TO_PROMOTE_USER)
+                store.dispatch(AdminConsoleAction.PromoteUserFailed)
+            }
+        }
+    }
+
     fun deleteAlgorithmData(algorithmName: String) = launch {
         store.dispatch(AdminConsoleAction.DeleteAlgorithmStarted)
         when (dataService.deleteFilesForAlgorithm(algorithmName)) {
             is Result.Success -> {
+                Toast.show(TOAST_DELETE_ALGORITHM_DATA_SUCCESS)
                 loadAdminConsole()
                 store.dispatch(AdminConsoleAction.DeleteAlgorithmSuccess)
             }

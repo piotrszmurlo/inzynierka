@@ -103,9 +103,11 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @app.get("/users/me")
 async def get_current_user_data(current_user: Annotated[User, Depends(get_current_user)]):
     return User(email=current_user.email, disabled=current_user.disabled, is_admin=current_user.is_admin)
+
 
 @app.get("/users")
 async def get_all_users(current_user: Annotated[User, Depends(get_current_active_user)]):
@@ -116,9 +118,26 @@ async def get_all_users(current_user: Annotated[User, Depends(get_current_active
         )
     return user_service.get_users()
 
+
+@app.post("/users/promote")
+async def promote_user(email: str, current_user: Annotated[User, Depends(get_current_active_user)]):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Current user does not have permission to perform this action"
+        )
+    user = user_service.get_user(email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with email: {email} does not exist"
+        )
+    user_service.promote_user_to_admin(email)
+    return True
+
+
 @app.get("/algorithms")
 async def get_available_algorithms():
-
     return file_service.get_algorithm_names()
 
 
@@ -185,7 +204,8 @@ async def delete_files(algorithm_name: str, current_user: Annotated[User, Depend
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile], overwrite: bool, current_user: Annotated[User, Depends(get_current_active_user)]):
+async def post_file(files: list[UploadFile], overwrite: bool,
+                    current_user: Annotated[User, Depends(get_current_active_user)]):
     try:
         if len(files) != FUNCTIONS_COUNT * len(ALL_DIMENSIONS):
             raise ParseError(
