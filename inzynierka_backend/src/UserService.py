@@ -14,5 +14,8 @@ class UserService:
     def promote_user_to_admin(self, email):
         return self._repository.promote_user_to_admin(email)
 
+    def verify_user(self, email):
+        return self._repository.verify_account(email)
+
     def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
         return self._repository.create_user(email, password_hash, disabled, is_admin)

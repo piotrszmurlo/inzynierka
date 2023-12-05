@@ -16,5 +16,9 @@ class IUserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
+    def verify_account(self, email):
+        raise NotImplementedError
+
+    @abstractmethod
+    def create_user(self, email: str, password_hash: str, verification_hash: str, disabled: bool, is_admin: bool):
         raise NotImplementedError

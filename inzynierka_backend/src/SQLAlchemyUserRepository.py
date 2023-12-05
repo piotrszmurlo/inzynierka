@@ -23,11 +23,17 @@ class SQLAlchemyUserRepository(IUserRepository):
         self._db.execute(query)
         self._db.commit()
 
-    def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
+    def verify_account(self, email):
+        query = update(models.UserTable).where(models.UserTable.email == email).values(disabled = False)
+        self._db.execute(query)
+        self._db.commit()
+
+    def create_user(self, email: str, password_hash: str, verification_hash: str, disabled: bool, is_admin: bool):
         try:
             file = models.UserTable(
                 email=email,
                 password_hash=password_hash,
+                verification_hash=verification_hash,
                 disabled=disabled,
                 is_admin=is_admin
             )

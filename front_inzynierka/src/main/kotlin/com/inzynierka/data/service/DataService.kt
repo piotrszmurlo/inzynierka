@@ -5,6 +5,7 @@ import com.inzynierka.common.Result
 import com.inzynierka.data.models.toDomain
 import com.inzynierka.data.parsedRemoteExceptionMessage
 import com.inzynierka.data.repository.IDataRepository
+import com.inzynierka.domain.core.UserData
 import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
@@ -129,9 +130,32 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun isCurrentUserAdmin(): Result<Boolean> {
+    override suspend fun verifyAccount(code: String): Result<Unit> {
         return try {
-            Result.Success(dataRepository.isCurrentUserAdmin().isAdmin)
+            Result.Success(dataRepository.verifyAccount(code))
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
+    override suspend fun resendVerificationCode(): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.resendVerificationCode())
+        } catch (e: Throwable) {
+            Result.Error(
+                DomainError(e.parsedRemoteExceptionMessage)
+            )
+        }
+    }
+
+    override suspend fun getUserData(): Result<UserData> {
+        return try {
+            val data = dataRepository.getUserData()
+            Result.Success(
+                UserData(disabled = data.disabled, isUserAdmin = data.isAdmin)
+            )
         } catch (e: Throwable) {
             Result.Error(
                 DomainError(e.parsedRemoteExceptionMessage)

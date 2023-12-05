@@ -28,6 +28,7 @@ data class MainAppState(
     val loginState: LoginState = LoginState()
 ) : KoinComponent {
     val isUserLoggedIn = loginState.isUserLoggedIn
+    val isUserVerified = loginState.loggedInUserData?.disabled == false
 }
 
 

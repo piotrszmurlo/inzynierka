@@ -20,6 +20,10 @@ sealed class AdminConsoleAction : MainAppAction() {
     object PromoteUserStarted : AdminConsoleAction()
     object PromoteUserSuccess : AdminConsoleAction()
     object PromoteUserFailed : AdminConsoleAction()
+
+    object VerifyUserStarted : AdminConsoleAction()
+    object VerifyUserSuccess : AdminConsoleAction()
+    object VerifyUserFailed : AdminConsoleAction()
     data class AlgorithmSelected(val algorithmName: String) : AdminConsoleAction()
     object DeleteAlgorithmStarted : AdminConsoleAction()
     object DeleteAlgorithmFailed : AdminConsoleAction()
@@ -46,4 +50,7 @@ fun adminConsoleReducer(state: AdminConsoleState, action: AdminConsoleAction) = 
     is AdminConsoleAction.PromoteUserFailed -> state.copy(isFetching = false)
     is AdminConsoleAction.PromoteUserStarted -> state.copy(isFetching = true)
     is AdminConsoleAction.PromoteUserSuccess -> state.copy(isFetching = false)
+    is AdminConsoleAction.VerifyUserFailed -> state.copy()
+    is AdminConsoleAction.VerifyUserStarted -> state.copy()
+    is AdminConsoleAction.VerifyUserSuccess -> state.copy()
 }

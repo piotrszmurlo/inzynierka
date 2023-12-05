@@ -11,6 +11,10 @@ import com.inzynierka.ui.StringResources.PASSWORD
 import com.inzynierka.ui.StringResources.PASSWORD_TOOLTIP
 import com.inzynierka.ui.StringResources.REGISTER_LABEL
 import com.inzynierka.ui.StringResources.REGISTER_LABEL_PROMPT
+import com.inzynierka.ui.StringResources.RESEND_EMAIL_BUTTON_LABEL
+import com.inzynierka.ui.StringResources.VERIFY_BUTTON_LABEL
+import com.inzynierka.ui.StringResources.VERIFY_LABEL
+import com.inzynierka.ui.StringResources.VERIFY_TEXT_FIELD_PLACEHOLDER
 import com.inzynierka.ui.divider
 import io.kvision.core.*
 import io.kvision.form.ValidationStatus
@@ -36,9 +40,43 @@ data class LoginForm(
 fun Container.login(state: LoginState) {
     flexPanel(FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
         paddingTop = 32.px
-        h5(LOGIN_LABEL)
-        divider()
-        loginForm(state)
+        if (state.isUserLoggedIn) {
+            accountVerifyForm()
+        } else {
+            h5(LOGIN_LABEL)
+            divider()
+            loginForm(state)
+        }
+    }
+}
+
+fun Container.accountVerifyForm() {
+    flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
+        paddingTop = 32.px
+        h5(VERIFY_LABEL)
+        val textField = text {
+            paddingTop = 24.px
+            width = 250.px
+            placeholder = VERIFY_TEXT_FIELD_PLACEHOLDER
+        }
+        flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
+            button(
+                VERIFY_BUTTON_LABEL
+            ) {
+                width = 250.px
+            }.onClick {
+                textField.value?.let { code ->
+                    AppManager.verifyCurrentUser(code)
+                }
+            }
+            button(
+                RESEND_EMAIL_BUTTON_LABEL
+            ) {
+                width = 250.px
+            }.onClick {
+                AppManager.resendVerificationCode()
+            }
+        }
     }
 }
 

@@ -5,6 +5,11 @@ import com.inzynierka.common.DomainError
 
 private const val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
 
+data class UserData(
+    val disabled: Boolean,
+    val isUserAdmin: Boolean
+)
+
 data class LoginState(
     val email: String? = "",
     val emailValid: Boolean = true,
@@ -12,15 +17,15 @@ data class LoginState(
     val password: String? = "",
     val error: DomainError? = null,
     val isUserLoggedIn: Boolean = false,
-    val isUserAdmin: Boolean = false,
-    val isRegisteringOrLoggingIn: Boolean = false
+    val isRegisteringOrLoggingIn: Boolean = false,
+    val loggedInUserData: UserData? = null,
 )
 
 sealed class LoginAction : MainAppAction() {
     object Login : LoginAction()
-    data class LoginSuccess(val isUserAdmin: Boolean) : LoginAction()
+    data class LoginSuccess(val loggedInUserData: UserData?) : LoginAction()
     object Register : LoginAction()
-    object RegisterSuccess : LoginAction()
+    data class RegisterSuccess(val data: UserData?) : LoginAction()
     data class EmailChanged(val email: String?) : LoginAction()
     data class PasswordChanged(val password: String?) : LoginAction()
     data class LoginFailed(val domainError: DomainError) : LoginAction()
@@ -50,13 +55,19 @@ fun loginReducer(state: LoginState, action: LoginAction) = when (action) {
             password = "",
             isRegisteringOrLoggingIn = false,
             isUserLoggedIn = true,
-            isUserAdmin = action.isUserAdmin
+            loggedInUserData = action.loggedInUserData
         )
     }
 
     is LoginAction.Register -> state.copy(isRegisteringOrLoggingIn = true)
     is LoginAction.RegisterFailed -> state.copy(isRegisteringOrLoggingIn = false)
-    is LoginAction.RegisterSuccess -> state.copy(email = "", password = "", isUserLoggedIn = true)
+    is LoginAction.RegisterSuccess -> state.copy(
+        email = "",
+        password = "",
+        isUserLoggedIn = true,
+        isRegisteringOrLoggingIn = false,
+        loggedInUserData = action.data
+    )
 }
 
 

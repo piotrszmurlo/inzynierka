@@ -2,6 +2,7 @@ package com.inzynierka.ui
 
 import com.inzynierka.domain.core.MainAppAction
 import com.inzynierka.domain.core.Tab
+import com.inzynierka.domain.core.UserData
 import com.inzynierka.ui.StringResources.ADMIN_CONSOLE_LABEL
 import com.inzynierka.ui.StringResources.BROWSE_RANKINGS_LABEL
 import com.inzynierka.ui.StringResources.LOGIN_LABEL
@@ -14,7 +15,7 @@ import io.kvision.navbar.nav
 import io.kvision.navbar.navbar
 import io.kvision.utils.px
 
-fun Container.navBar(isLoggedIn: Boolean, isAdmin: Boolean, activeTab: Tab) {
+fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
     navbar(NAVBAR_TITLE) {
         nav(rightAlign = true) {
             div {
@@ -31,7 +32,7 @@ fun Container.navBar(isLoggedIn: Boolean, isAdmin: Boolean, activeTab: Tab) {
                     AppManager.loadCec2022Scores()
                 }
             }
-            if (isAdmin) {
+            if (userData?.isUserAdmin == true) {
                 div {
                     padding = 4.px
                     button(ADMIN_CONSOLE_LABEL, style = tabButtonStyle(activeTab is Tab.AdminConsole)).onClick {
@@ -40,6 +41,15 @@ fun Container.navBar(isLoggedIn: Boolean, isAdmin: Boolean, activeTab: Tab) {
                     }
                 }
             }
+            if (isLoggedIn && userData?.disabled == true) {
+                div {
+                    padding = 4.px
+                    button("VERIFY ACCOUNT", style = tabButtonStyle(activeTab is Tab.Login)).onClick {
+                        AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Login))
+                    }
+                }
+            }
+
             if (!isLoggedIn) {
                 div {
                     padding = 4.px

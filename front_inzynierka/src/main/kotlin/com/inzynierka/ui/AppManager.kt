@@ -3,6 +3,8 @@ package com.inzynierka.ui
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.*
 import com.inzynierka.domain.service.IDataService
+import com.inzynierka.ui.StringResources.EMAIL_FAILED
+import com.inzynierka.ui.StringResources.EMAIL_SENT
 import com.inzynierka.ui.StringResources.LOGIN_FAILED_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_ERROR_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
@@ -12,6 +14,8 @@ import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_PROMOTE_USER
 import com.inzynierka.ui.StringResources.TOAST_PROMOTE_USER_SUCCESS
+import com.inzynierka.ui.StringResources.TOAST_VERIFY_USER_FAILED
+import com.inzynierka.ui.StringResources.TOAST_VERIFY_USER_SUCCESS
 import io.kvision.redux.createTypedReduxStore
 import io.kvision.toast.Toast
 import io.kvision.types.KFile
@@ -135,6 +139,38 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
+    fun verifyCurrentUser(code: String) = launch {
+        store.dispatch(AdminConsoleAction.PromoteUserStarted)
+        when (dataService.verifyAccount(code)) {
+            is Result.Success -> {
+                Toast.show(TOAST_VERIFY_USER_SUCCESS)
+                when (val userData = dataService.getUserData()) {
+                    is Result.Success -> {
+                        store.dispatch(LoginAction.LoginSuccess(userData.data))
+                    }
+
+                    is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
+                }
+                store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+                store.dispatch(AdminConsoleAction.VerifyUserSuccess)
+            }
+
+            is Result.Error -> {
+                Toast.show(TOAST_VERIFY_USER_FAILED)
+                store.dispatch(AdminConsoleAction.VerifyUserFailed)
+            }
+        }
+    }
+
+    fun resendVerificationCode() = launch {
+        when (dataService.resendVerificationCode()) {
+            is Result.Error -> Toast.show(EMAIL_FAILED)
+            is Result.Success -> Toast.show(EMAIL_SENT)
+        }
+
+
+    }
+
     fun deleteAlgorithmData(algorithmName: String) = launch {
         store.dispatch(AdminConsoleAction.DeleteAlgorithmStarted)
         when (dataService.deleteFilesForAlgorithm(algorithmName)) {
@@ -166,12 +202,12 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         store.dispatch(LoginAction.Login)
         when (val result = dataService.loginUser(email, password)) {
             is Result.Success -> {
-                when (val isAdmin = dataService.isCurrentUserAdmin()) {
+                when (val userData = dataService.getUserData()) {
                     is Result.Success -> {
-                        store.dispatch(LoginAction.LoginSuccess(isAdmin.data))
+                        store.dispatch(LoginAction.LoginSuccess(userData.data))
                     }
 
-                    is Result.Error -> store.dispatch(LoginAction.LoginSuccess(false))
+                    is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
                 }
                 store.dispatch(MainAppAction.TabSelected(Tab.Upload))
             }
@@ -187,9 +223,19 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         store.dispatch(LoginAction.Register)
         when (val result = dataService.registerUser(email, password)) {
             is Result.Success -> {
+                when (val userData = dataService.getUserData()) {
+                    is Result.Success -> {
+                        store.dispatch(LoginAction.RegisterSuccess(userData.data))
+                        store.dispatch(MainAppAction.TabSelected(Tab.Login))
+                    }
+
+                    is Result.Error -> {
+                        store.dispatch(LoginAction.RegisterSuccess(null))
+                        store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+                    }
+
+                }
                 Toast.show(REGISTER_SUCCESS_TOAST)
-                store.dispatch(LoginAction.RegisterSuccess)
-                store.dispatch(MainAppAction.TabSelected(Tab.Upload))
             }
 
             is Result.Error -> {

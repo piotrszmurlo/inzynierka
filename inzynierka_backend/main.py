@@ -1,6 +1,7 @@
+import asyncio
 import os
+import smtplib
 from typing import Annotated
-
 from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
@@ -16,7 +17,7 @@ from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, Sessi
 from src.SQLAlchemyUserRepository import SQLAlchemyUserRepository
 from src.UserService import UserService
 from src.auth_helpers import TokenData, Token, authenticate_user, create_access_token, \
-    get_password_hash
+    get_password_hash, generate_verification_code
 from src.config import settings
 from src.models import ParseError, User
 from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, \
@@ -48,7 +49,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Can't authenticate user",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -88,6 +89,38 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+@app.post("/users/verify")
+async def login_for_access_token(code: str, current_user: Annotated[User, Depends(get_current_user)]):
+    user = user_service.get_user(current_user.email)
+    if user.verification_hash == code:
+        user_service.verify_user(current_user.email)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect verification code"
+        )
+
+
+async def send_verification_email(email: str, code: str):
+    try:
+        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
+            try:
+                server.login(settings.EMAIL_USERNAME, settings.EMAIL_PASSWORD)
+            except smtplib.SMTPNotSupportedError:
+                pass
+            server.sendmail(settings.EMAIL_FROM, email, f"Verification code: {code}")
+    except ConnectionRefusedError:
+        print("SMTP server refused to connect")
+
+@app.get("/users/resend")
+async def resend_verification_code(current_user: Annotated[User, Depends(get_current_user)]):
+    asyncio.create_task(
+        send_verification_email(
+            current_user.email,
+            current_user.verification_hash
+        )
+    )
+
 @app.post("/register", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = user_repository.get_user(form_data.username)
@@ -96,7 +129,12 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists"
         )
+
+    code = generate_verification_code()
+
+    asyncio.create_task(send_verification_email(form_data.username, code))
     user_repository.create_user(email=form_data.username, password_hash=get_password_hash(form_data.password),
+                                verification_hash=code,
                                 disabled=True, is_admin=False)
     access_token = create_access_token(
         data={"sub": form_data.username}

@@ -1,6 +1,7 @@
 package com.inzynierka.domain.service
 
 import com.inzynierka.common.Result
+import com.inzynierka.domain.core.UserData
 import com.inzynierka.domain.models.PairTestEntry
 import com.inzynierka.domain.models.RevisitedRankingEntry
 import com.inzynierka.domain.models.ScoreRankingEntry
@@ -29,6 +30,8 @@ interface IDataService {
     suspend fun loginUser(email: String, password: String): Result<Unit>
     suspend fun promoteUserToAdmin(email: String): Result<Unit>
     suspend fun registerUser(email: String, password: String): Result<Unit>
-    suspend fun isCurrentUserAdmin(): Result<Boolean>
+    suspend fun verifyAccount(code: String): Result<Unit>
+    suspend fun resendVerificationCode(): Result<Unit>
+    suspend fun getUserData(): Result<UserData>
     suspend fun getPairTest(algorithm1: String, algorithm2: String, dimension: Int): Result<List<PairTestEntry>>
 }

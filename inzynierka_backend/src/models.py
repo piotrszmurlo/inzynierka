@@ -14,12 +14,12 @@ class ParseError(Exception):
 
 class LocalFile(Base):
     __tablename__ = "files"
+    __table_args__ = (UniqueConstraint("algorithm_name", "dimension", "function_number", name="uix_1"),)
     id = Column(Integer, primary_key=True, index=True)
     contents = Column(Text)
     algorithm_name = Column(VARCHAR(255))
     dimension = Column(Integer)
     function_number = Column(Integer)
-    UniqueConstraint("algorithm_name", "dimension", "function_number", name="uix_1")
 
     def __repr__(self):
         return f'LocalFile({self.id}, {self.algorithm_name}, {self.function_number}, {self.dimension})'
@@ -28,17 +28,19 @@ class LocalFile(Base):
 class UserTable(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(Text)
+    email = Column(VARCHAR(255), unique=True)
     password_hash = Column(Text)
     disabled = Column(Boolean)
     is_admin = Column(Boolean)
-    UniqueConstraint("email", name="uix_2")
+    verification_hash = Column(Text)
+
 
 
 class User(BaseModel):
     email: Union[str, None] = None
     disabled: Union[bool, None] = None
     is_admin: bool = False
+
 
 class StatisticRankingEntry(BaseModel):
     dimension: int

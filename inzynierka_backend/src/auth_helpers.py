@@ -1,3 +1,5 @@
+import secrets
+import string
 from typing import Union
 
 from jose import jwt
@@ -9,10 +11,16 @@ from src.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+CODE_LENGTH = 15
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+def generate_verification_code():
+    return ''.join(secrets.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(CODE_LENGTH))
 
 
 class TokenData(BaseModel):

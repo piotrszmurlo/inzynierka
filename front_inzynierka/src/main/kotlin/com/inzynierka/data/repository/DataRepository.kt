@@ -91,7 +91,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         bearerToken = token
     }
 
-    override suspend fun isCurrentUserAdmin(): UserData {
+    override suspend fun getUserData(): UserData {
         return client.get(urlString = "/users/me") {
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
         }.body()
@@ -102,6 +102,19 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
             parameter("email", email)
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
         }.body()
+    }
+
+    override suspend fun verifyAccount(code: String) {
+        client.post("/users/verify") {
+            parameter("code", code)
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
+    }
+
+    override suspend fun resendVerificationCode() {
+        client.get("users/resend") {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
     }
 
     override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean) {

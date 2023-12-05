@@ -30,7 +30,8 @@ class App : Application(), KoinComponent {
             )
         )
         root("kvapp").bind(AppManager.store) { state ->
-            navBar(state.isUserLoggedIn, state.loginState.isUserAdmin, state.tab)
+            console.log(state.loginState.loggedInUserData?.disabled)
+            navBar(state.isUserLoggedIn, state.loginState.loggedInUserData, state.tab)
             flexPanel(
                 justify = JustifyContent.CENTER
             ) {

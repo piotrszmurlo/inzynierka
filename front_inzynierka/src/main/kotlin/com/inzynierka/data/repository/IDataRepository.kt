@@ -16,8 +16,10 @@ interface IDataRepository {
     suspend fun deleteFilesForAlgorithm(algorithmName: String)
     suspend fun loginUser(email: String, password: String)
     suspend fun registerUser(email: String, password: String)
-    suspend fun isCurrentUserAdmin(): UserData
+    suspend fun getUserData(): UserData
     suspend fun promoteUserToAdmin(email: String)
+    suspend fun verifyAccount(code: String)
+    suspend fun resendVerificationCode()
 
     suspend fun getPairTest(
         firstAlgorithm: String,

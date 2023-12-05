@@ -18,6 +18,10 @@ modify database connection by changing DATABASE_URL in `.env` file
 
 `dialect+driver://username:password@host:port/database`
 
+Test SMTP server (necessary for verifying accounts):
+
+`python3 -m smtpd -c DebuggingServer -n localhost:1025`
+
 To run backend tests (python and c++ tests), run `./run_tests.sh` while in inzynierka_backend folder:
 
 Generated coverage report path: /inzynierka_backend/htmlcov/index.html
