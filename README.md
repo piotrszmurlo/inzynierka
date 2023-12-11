@@ -30,4 +30,9 @@ Building frontend app for production:
 
 `./gradlew clean zip`
 
-The package containing all of application files (index.html + main.bundle.js) will be saved as build/libs/template-1.0.0-SNAPSHOT.zip.
+The package containing all of application files (index.html + main.bundle.js) will be saved as build/libs/template-1.0.0-SNAPSHOT.zip. Website can be hosted using e.g. Apache HTTP Server
+
+Running backend app for production (uvicorn: `pip install "uvicorn[standard]"`):
+
+`uvicorn main:app --host 0.0.0.0 --port 80`
+
