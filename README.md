@@ -24,6 +24,8 @@ Test SMTP server (necessary for verifying accounts):
 
 To run backend tests (python and c++ tests), run `./run_tests.sh` while in inzynierka_backend folder:
 
+To run frontend tests (kotlin tests), run `./gradlew test`` while in front_inzynierka folder:
+
 Generated coverage report path: /inzynierka_backend/htmlcov/index.html
 
 Building frontend app for production:
