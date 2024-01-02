@@ -14,7 +14,7 @@ sealed class MedianRankingAction : RankingsAction() {
 }
 
 fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = when (action) {
-    is MedianRankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
+    is MedianRankingAction.FetchRankingsFailed -> state.copy(isFetching = false, error = action.error)
     is MedianRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is MedianRankingAction.FetchRankingsSuccess -> {
         val sorted = action.scores.createRankings(

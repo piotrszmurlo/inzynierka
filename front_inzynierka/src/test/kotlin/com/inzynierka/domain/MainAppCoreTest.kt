@@ -53,5 +53,4 @@ class MainAppCoreTest {
         store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
         assertEquals(Tab.ResultsTab.PairTest, store.getState().tab)
     }
-
 }
