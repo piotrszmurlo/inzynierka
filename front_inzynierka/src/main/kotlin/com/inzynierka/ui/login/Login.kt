@@ -51,6 +51,7 @@ fun Container.login(state: LoginState) {
 }
 
 fun Container.accountVerifyForm() {
+
     flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
         paddingTop = 32.px
         h5(VERIFY_LABEL)

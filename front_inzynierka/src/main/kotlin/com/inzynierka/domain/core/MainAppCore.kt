@@ -1,6 +1,5 @@
 package com.inzynierka.domain.core
 
-import com.inzynierka.common.DomainError
 import io.kvision.redux.RAction
 import org.koin.core.component.KoinComponent
 
@@ -21,7 +20,6 @@ sealed class Tab {
 
 data class MainAppState(
     val tab: Tab,
-    val error: DomainError? = null,
     val uploadFilesState: UploadFilesState = UploadFilesState(),
     val rankingsState: RankingsState = RankingsState(),
     val adminConsoleState: AdminConsoleState = AdminConsoleState(),
@@ -33,23 +31,17 @@ data class MainAppState(
 
 
 sealed class MainAppAction : RAction {
-    object ErrorHandled : MainAppAction()
     data class TabSelected(val tab: Tab) : MainAppAction()
 }
 
 
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
-
     is UploadAction -> state.copy(uploadFilesState = uploadReducer(state.uploadFilesState, action))
-
-    is MainAppAction.ErrorHandled -> state.copy(error = null)
-
+    is RankingsAction -> state.copy(rankingsState = rankingsReducer(state.rankingsState, action))
+    is AdminConsoleAction -> state.copy(adminConsoleState = adminConsoleReducer(state.adminConsoleState, action))
+    is LoginAction -> state.copy(loginState = loginReducer(state.loginState, action))
     is MainAppAction.TabSelected -> state.copy(
         tab = action.tab,
         rankingsState = state.rankingsState
     )
-
-    is RankingsAction -> state.copy(rankingsState = rankingsReducer(state.rankingsState, action))
-    is AdminConsoleAction -> state.copy(adminConsoleState = adminConsoleReducer(state.adminConsoleState, action))
-    is LoginAction -> state.copy(loginState = loginReducer(state.loginState, action))
 }

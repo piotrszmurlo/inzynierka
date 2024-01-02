@@ -1,4 +1,4 @@
-package test.com.example
+package com.inzynierka.example
 
 import io.kvision.test.SimpleSpec
 import kotlin.test.Test
@@ -9,7 +9,7 @@ class AppSpec : SimpleSpec {
     @Test
     fun render() {
         run {
-            assertTrue(true, "Dummy test")
+            assertTrue(true, "Dummy test2")
         }
     }
 }
