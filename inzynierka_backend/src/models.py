@@ -1,11 +1,13 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, Text, UniqueConstraint, Boolean
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.dialects.mysql import VARCHAR
+from sqlalchemy import Column, Integer, Text, UniqueConstraint, Boolean, String, ForeignKey
+from sqlalchemy.orm import relationship, mapped_column, Mapped
+from sqlalchemy.orm import DeclarativeBase
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 
 class ParseError(Exception):
@@ -14,12 +16,14 @@ class ParseError(Exception):
 
 class LocalFile(Base):
     __tablename__ = "files"
-    __table_args__ = (UniqueConstraint("algorithm_name", "dimension", "function_number", name="uix_1"),)
-    id = Column(Integer, primary_key=True, index=True)
-    contents = Column(Text)
-    algorithm_name = Column(VARCHAR(255))
-    dimension = Column(Integer)
-    function_number = Column(Integer)
+    __table_args__ = (UniqueConstraint("algorithm_name", "dimension", "function_number", "benchmark_id", name="uix_1"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    contents: Mapped[str] = mapped_column(Text)
+    algorithm_name: Mapped[str] = mapped_column(String(255))
+    dimension: Mapped[int]
+    function_number: Mapped[int]
+    benchmark_id: Mapped[int] = mapped_column(ForeignKey("benchmarks.id", ondelete="CASCADE"))
+    benchmark: Mapped["Benchmark"] = relationship("Benchmark", back_populates="files")
 
     def __repr__(self):
         return f'LocalFile({self.id}, {self.algorithm_name}, {self.function_number}, {self.dimension})'
@@ -27,13 +31,22 @@ class LocalFile(Base):
 
 class UserTable(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(VARCHAR(255), unique=True)
-    password_hash = Column(Text)
-    disabled = Column(Boolean)
-    is_admin = Column(Boolean)
-    verification_hash = Column(Text)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    disabled: Mapped[bool]
+    is_admin: Mapped[bool]
+    verification_hash: Mapped[str] = mapped_column(String(255))
 
+
+class Benchmark(Base):
+    __tablename__ = "benchmarks"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), unique=True)
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    function_count: Mapped[int]
+    trial_count: Mapped[int]
+    files: Mapped[List["LocalFile"]] = relationship("LocalFile", back_populates="benchmark")
 
 
 class User(BaseModel):

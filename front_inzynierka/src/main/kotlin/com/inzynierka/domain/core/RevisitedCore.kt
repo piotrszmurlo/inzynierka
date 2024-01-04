@@ -17,48 +17,55 @@ sealed class RevisitedRankingAction : RankingsAction() {
 }
 
 fun revisitedReducer(state: RevisitedRankingState, action: RevisitedRankingAction) = when (action) {
-    is RevisitedRankingAction.FetchRankingsFailed -> state.copy(isFetching = true)
+    is RevisitedRankingAction.FetchRankingsFailed -> state.copy(isFetching = false)
     is RevisitedRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
-    is RevisitedRankingAction.FetchRankingsSuccess -> {
-        val splitEntries = action.scores.groupBy { it.dimension }
-            .mapValues {
-                it.value
-                    .groupBy { entry -> entry.functionNumber }
-                    .mapValues { entries ->
-                        entries.value
-                            .sortedByDescending { entry -> entry.score }
-                            .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+    is RevisitedRankingAction.FetchRankingsSuccess ->
+        if (action.scores.isEmpty()) {
+            state.copy(
+                isFetching = false,
+                scores = null,
+                averagedScores = null
+            )
+        } else {
+            val splitEntries = action.scores.groupBy { it.dimension }
+                .mapValues {
+                    it.value
+                        .groupBy { entry -> entry.functionNumber }
+                        .mapValues { entries ->
+                            entries.value
+                                .sortedByDescending { entry -> entry.score }
+                                .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+                        }
+                }
+            var entriesPerAlgorithm: Int
+            val averagedEntries = action.scores.groupBy { entry -> entry.algorithmName }.values
+                .also { entriesPerAlgorithm = it.elementAt(0).count() }
+                .map {
+                    it.reduce { acc, next ->
+                        acc.copy(
+                            successfulTrialsPercentage = acc.successfulTrialsPercentage + next.successfulTrialsPercentage,
+                            thresholdsAchievedPercentage = acc.thresholdsAchievedPercentage + next.thresholdsAchievedPercentage,
+                            budgetLeftPercentage = acc.budgetLeftPercentage + next.budgetLeftPercentage,
+                            score = acc.score + next.score
+                        )
                     }
-            }
-        var entriesPerAlgorithm: Int
-        val averagedEntries = action.scores.groupBy { entry -> entry.algorithmName }.values
-            .also { entriesPerAlgorithm = it.elementAt(0).count() }
-            .map {
-                it.reduce { acc, next ->
-                    acc.copy(
-                        successfulTrialsPercentage = acc.successfulTrialsPercentage + next.successfulTrialsPercentage,
-                        thresholdsAchievedPercentage = acc.thresholdsAchievedPercentage + next.thresholdsAchievedPercentage,
-                        budgetLeftPercentage = acc.budgetLeftPercentage + next.budgetLeftPercentage,
-                        score = acc.score + next.score
+                }
+                .map {
+                    it.copy(
+                        successfulTrialsPercentage = it.successfulTrialsPercentage / entriesPerAlgorithm,
+                        thresholdsAchievedPercentage = it.thresholdsAchievedPercentage / entriesPerAlgorithm,
+                        budgetLeftPercentage = it.budgetLeftPercentage / entriesPerAlgorithm,
+                        score = it.score / entriesPerAlgorithm
                     )
                 }
-            }
-            .map {
-                it.copy(
-                    successfulTrialsPercentage = it.successfulTrialsPercentage / entriesPerAlgorithm,
-                    thresholdsAchievedPercentage = it.thresholdsAchievedPercentage / entriesPerAlgorithm,
-                    budgetLeftPercentage = it.budgetLeftPercentage / entriesPerAlgorithm,
-                    score = it.score / entriesPerAlgorithm
-                )
-            }
-            .sortedByDescending { it.score }
-            .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+                .sortedByDescending { it.score }
+                .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
 
-        state.copy(
-            isFetching = false,
-            scores = splitEntries,
-            averagedScores = averagedEntries
-        )
-    }
+            state.copy(
+                isFetching = false,
+                scores = splitEntries,
+                averagedScores = averagedEntries
+            )
+        }
 }
 

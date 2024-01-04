@@ -8,7 +8,11 @@ import com.inzynierka.ui.StringResources.EMAIL_SENT
 import com.inzynierka.ui.StringResources.LOGIN_FAILED_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_ERROR_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
+import com.inzynierka.ui.StringResources.TOAST_CREATE_BENCHMARK_FAILED
+import com.inzynierka.ui.StringResources.TOAST_CREATE_BENCHMARK_SUCCESS
 import com.inzynierka.ui.StringResources.TOAST_DELETE_ALGORITHM_DATA_SUCCESS
+import com.inzynierka.ui.StringResources.TOAST_DELETE_BENCHMARK_DATA_FAILED
+import com.inzynierka.ui.StringResources.TOAST_DELETE_BENCHMARK_DATA_SUCCESS
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
@@ -28,14 +32,14 @@ import org.koin.core.component.inject
 
 object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + SupervisorJob()), KoinComponent {
 
-    private val initialMainAppState = MainAppState(tab = Tab.Upload)
+    private val initialMainAppState = MainAppState(tab = Tab.Login)
     private val dataService: IDataService by inject()
     val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
 
-    fun loadMeanRanking() {
+    fun loadMeanRanking(benchmarkName: String) {
         launch {
             store.dispatch(MeanRankingAction.FetchRankingsStarted)
-            when (val result = dataService.getStatisticsRankingEntries()) {
+            when (val result = dataService.getStatisticsRankingEntries(benchmarkName)) {
                 is Result.Success -> store.dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
                 is Result.Error -> {
                     Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -45,9 +49,20 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun uploadFiles(files: List<KFile>, overwriteExisting: Boolean) = launch {
+    fun initializeUploadTab() {
+        launch {
+            when (val result = dataService.getAvailableBenchmarks()) {
+                is Result.Success -> store.dispatch(UploadAction.FetchAvailableBenchmarksSuccess(result.data))
+                is Result.Error -> {
+                    store.dispatch(UploadAction.FetchAvailableBenchmarksFailed(result.domainError))
+                }
+            }
+        }
+    }
+
+    fun uploadFiles(files: List<KFile>, benchmarkName: String, overwriteExisting: Boolean) = launch {
         store.dispatch(UploadAction.UploadFileStarted)
-        when (val result = dataService.postFiles(files, overwriteExisting)) {
+        when (val result = dataService.postFiles(files, benchmarkName, overwriteExisting)) {
             is Result.Success -> {
                 store.dispatch(UploadAction.UploadFileSuccess)
             }
@@ -58,9 +73,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun loadFriedmanScores() = launch {
+    fun loadFriedmanScores(benchmarkName: String) = launch {
         store.dispatch(FriedmanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getFriedmanScores()) {
+        when (val result = dataService.getFriedmanScores(benchmarkName)) {
             is Result.Success -> store.dispatch(FriedmanRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -69,9 +84,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun getAvailableBenchmarkData() = launch {
+    fun getAvailableBenchmarkData(benchmarkName: String) = launch {
         store.dispatch(PairTestAction.Initialize)
-        when (val result = dataService.getAvailableBenchmarkData()) {
+        when (val result = dataService.getAvailableBenchmarkData(benchmarkName)) {
             is Result.Success -> store.dispatch(PairTestAction.InitializeSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -80,9 +95,25 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun loadRevisitedRanking() = launch {
+    fun deleteBenchmark(benchmarkName: String) = launch {
+        when (dataService.deleteBenchmark(benchmarkName)) {
+            is Result.Success -> {
+                store.dispatch(AdminConsoleAction.CreateBenchmarkSuccess)
+                Toast.show(TOAST_DELETE_BENCHMARK_DATA_SUCCESS)
+                loadAdminConsole()
+            }
+
+            is Result.Error -> {
+                store.dispatch(AdminConsoleAction.CreateBenchmarkFailed)
+                Toast.show(TOAST_DELETE_BENCHMARK_DATA_FAILED)
+            }
+        }
+
+    }
+
+    fun loadRevisitedRanking(benchmarkName: String) = launch {
         store.dispatch(RevisitedRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getRevisitedRankingEntries()) {
+        when (val result = dataService.getRevisitedRankingEntries(benchmarkName)) {
             is Result.Success -> store.dispatch(RevisitedRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -91,9 +122,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun loadEcdfData() = launch {
+    fun loadEcdfData(benchmarkName: String) = launch {
         store.dispatch(FriedmanRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getEcdfData()) {
+        when (val result = dataService.getEcdfData(benchmarkName)) {
             is Result.Success -> store.dispatch(EcdfAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -102,9 +133,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun loadMedianRanking() = launch {
+    fun loadMedianRanking(benchmarkName: String) = launch {
         store.dispatch(MedianRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getStatisticsRankingEntries()) {
+        when (val result = dataService.getStatisticsRankingEntries(benchmarkName)) {
             is Result.Success -> store.dispatch(MedianRankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -114,13 +145,39 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
     }
 
     fun loadAdminConsole() = launch {
-        store.dispatch(AdminConsoleAction.FetchAlgorithmsStarted)
-        when (val result = dataService.getAvailableBenchmarkData()) {
-            is Result.Success -> store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(result.data.algorithms))
+        when (val result = dataService.getAvailableBenchmarks()) {
+            is Result.Success -> {
+                store.dispatch(AdminConsoleAction.FetchBenchmarksSuccess(result.data))
+                result.data.firstOrNull()?.let {
+                    getAlgorithmNamesForBenchmark(it)
+                } ?: store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
+            }
+
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE)
-                store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
+                store.dispatch(AdminConsoleAction.FetchBenchmarksFailed)
             }
+        }
+    }
+
+    fun initializeRankings() = launch {
+        when (val result = dataService.getAvailableBenchmarks()) {
+            is Result.Success -> {
+                store.dispatch(RankingsAction.FetchAvailableBenchmarksSuccess(result.data))
+                console.log(result.data.firstOrNull())
+                result.data.firstOrNull()?.let { loadCec2022Scores(it) }
+            }
+
+            is Result.Error -> {
+                store.dispatch(RankingsAction.FetchAvailableBenchmarksFailed(result.domainError))
+            }
+        }
+    }
+
+    fun getAlgorithmNamesForBenchmark(benchmarkName: String) = launch {
+        when (val algorithmsResult = dataService.getAvailableBenchmarkData(benchmarkName)) {
+            is Result.Success -> store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(algorithmsResult.data.algorithms))
+            is Result.Error -> store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
         }
     }
 
@@ -151,6 +208,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
 
                     is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
                 }
+                initializeUploadTab()
                 store.dispatch(MainAppAction.TabSelected(Tab.Upload))
                 store.dispatch(AdminConsoleAction.VerifyUserSuccess)
             }
@@ -171,9 +229,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
 
     }
 
-    fun deleteAlgorithmData(algorithmName: String) = launch {
+    fun deleteAlgorithmData(algorithmName: String, benchmarkName: String) = launch {
         store.dispatch(AdminConsoleAction.DeleteAlgorithmStarted)
-        when (dataService.deleteFilesForAlgorithm(algorithmName)) {
+        when (dataService.deleteFilesForAlgorithm(algorithmName, benchmarkName)) {
             is Result.Success -> {
                 Toast.show(TOAST_DELETE_ALGORITHM_DATA_SUCCESS)
                 loadAdminConsole()
@@ -187,9 +245,9 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun loadCec2022Scores() = launch {
+    fun loadCec2022Scores(benchmarkName: String) = launch {
         store.dispatch(Cec2022RankingAction.FetchRankingsStarted)
-        when (val result = dataService.getCec2022Scores()) {
+        when (val result = dataService.getCec2022Scores(benchmarkName)) {
             is Result.Success -> store.dispatch(Cec2022RankingAction.FetchRankingsSuccess(result.data))
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
@@ -209,6 +267,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
 
                     is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
                 }
+                initializeUploadTab()
                 store.dispatch(MainAppAction.TabSelected(Tab.Upload))
             }
 
@@ -231,6 +290,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
 
                     is Result.Error -> {
                         store.dispatch(LoginAction.RegisterSuccess(null))
+                        initializeUploadTab()
                         store.dispatch(MainAppAction.TabSelected(Tab.Upload))
                     }
 
@@ -245,16 +305,36 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
+    fun createBenchmark(
+        name: String,
+        description: String,
+        functionCount: Int,
+        trialCount: Int
+    ) = launch {
+        when (dataService.createBenchmark(name, description, functionCount, trialCount)) {
+            is Result.Error -> {
+                Toast.show(TOAST_CREATE_BENCHMARK_FAILED)
+            }
+
+            is Result.Success -> {
+                loadAdminConsole()
+                Toast.show(TOAST_CREATE_BENCHMARK_SUCCESS)
+            }
+        }
+    }
+
     fun performPairTest(
         algorithmFirst: String,
         algorithmSecond: String,
-        dimension: Int
+        dimension: Int,
+        benchmarkName: String
     ) = launch {
         store.dispatch(PairTestAction.PerformPairTest)
         val result = dataService.getPairTest(
             algorithmFirst,
             algorithmSecond,
-            dimension
+            dimension,
+            benchmarkName
         )
         when (result) {
             is Result.Success -> store.dispatch(PairTestAction.PairTestSuccess(result.data))

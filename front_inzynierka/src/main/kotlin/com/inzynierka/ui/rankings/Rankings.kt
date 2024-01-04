@@ -22,10 +22,8 @@ import com.inzynierka.ui.StringResources.STDEV
 import com.inzynierka.ui.StringResources.WORST
 import com.inzynierka.ui.divider
 import com.inzynierka.ui.tabButtonStyle
-import io.kvision.core.AlignItems
-import io.kvision.core.Container
-import io.kvision.core.FlexDirection
-import io.kvision.core.onClickLaunch
+import io.kvision.core.*
+import io.kvision.form.select.select
 import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
@@ -36,7 +34,22 @@ fun Container.rankings(
     tab: Tab.ResultsTab,
 ) {
     flexPanel(direction = FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
-        rankingTabs(tab)
+        rankingTabs(tab, state.selectedBenchmarkName)
+        select(
+            options = state.benchmarkNames.map { it to it },
+            value = state.selectedBenchmarkName,
+            label = "Benchmark"
+        ) {
+            width = 250.px
+        }.onChange {
+            AppManager.store.dispatch(
+                RankingsAction.BenchmarkSelected(
+                    benchmarkName = this.value!!,
+                )
+            )
+            AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
+            AppManager.loadCec2022Scores(this.value!!)
+        }
         when (tab) {
             is Tab.ResultsTab.Cec2022 -> {
                 h5(CEC2022_RANKING_DESCRIPTION)
@@ -75,7 +88,7 @@ fun Container.rankings(
             }
 
             is Tab.ResultsTab.PairTest -> {
-                pairTest(state.pairTest)
+                state.selectedBenchmarkName?.let { pairTest(state.pairTest, it) }
             }
 
             is Tab.ResultsTab.Ecdf -> {
@@ -92,7 +105,8 @@ fun Container.rankings(
 }
 
 
-fun Container.rankingTabs(tab: Tab.ResultsTab) {
+fun Container.rankingTabs(tab: Tab.ResultsTab, benchmarkName: String?) {
+    if (benchmarkName == null) return
     flexPanel(direction = FlexDirection.ROW, spacing = 8) {
         padding = 16.px
         paddingBottom = 32.px
@@ -102,7 +116,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
-                AppManager.loadCec2022Scores()
+                AppManager.loadCec2022Scores(benchmarkName)
             }
         button(
             text = MEAN_TAB_LABEL,
@@ -110,7 +124,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Mean))
-                AppManager.loadMeanRanking()
+                AppManager.loadMeanRanking(benchmarkName)
             }
         button(
             text = MEDIAN_TAB_LABEL,
@@ -118,7 +132,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Median))
-                AppManager.loadMedianRanking()
+                AppManager.loadMedianRanking(benchmarkName)
             }
         button(
             text = ECDF_TAB_LABEL,
@@ -126,7 +140,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Ecdf))
-                AppManager.loadEcdfData()
+                AppManager.loadEcdfData(benchmarkName)
             }
         button(
             text = FRIEDMAN_TAB_LABEL,
@@ -134,7 +148,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Friedman))
-                AppManager.loadFriedmanScores()
+                AppManager.loadFriedmanScores(benchmarkName)
             }
         button(
             text = COMPARE_TWO_ALGORITHMS_TAB_LABEL,
@@ -142,7 +156,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
-                AppManager.getAvailableBenchmarkData()
+                AppManager.getAvailableBenchmarkData(benchmarkName)
             }
         button(
             text = REVISITED_TAB_LABEL,
@@ -152,7 +166,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Revisited))
-                AppManager.loadRevisitedRanking()
+                AppManager.loadRevisitedRanking(benchmarkName)
             }
     }
 }

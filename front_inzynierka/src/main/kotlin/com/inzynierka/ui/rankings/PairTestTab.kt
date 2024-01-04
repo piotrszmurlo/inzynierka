@@ -41,6 +41,7 @@ data class PairTestForm(
 
 fun Container.pairTest(
     pairTestState: PairTestState,
+    benchmarkName: String
 ) {
     flexPanel(
         direction = FlexDirection.COLUMN,
@@ -98,7 +99,8 @@ fun Container.pairTest(
                 AppManager.performPairTest(
                     formData.algorithmFirst!!,
                     formData.algorithmSecond!!,
-                    formData.dimension!!.toInt()
+                    formData.dimension!!.toInt(),
+                    benchmarkName
                 )
             }
         }

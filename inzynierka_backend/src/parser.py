@@ -7,7 +7,6 @@ import python_extensions as extensions
 ALLOWED_EXTENSIONS = ("txt", "dat")
 FINAL_ERROR_INDEX = 15
 FINAL_FES_INDEX = 16
-FUNCTIONS_COUNT = 12
 TRIALS_COUNT = 30
 DIMENSION_10 = 10
 DIMENSION_20 = 20
@@ -123,13 +122,14 @@ def get_final_error_and_evaluations_number_array(data_file: LocalFile):
 
 
 # results[function_number - 1]
-def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile]) -> extensions.FunctionTrialsVector:
+def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile], function_count: int) -> extensions.FunctionTrialsVector:
     """
+    :param function_count: number of functions
     :param data_files: list of LocalFile(s) with already preprocessed contents
     :return: FunctionTrialsVector[TrialsVector[Trial]] with all final results provided
     """
     results = extensions.FunctionTrialsVector()
-    for _ in range(FUNCTIONS_COUNT):
+    for _ in range(function_count):
         results.append(extensions.TrialsVector())
     for data_file in data_files:
         results[data_file.function_number - 1].extend(get_final_error_and_evaluations_number(data_file))
@@ -137,15 +137,15 @@ def get_final_error_and_evaluation_number_for_files(data_files: list[LocalFile])
 
 
 # results[function_number - 1][algorithm_name]
-def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile]):
-    results = [defaultdict(dict) for _ in range(FUNCTIONS_COUNT)]
+def get_final_error_and_evaluation_number_for_files_grouped_by_algorithm(data_files: list[LocalFile], function_count: int):
+    results = [defaultdict(dict) for _ in range(function_count)]
     for data_file in data_files:
         results[data_file.function_number - 1][
             data_file.dimension][data_file.algorithm_name] = get_final_error_and_evaluations_number(data_file)
     return extensions.BasicRankingInput(results)
 
 
-def check_filenames_integrity(parsed_filenames: list[tuple]):
+def check_filenames_integrity(parsed_filenames: list[tuple], function_count: int):
     dimensions = []
     function_numbers = []
     filenames = []
@@ -161,5 +161,5 @@ def check_filenames_integrity(parsed_filenames: list[tuple]):
     if set(dimensions) != set(ALL_DIMENSIONS):
         raise ParseError("Incompatible function dimensions")
 
-    if any(function_number > FUNCTIONS_COUNT for function_number in function_numbers):
+    if any(function_number > function_count for function_number in function_numbers):
         raise ParseError("Incompatible function numbers")

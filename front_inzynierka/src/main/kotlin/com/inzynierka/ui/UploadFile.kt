@@ -12,6 +12,7 @@ import com.inzynierka.ui.StringResources.UPLOAD_FILE_TAB_TITLE
 import io.kvision.core.*
 import io.kvision.form.formPanel
 import io.kvision.form.getDataWithFileContent
+import io.kvision.form.select.select
 import io.kvision.form.upload.upload
 import io.kvision.html.button
 import io.kvision.html.h5
@@ -32,7 +33,8 @@ private const val UPLOAD_FORM_ID = "UploadFormId"
 
 @Serializable
 private data class UploadFileForm(
-    val filesToUpload: List<KFile>? = null
+    val filesToUpload: List<KFile>? = null,
+    val benchmarkName: String? = null
 )
 
 fun Container.uploadFileForm(
@@ -68,16 +70,37 @@ fun Container.uploadFileForm(
             }
             add(UploadFileForm::filesToUpload, uploadForm)
             flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
+                val benchmarkSelect = select(
+                    options = state.benchmarkNames.map { it to it },
+                    value = state.selectedBenchmarkName,
+                    label = "Select benchmark"
+                ) {
+                    width = 250.px
+                }
+                benchmarkSelect.bind(UploadFileForm::benchmarkName)
+                benchmarkSelect.onChange {
+                    AppManager.store.dispatch(
+                        UploadAction.BenchmarkSelected(
+                            benchmarkName = this.value!!,
+                        )
+                    )
+                }
                 flexPanel(FlexDirection.ROW, spacing = 8) {
                     button(SELECT_FILES).onClick {
                         uploadForm.input.id?.let { id -> document.getElementById(id)?.click() }
                     }
-                    val uploadFileButton = button(UPLOAD_FILES) {
+                    button(UPLOAD_FILES) {
                         disabled = state.uploadButtonDisabled
+                    }.onClick {
+                        state.kFiles?.let { files ->
+                            state.selectedBenchmarkName?.let { benchmark ->
+                                AppManager.uploadFiles(
+                                    files = files, benchmarkName = benchmark, overwriteExisting = false
+                                )
+                            }
+                        }
                     }
-                    uploadFileButton.onClick {
-                        state.kFiles?.let { files -> AppManager.uploadFiles(files, false) }
-                    }
+
                 }
                 state.selectedFiles?.let {
                     selectedFilesList(it)
@@ -88,7 +111,15 @@ fun Container.uploadFileForm(
     state.error?.let {
         if (it.message?.contains("File already exists") == true) {
             Confirm.show(text = OVERWRITE_FILES_DIALOG_TEXT) {
-                state.kFiles?.let { files -> AppManager.uploadFiles(files, true) }
+                state.kFiles?.let { files ->
+                    state.selectedBenchmarkName?.let { benchmark ->
+                        AppManager.uploadFiles(
+                            files = files,
+                            benchmarkName = benchmark,
+                            overwriteExisting = true
+                        )
+                    }
+                }
             }
         } else {
             Toast.show(StringResources.FILE_UPLOAD_ERROR(it.message))

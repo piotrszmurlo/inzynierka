@@ -4,19 +4,23 @@ import com.inzynierka.data.models.*
 import io.kvision.types.KFile
 
 interface IDataRepository {
-    suspend fun getCec2022Scores(): List<ScoreEntryDTO>
-    suspend fun getFriedmanScores(): List<ScoreEntryDTO>
-    suspend fun getStatisticsEntries(): List<StatisticsEntryDTO>
-    suspend fun getRevisitedEntries(): List<RevisitedEntryDTO>
-    suspend fun getEcdfData(): List<EcdfDataDTO>
-    suspend fun getAvailableAlgorithms(): List<String>
-    suspend fun getAvailableDimensions(): List<Int>
-    suspend fun getAvailableFunctionNumbers(): List<Int>
-    suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean)
-    suspend fun deleteFilesForAlgorithm(algorithmName: String)
+    suspend fun getCec2022Scores(benchmarkName: String): List<ScoreEntryDTO>
+    suspend fun getFriedmanScores(benchmarkName: String): List<ScoreEntryDTO>
+    suspend fun getStatisticsEntries(benchmarkName: String): List<StatisticsEntryDTO>
+    suspend fun getRevisitedEntries(benchmarkName: String): List<RevisitedEntryDTO>
+    suspend fun getEcdfData(benchmarkName: String): List<EcdfDataDTO>
+    suspend fun getAvailableAlgorithms(benchmarkName: String): List<String>
+    suspend fun getAvailableDimensions(benchmarkName: String): List<Int>
+    suspend fun getAvailableFunctionNumbers(benchmarkName: String): List<Int>
+    suspend fun postFiles(kFiles: List<KFile>, benchmarkName: String, overwriteExisting: Boolean)
+    suspend fun postBenchmark(name: String, description: String, functionCount: Int, trialCount: Int)
+    suspend fun deleteBenchmark(benchmarkName: String)
+    suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String)
     suspend fun loginUser(email: String, password: String)
     suspend fun registerUser(email: String, password: String)
     suspend fun getUserData(): UserData
+    suspend fun getAvailableBenchmarks(): List<BenchmarkDTO>
+
     suspend fun promoteUserToAdmin(email: String)
     suspend fun verifyAccount(code: String)
     suspend fun resendVerificationCode()
@@ -24,6 +28,7 @@ interface IDataRepository {
     suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,
-        dimension: Int
+        dimension: Int,
+        benchmarkName: String
     ): List<PairTestEntryDTO>
 }

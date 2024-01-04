@@ -20,7 +20,7 @@ from src.auth_helpers import TokenData, Token, authenticate_user, create_access_
     get_password_hash, generate_verification_code
 from src.config import settings
 from src.models import ParseError, User
-from src.parser import parse_remote_results_file, ALL_DIMENSIONS, FUNCTIONS_COUNT, parse_remote_filename, \
+from src.parser import parse_remote_results_file, ALL_DIMENSIONS, parse_remote_filename, \
     check_filenames_integrity
 
 models.Base.metadata.create_all(bind=engine)
@@ -112,6 +112,7 @@ async def send_verification_email(email: str, code: str):
     except ConnectionRefusedError:
         print("SMTP server refused to connect")
 
+
 @app.get("/users/resend")
 async def resend_verification_code(current_user: Annotated[User, Depends(get_current_user)]):
     asyncio.create_task(
@@ -120,6 +121,7 @@ async def resend_verification_code(current_user: Annotated[User, Depends(get_cur
             current_user.verification_hash
         )
     )
+
 
 @app.post("/register", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
@@ -145,6 +147,25 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
 @app.get("/users/me")
 async def get_current_user_data(current_user: Annotated[User, Depends(get_current_user)]):
     return User(email=current_user.email, disabled=current_user.disabled, is_admin=current_user.is_admin)
+
+
+@app.get("/benchmarks")
+async def get_all_benchmarks():
+    return file_service.get_benchmarks()
+
+
+@app.delete("/benchmarks/{benchmark_name}")
+async def delete_benchmark(benchmark_name: str):
+    print(benchmark_name)
+    return file_service.delete_benchmark(benchmark_name)
+
+
+@app.post("/benchmarks")
+async def create_benchmark(name: Annotated[str, Form()], description: Annotated[str, Form()], function_count: Annotated[int, Form()], trial_count: Annotated[int, Form()]):
+    try:
+        file_service.create_benchmark(name, description, function_count, trial_count)
+    except IntegrityError:
+        raise HTTPException(409, detail='Benchmark with this name already exists')
 
 
 @app.get("/users")
@@ -174,83 +195,95 @@ async def promote_user(email: str, current_user: Annotated[User, Depends(get_cur
     return True
 
 
-@app.get("/algorithms")
-async def get_available_algorithms():
-    return file_service.get_algorithm_names()
+@app.get("/algorithms/{benchmark_name}")
+async def get_available_algorithms(benchmark_name: str):
+    return file_service.get_algorithm_names(benchmark_name)
 
 
-@app.get("/dimensions")
-async def get_available_dimensions():
-    return file_service.get_dimensions()
+@app.get("/dimensions/{benchmark_name}")
+async def get_available_dimensions(benchmark_name: str):
+    return file_service.get_dimensions(benchmark_name)
 
 
-@app.get("/functions")
-async def get_available_functions():
-    return file_service.get_function_numbers()
+@app.get("/functions/{benchmark_name}")
+async def get_available_functions(benchmark_name: str):
+    return file_service.get_function_numbers(benchmark_name)
 
 
 @app.post("/rankings/wilcoxon")
 async def get_wilcoxon_test(
+        benchmark_name: Annotated[str, Form()],
         first_algorithm: Annotated[str, Form()],
         second_algorithm: Annotated[str, Form()],
         dimension: Annotated[int, Form()]
 ):
     try:
+        benchmark = file_service.get_benchmark(benchmark_name)
         return rankings.get_wilcoxon_test(
             first_algorithm=first_algorithm,
             second_algorithm=second_algorithm,
-            dimension=dimension
+            dimension=dimension,
+            benchmark=benchmark
         )
     except ValueError as e:
         raise HTTPException(422, detail=str(e))
 
 
 @app.get("/rankings/cec2022")
-async def get_cec2022_ranking():
-    return rankings.get_cec2022_ranking_scores()
+async def get_cec2022_ranking(benchmark_name: str):
+    benchmark = file_service.get_benchmark(benchmark_name)
+    return rankings.get_cec2022_ranking_scores(benchmark)
 
 
 @app.get("/rankings/friedman")
-async def get_friedman_ranking():
-    return rankings.get_friedman_ranking_scores()
+async def get_friedman_ranking(benchmark_name: str):
+    benchmark = file_service.get_benchmark(benchmark_name)
+    return rankings.get_friedman_ranking_scores(benchmark)
 
 
 @app.get("/rankings/statistics")
-async def get_statistics_ranking_data():
-    return rankings.get_statistics_ranking_data()
+async def get_statistics_ranking_data(benchmark_name: str):
+    benchmark = file_service.get_benchmark(benchmark_name)
+    return rankings.get_statistics_ranking_data(benchmark)
 
 
 @app.get("/rankings/revisited")
-async def get_revisited_ranking():
-    return rankings.get_revisited_ranking_entries()
+async def get_revisited_ranking(benchmark_name: str):
+    benchmark = file_service.get_benchmark(benchmark_name)
+    return rankings.get_revisited_ranking_entries(benchmark)
 
 
 @app.get("/rankings/ecdf")
-async def get_ecdf_data():
-    return rankings.get_ecdf_data()
+async def get_ecdf_data(benchmark_name: str):
+    benchmark = file_service.get_benchmark(benchmark_name)
+    return rankings.get_ecdf_data(benchmark)
 
 
 @app.delete("/file/{algorithm_name}")
-async def delete_files(algorithm_name: str, current_user: Annotated[User, Depends(get_current_active_user)]):
+async def delete_files(algorithm_name: str, benchmark_name: str, current_user: Annotated[User, Depends(get_current_active_user)]):
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Current user does not have permission to perform this action"
         )
-    file_service.delete_files(algorithm_name)
-    rankings.invalidate_cache()
+    file_service.delete_files(algorithm_name, benchmark_name)
 
 
 @app.post("/file")
-async def post_file(files: list[UploadFile], overwrite: bool,
+async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
                     current_user: Annotated[User, Depends(get_current_active_user)]):
     try:
-        if len(files) != FUNCTIONS_COUNT * len(ALL_DIMENSIONS):
+        benchmark_data = file_service.get_benchmark(benchmark)
+        if not benchmark_data:
+            raise HTTPException(404, detail='Given benchmark does not exist')
+        if len(files) != benchmark_data.function_count * len(ALL_DIMENSIONS):
             raise ParseError(
-                f"Provide exactly {FUNCTIONS_COUNT * len(ALL_DIMENSIONS)} files, one for each function-dimension pair"
+                f"Provide exactly {benchmark_data.function_count * len(ALL_DIMENSIONS)} files, one for each function-dimension pair"
             )
         check_filenames_integrity(
-            [parse_remote_filename(file.filename) for file in files])
+            [parse_remote_filename(file.filename) for file in files],
+            benchmark_data.function_count
+        )
         parsed_file_tuples = []
         for file in files:
             parsed_file_tuples.append(
@@ -259,11 +292,10 @@ async def post_file(files: list[UploadFile], overwrite: bool,
                 )
             )
         if overwrite:
-            file_service.delete_files(parsed_file_tuples[0][0])
+            file_service.delete_files(parsed_file_tuples[0][0], benchmark_data.name)
         for algorithm_name, function_number, dimension, content in parsed_file_tuples:
             file_service.create_file(algorithm_name=algorithm_name, function_number=function_number,
-                                     dimension=dimension, content=content)
-        rankings.invalidate_cache()
+                                     dimension=dimension, content=content, benchmark_id=benchmark_data.id)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:

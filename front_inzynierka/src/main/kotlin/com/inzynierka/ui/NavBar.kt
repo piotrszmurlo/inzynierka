@@ -19,17 +19,21 @@ fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
     navbar(NAVBAR_TITLE) {
         nav(rightAlign = true) {
             div {
-                padding = 4.px
-                button(UPLOAD_RESULTS_LABEL, style = tabButtonStyle(activeTab is Tab.Upload)) {
-                }.onClick {
-                    AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+                if (isLoggedIn && userData?.disabled == false) {
+                    padding = 4.px
+                    button(UPLOAD_RESULTS_LABEL, style = tabButtonStyle(activeTab is Tab.Upload)) {
+                    }.onClick {
+                        AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Upload))
+                        AppManager.initializeUploadTab()
+                    }
                 }
             }
             div {
                 padding = 4.px
                 button(BROWSE_RANKINGS_LABEL, style = tabButtonStyle(activeTab is Tab.ResultsTab)).onClick {
                     AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
-                    AppManager.loadCec2022Scores()
+                    AppManager.initializeRankings()
+
                 }
             }
             if (userData?.isUserAdmin == true) {

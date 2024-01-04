@@ -23,7 +23,7 @@ class UploadCoreTest {
         store.dispatch(UploadAction.UploadFileSuccess)
         assertFalse(store.getState().isUploading)
         assertNull(store.getState().kFiles)
-        assertTrue(store.getState().success ?: false)
+        assertTrue(store.getState().success!!)
     }
 
     @Test

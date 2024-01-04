@@ -17,11 +17,19 @@ import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
 
-    override suspend fun getAvailableBenchmarkData(): Result<BenchmarkData> {
+    override suspend fun getAvailableBenchmarks(): Result<List<String>> {
         return try {
-            val algorithms = dataRepository.getAvailableAlgorithms()
-            val dimensions = dataRepository.getAvailableDimensions()
-            val functionNumbers = dataRepository.getAvailableFunctionNumbers()
+            Result.Success(dataRepository.getAvailableBenchmarks().map { it.name })
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
+
+    override suspend fun getAvailableBenchmarkData(benchmarkName: String): Result<BenchmarkData> {
+        return try {
+            val algorithms = dataRepository.getAvailableAlgorithms(benchmarkName)
+            val dimensions = dataRepository.getAvailableDimensions(benchmarkName)
+            val functionNumbers = dataRepository.getAvailableFunctionNumbers(benchmarkName)
             Result.Success(
                 BenchmarkData(algorithms, dimensions, functionNumbers)
             )
@@ -30,59 +38,63 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun getAvailableDimensions(): Result<List<Int>> {
+    override suspend fun getAvailableDimensions(benchmarkName: String): Result<List<Int>> {
         return try {
-            Result.Success(dataRepository.getAvailableDimensions())
+            Result.Success(dataRepository.getAvailableDimensions(benchmarkName))
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun getCec2022Scores(): Result<List<ScoreRankingEntry>> {
+    override suspend fun getCec2022Scores(benchmarkName: String): Result<List<ScoreRankingEntry>> {
         return try {
-            val result = dataRepository.getCec2022Scores().map { it.toDomain() }
+            val result = dataRepository.getCec2022Scores(benchmarkName).map { it.toDomain() }
             Result.Success(result)
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>> {
+    override suspend fun getFriedmanScores(benchmarkName: String): Result<List<ScoreRankingEntry>> {
         return try {
-            Result.Success(dataRepository.getFriedmanScores().map { it.toDomain() })
+            Result.Success(dataRepository.getFriedmanScores(benchmarkName).map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>> {
+    override suspend fun getStatisticsRankingEntries(benchmarkName: String): Result<List<StatisticsRankingEntry>> {
         return try {
-            val result = dataRepository.getStatisticsEntries().map { it.toDomain() }
+            val result = dataRepository.getStatisticsEntries(benchmarkName).map { it.toDomain() }
             Result.Success(result)
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>> {
+    override suspend fun getRevisitedRankingEntries(benchmarkName: String): Result<List<RevisitedRankingEntry>> {
         return try {
-            Result.Success(dataRepository.getRevisitedEntries().map { it.toDomain() })
+            Result.Success(dataRepository.getRevisitedEntries(benchmarkName).map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun getEcdfData(): Result<List<EcdfData>> {
+    override suspend fun getEcdfData(benchmarkName: String): Result<List<EcdfData>> {
         return try {
-            Result.Success(dataRepository.getEcdfData().map { it.toDomain() })
+            Result.Success(dataRepository.getEcdfData(benchmarkName).map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
 
-    override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean): Result<Unit> {
+    override suspend fun postFiles(
+        kFiles: List<KFile>,
+        benchmarkName: String,
+        overwriteExisting: Boolean
+    ): Result<Unit> {
         return try {
-            Result.Success(dataRepository.postFiles(kFiles, overwriteExisting))
+            Result.Success(dataRepository.postFiles(kFiles, benchmarkName, overwriteExisting))
         } catch (e: Throwable) {
             Result.Error(
                 DomainError(e.parsedRemoteExceptionMessage)
@@ -90,9 +102,9 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
-    override suspend fun deleteFilesForAlgorithm(algorithmName: String): Result<Unit> {
+    override suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String): Result<Unit> {
         return try {
-            Result.Success(dataRepository.deleteFilesForAlgorithm(algorithmName))
+            Result.Success(dataRepository.deleteFilesForAlgorithm(algorithmName, benchmarkName))
         } catch (e: Throwable) {
             Result.Error(
                 DomainError(e.parsedRemoteExceptionMessage)
@@ -163,13 +175,36 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
         }
     }
 
+    override suspend fun createBenchmark(
+        name: String,
+        description: String,
+        functionCount: Int,
+        trialCount: Int
+    ): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.postBenchmark(name, description, functionCount, trialCount))
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
+
+    override suspend fun deleteBenchmark(benchmarkName: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.deleteBenchmark(benchmarkName))
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
+
     override suspend fun getPairTest(
         algorithm1: String,
         algorithm2: String,
-        dimension: Int
+        dimension: Int,
+        benchmarkName: String
     ): Result<List<PairTestEntry>> {
         return try {
-            val result = dataRepository.getPairTest(algorithm1, algorithm2, dimension).map { it.toDomain() }
+            val result =
+                dataRepository.getPairTest(algorithm1, algorithm2, dimension, benchmarkName).map { it.toDomain() }
             Result.Success(result)
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))

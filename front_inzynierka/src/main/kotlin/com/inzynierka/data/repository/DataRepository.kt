@@ -31,41 +31,52 @@ private var bearerToken: BearerToken? = null
 
 class DataRepository(private val client: HttpClient) : IDataRepository {
 
-    override suspend fun getCec2022Scores(): List<ScoreEntryDTO> {
-        return client.get(urlString = "rankings/cec2022").body()
+    override suspend fun getCec2022Scores(benchmarkName: String): List<ScoreEntryDTO> {
+        return client.get(urlString = "rankings/cec2022") {
+            parameter("benchmark_name", benchmarkName)
+        }.body()
     }
 
-    override suspend fun getFriedmanScores(): List<ScoreEntryDTO> {
-        return client.get(urlString = "rankings/friedman").body()
+    override suspend fun getFriedmanScores(benchmarkName: String): List<ScoreEntryDTO> {
+        return client.get(urlString = "rankings/friedman") {
+            parameter("benchmark_name", benchmarkName)
+        }.body()
     }
 
-    override suspend fun getStatisticsEntries(): List<StatisticsEntryDTO> {
-        return client.get(urlString = "rankings/statistics").body()
+    override suspend fun getStatisticsEntries(benchmarkName: String): List<StatisticsEntryDTO> {
+        return client.get(urlString = "rankings/statistics") {
+            parameter("benchmark_name", benchmarkName)
+        }.body()
     }
 
-    override suspend fun getRevisitedEntries(): List<RevisitedEntryDTO> {
-        return client.get(urlString = "rankings/revisited").body()
+    override suspend fun getRevisitedEntries(benchmarkName: String): List<RevisitedEntryDTO> {
+        return client.get(urlString = "rankings/revisited") {
+            parameter("benchmark_name", benchmarkName)
+        }.body()
     }
 
-    override suspend fun getEcdfData(): List<EcdfDataDTO> {
-        return client.get(urlString = "rankings/ecdf").body()
+    override suspend fun getEcdfData(benchmarkName: String): List<EcdfDataDTO> {
+        return client.get(urlString = "rankings/ecdf") {
+            parameter("benchmark_name", benchmarkName)
+        }.body()
     }
 
-    override suspend fun getAvailableAlgorithms(): List<String> {
-        return client.get(urlString = "algorithms").body()
+    override suspend fun getAvailableAlgorithms(benchmarkName: String): List<String> {
+        return client.get(urlString = "algorithms/$benchmarkName").body()
     }
 
-    override suspend fun getAvailableDimensions(): List<Int> {
-        return client.get(urlString = "dimensions").body()
+    override suspend fun getAvailableDimensions(benchmarkName: String): List<Int> {
+        return client.get(urlString = "dimensions/$benchmarkName").body()
     }
 
-    override suspend fun getAvailableFunctionNumbers(): List<Int> {
-        return client.get(urlString = "functions").body()
+    override suspend fun getAvailableFunctionNumbers(benchmarkName: String): List<Int> {
+        return client.get(urlString = "functions/$benchmarkName").body()
     }
 
-    override suspend fun deleteFilesForAlgorithm(algorithmName: String) {
+    override suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String) {
         return client.delete(urlString = "file/$algorithmName") {
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
+            parameter("benchmark_name", benchmarkName)
         }.body()
     }
 
@@ -97,6 +108,10 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         }.body()
     }
 
+    override suspend fun getAvailableBenchmarks(): List<BenchmarkDTO> {
+        return client.get(urlString = "benchmarks").body()
+    }
+
     override suspend fun promoteUserToAdmin(email: String) {
         return client.post(urlString = "/users/promote") {
             parameter("email", email)
@@ -117,7 +132,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
         }
     }
 
-    override suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean) {
+    override suspend fun postFiles(kFiles: List<KFile>, benchmarkName: String, overwriteExisting: Boolean) {
         client.submitFormWithBinaryData(
             url = "file",
             formData = formData {
@@ -130,6 +145,27 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
             }
         ) {
             parameter("overwrite", overwriteExisting)
+            parameter("benchmark", benchmarkName)
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
+    }
+
+    override suspend fun postBenchmark(name: String, description: String, functionCount: Int, trialCount: Int) {
+        client.submitForm(
+            url = "benchmarks",
+            formParameters = Parameters.build {
+                this.append("name", name)
+                this.append("description", description)
+                this.append("function_count", functionCount.toString())
+                this.append("trial_count", trialCount.toString())
+            }
+        ) {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
+    }
+
+    override suspend fun deleteBenchmark(benchmarkName: String) {
+        client.delete(urlString = "benchmarks/$benchmarkName") {
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
         }
     }
@@ -137,7 +173,8 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     override suspend fun getPairTest(
         firstAlgorithm: String,
         secondAlgorithm: String,
-        dimension: Int
+        dimension: Int,
+        benchmarkName: String
     ): List<PairTestEntryDTO> {
         return client.submitForm(
             url = "rankings/wilcoxon",
@@ -145,6 +182,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
                 append("first_algorithm", firstAlgorithm)
                 append("second_algorithm", secondAlgorithm)
                 append("dimension", "$dimension")
+                append("benchmark_name", benchmarkName)
             }
         ).body()
     }

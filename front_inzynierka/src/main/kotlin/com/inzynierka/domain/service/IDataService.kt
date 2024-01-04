@@ -12,26 +12,36 @@ import io.kvision.types.KFile
 
 interface IDataService {
 
-    suspend fun getAvailableBenchmarkData(): Result<BenchmarkData>
-    suspend fun getAvailableDimensions(): Result<List<Int>>
-    suspend fun getCec2022Scores(): Result<List<ScoreRankingEntry>>
-    suspend fun getFriedmanScores(): Result<List<ScoreRankingEntry>>
-    suspend fun getStatisticsRankingEntries(): Result<List<StatisticsRankingEntry>>
+    suspend fun getAvailableBenchmarks(): Result<List<String>>
+    suspend fun getAvailableBenchmarkData(benchmarkName: String): Result<BenchmarkData>
+    suspend fun getAvailableDimensions(benchmarkName: String): Result<List<Int>>
+    suspend fun getCec2022Scores(benchmarkName: String): Result<List<ScoreRankingEntry>>
+    suspend fun getFriedmanScores(benchmarkName: String): Result<List<ScoreRankingEntry>>
+    suspend fun getStatisticsRankingEntries(benchmarkName: String): Result<List<StatisticsRankingEntry>>
 
-    suspend fun getRevisitedRankingEntries(): Result<List<RevisitedRankingEntry>>
-    suspend fun getEcdfData(): Result<List<EcdfData>>
+    suspend fun getRevisitedRankingEntries(benchmarkName: String): Result<List<RevisitedRankingEntry>>
+    suspend fun getEcdfData(benchmarkName: String): Result<List<EcdfData>>
 
     /*
      * uploads [kFiles] to the server
      * @return [Result] Unit or DomainError if an error occurred
      **/
-    suspend fun postFiles(kFiles: List<KFile>, overwriteExisting: Boolean): Result<Unit>
-    suspend fun deleteFilesForAlgorithm(algorithmName: String): Result<Unit>
+    suspend fun postFiles(kFiles: List<KFile>, benchmarkName: String, overwriteExisting: Boolean): Result<Unit>
+    suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String): Result<Unit>
     suspend fun loginUser(email: String, password: String): Result<Unit>
     suspend fun promoteUserToAdmin(email: String): Result<Unit>
     suspend fun registerUser(email: String, password: String): Result<Unit>
     suspend fun verifyAccount(code: String): Result<Unit>
     suspend fun resendVerificationCode(): Result<Unit>
     suspend fun getUserData(): Result<UserData>
-    suspend fun getPairTest(algorithm1: String, algorithm2: String, dimension: Int): Result<List<PairTestEntry>>
+    suspend fun createBenchmark(name: String, description: String, functionCount: Int, trialCount: Int): Result<Unit>
+
+    suspend fun deleteBenchmark(benchmarkName: String): Result<Unit>
+
+    suspend fun getPairTest(
+        algorithm1: String,
+        algorithm2: String,
+        dimension: Int,
+        benchmarkName: String
+    ): Result<List<PairTestEntry>>
 }

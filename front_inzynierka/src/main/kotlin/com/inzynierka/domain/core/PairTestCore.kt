@@ -47,10 +47,12 @@ fun pairTestReducer(state: PairTestState, action: PairTestAction) = when (action
             dimensions = action.benchmarkData.dimensions,
             functionNumbers = action.benchmarkData.functionNumbers,
             formState = FormState(
-                algorithmFirst = action.benchmarkData.algorithms[0],
-                algorithmSecond = action.benchmarkData.algorithms[1],
-                dimension = action.benchmarkData.dimensions[0]
-            )
+                algorithmFirst = action.benchmarkData.algorithms.firstOrNull(),
+                algorithmSecond = action.benchmarkData.algorithms.lastOrNull(),
+                dimension = action.benchmarkData.dimensions.firstOrNull()
+            ),
+            results = null,
+            resultsSum = null
         )
     }
 
