@@ -288,7 +288,7 @@ async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
         for file in files:
             parsed_file_tuples.append(
                 parse_remote_results_file(
-                    file.filename, await file.read()
+                    file.filename, await file.read(), benchmark_data.trial_count
                 )
             )
         if overwrite:

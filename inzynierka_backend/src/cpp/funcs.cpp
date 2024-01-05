@@ -13,7 +13,6 @@
 
 const int FINAL_ERROR_INDEX = 16;
 const int EVALUATION_ROW_INDEX = 17;
-const int MAX_COLUMN_COUNT = 30;
 const int PRECISION = 8;
 
 std::vector<ScoreRankingEntry> calculate_cec2022_scores(const int& numberOfTrials, const int& dimension, FunctionTrialsVector& input) {
@@ -158,7 +157,7 @@ std::unordered_map<std::string, double> calculate_median(const FunctionTrialsVec
     return medians;
 }
 
-std::string parse_cec2022_results(std::string input, std::string fileName, int maxBudget) {
+std::string parse_cec2022_results(std::string input, std::string fileName, int trialCount, int maxBudget) {
     std::string adjusted_delimiter_input = std::regex_replace(input, std::regex("[^\\S\r\n]+|,"), " "); // acceptable delimiters are one or more whitespace or comma
     std::stringstream ss(adjusted_delimiter_input);
     std::stringstream result("");
@@ -193,7 +192,7 @@ std::string parse_cec2022_results(std::string input, std::string fileName, int m
                 throw std::invalid_argument("Unexpected evaluation number in data (greater than max): " + std::to_string(value) + " in file: " + fileName);
             }
         }
-        if (++columnCount == MAX_COLUMN_COUNT) {
+        if (++columnCount == trialCount) {
             result << value << "\n";
             columnCount = 0;
             ++rowNumber;
@@ -201,8 +200,8 @@ std::string parse_cec2022_results(std::string input, std::string fileName, int m
             result << value << " ";
         }
     }
-    if (totalValuesCount != MAX_COLUMN_COUNT * (EVALUATION_ROW_INDEX)) {
-        throw std::invalid_argument("Incorrect data format in file: " + fileName +". Provide a file with 17x30 matrix");
+    if (totalValuesCount != trialCount * (EVALUATION_ROW_INDEX)) {
+        throw std::invalid_argument("Incorrect data format in file: " + fileName +". Provide a file with 17x" + std::to_string(trialCount) +" matrix");
     }
 
     return result.str();

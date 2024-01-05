@@ -13,7 +13,7 @@ DIMENSION_20 = 20
 ALL_DIMENSIONS = [DIMENSION_10, DIMENSION_20]
 
 
-def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int, int, str]:
+def parse_remote_results_file(filename: str, contents: bytes, trial_count: int) -> tuple[str, int, int, str]:
     """
     Parses results file name and contents.
 
@@ -35,7 +35,7 @@ def parse_remote_results_file(filename: str, contents: bytes) -> tuple[str, int,
 
     raw_contents = base64.b64decode(contents).decode('utf-8')
     try:
-        parsed_contents = extensions.parse_cec2022_results(raw_contents, filename, DIM2BUDGET[dimension])
+        parsed_contents = extensions.parse_cec2022_results(raw_contents, filename, trial_count, DIM2BUDGET[dimension])
     except ValueError as e:
         raise ParseError(e.args[0])
     return algorithm_name, function_number, dimension, parsed_contents
