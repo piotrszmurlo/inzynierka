@@ -8,6 +8,7 @@ import com.inzynierka.ui.StringResources.BROWSE_RANKINGS_LABEL
 import com.inzynierka.ui.StringResources.LOGIN_LABEL
 import com.inzynierka.ui.StringResources.NAVBAR_TITLE
 import com.inzynierka.ui.StringResources.UPLOAD_RESULTS_LABEL
+import com.inzynierka.ui.StringResources.VERIFY_ACCOUNT
 import io.kvision.core.Container
 import io.kvision.html.button
 import io.kvision.html.div
@@ -48,7 +49,7 @@ fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
             if (isLoggedIn && userData?.disabled == true) {
                 div {
                     padding = 4.px
-                    button("VERIFY ACCOUNT", style = tabButtonStyle(activeTab is Tab.Login)).onClick {
+                    button(VERIFY_ACCOUNT, style = tabButtonStyle(activeTab is Tab.Login)).onClick {
                         AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Login))
                     }
                 }

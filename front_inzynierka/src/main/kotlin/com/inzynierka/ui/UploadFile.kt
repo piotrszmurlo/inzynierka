@@ -2,11 +2,15 @@ package com.inzynierka.ui
 
 import com.inzynierka.domain.core.UploadAction
 import com.inzynierka.domain.core.UploadFilesState
+import com.inzynierka.ui.StringResources.BENCHMARK_DESCRIPTION
+import com.inzynierka.ui.StringResources.FUNCTION_COUNT_DESCRIPTION
 import com.inzynierka.ui.StringResources.OVERWRITE_FILES_DIALOG_TEXT
 import com.inzynierka.ui.StringResources.SELECTED_FILES
+import com.inzynierka.ui.StringResources.SELECT_BENCHMARK
 import com.inzynierka.ui.StringResources.SELECT_FILES
 import com.inzynierka.ui.StringResources.TOAST_FILE_UPLOAD_COMPLETED
 import com.inzynierka.ui.StringResources.TOAST_MAXIMUM_FILE_SIZE_EXCEEDED
+import com.inzynierka.ui.StringResources.TRIAL_COUNT_DESCRIPTION
 import com.inzynierka.ui.StringResources.UPLOAD_FILES
 import com.inzynierka.ui.StringResources.UPLOAD_FILE_TAB_TITLE
 import io.kvision.core.*
@@ -69,11 +73,11 @@ fun Container.uploadFileForm(
                 style { display = Display.NONE }
             }
             add(UploadFileForm::filesToUpload, uploadForm)
-            flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
+            flexPanel(FlexDirection.COLUMN, spacing = 16, alignItems = AlignItems.CENTER) {
+                h5(SELECT_BENCHMARK)
                 val benchmarkSelect = select(
-                    options = state.benchmarkNames.map { it to it },
-                    value = state.selectedBenchmarkName,
-                    label = "Select benchmark"
+                    options = state.benchmarks.map { it.name to it.name },
+                    value = state.selectedBenchmarkName
                 ) {
                     width = 250.px
                 }
@@ -85,6 +89,9 @@ fun Container.uploadFileForm(
                         )
                     )
                 }
+                h5(state.currentBenchmark?.let { BENCHMARK_DESCRIPTION(it.description) })
+                h5(state.currentBenchmark?.let { TRIAL_COUNT_DESCRIPTION(it.trialCount) })
+                h5(state.currentBenchmark?.let { FUNCTION_COUNT_DESCRIPTION(it.functionCount) })
                 flexPanel(FlexDirection.ROW, spacing = 8) {
                     button(SELECT_FILES).onClick {
                         uploadForm.input.id?.let { id -> document.getElementById(id)?.click() }

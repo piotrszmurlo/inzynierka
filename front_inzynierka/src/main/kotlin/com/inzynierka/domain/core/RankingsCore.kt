@@ -1,6 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
+import com.inzynierka.domain.models.Benchmark
 
 data class RankingsState(
     val cec2022: ScoreRankingState = ScoreRankingState(),
@@ -15,7 +16,7 @@ data class RankingsState(
 )
 
 sealed class RankingsAction : MainAppAction() {
-    data class FetchAvailableBenchmarksSuccess(val benchmarkNames: List<String>) : RankingsAction()
+    data class FetchAvailableBenchmarksSuccess(val benchmarks: List<Benchmark>) : RankingsAction()
     data class FetchAvailableBenchmarksFailed(val error: DomainError) : RankingsAction()
     data class BenchmarkSelected(val benchmarkName: String) : RankingsAction()
 }
@@ -23,10 +24,11 @@ sealed class RankingsAction : MainAppAction() {
 fun rankingsReducer(state: RankingsState, action: RankingsAction) = when (action) {
     is RankingsAction.FetchAvailableBenchmarksFailed -> state
     is RankingsAction.FetchAvailableBenchmarksSuccess -> state.copy(
-        benchmarkNames = action.benchmarkNames,
+        benchmarkNames = action.benchmarks.map { it.name },
         selectedBenchmarkName = state.selectedBenchmarkName?.let { benchmark ->
-            if (action.benchmarkNames.contains(state.selectedBenchmarkName)) benchmark else action.benchmarkNames.firstOrNull()
-        } ?: action.benchmarkNames.firstOrNull()
+            if (action.benchmarks.map { it.name }
+                    .contains(state.selectedBenchmarkName)) benchmark else action.benchmarks.firstOrNull()?.name
+        } ?: action.benchmarks.firstOrNull()?.name
     )
 
     is RankingsAction.BenchmarkSelected -> state.copy(selectedBenchmarkName = action.benchmarkName)

@@ -6,10 +6,7 @@ import com.inzynierka.data.models.toDomain
 import com.inzynierka.data.parsedRemoteExceptionMessage
 import com.inzynierka.data.repository.IDataRepository
 import com.inzynierka.domain.core.UserData
-import com.inzynierka.domain.models.PairTestEntry
-import com.inzynierka.domain.models.RevisitedRankingEntry
-import com.inzynierka.domain.models.ScoreRankingEntry
-import com.inzynierka.domain.models.StatisticsRankingEntry
+import com.inzynierka.domain.models.*
 import com.inzynierka.domain.service.IDataService
 import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.EcdfData
@@ -17,9 +14,9 @@ import io.kvision.types.KFile
 
 class DataService(private val dataRepository: IDataRepository) : IDataService {
 
-    override suspend fun getAvailableBenchmarks(): Result<List<String>> {
+    override suspend fun getAvailableBenchmarks(): Result<List<Benchmark>> {
         return try {
-            Result.Success(dataRepository.getAvailableBenchmarks().map { it.name })
+            Result.Success(dataRepository.getAvailableBenchmarks().map { it.toDomain() })
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }

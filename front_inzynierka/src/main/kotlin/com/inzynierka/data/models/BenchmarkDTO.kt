@@ -1,5 +1,6 @@
 package com.inzynierka.data.models
 
+import com.inzynierka.domain.models.Benchmark
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,3 +15,10 @@ data class BenchmarkDTO(
     val trialCount: Int
 )
 
+fun BenchmarkDTO.toDomain() = Benchmark(
+    name = name,
+    description = description,
+    functionCount = functionCount,
+    trialCount = trialCount
+
+)

@@ -1,6 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
+import com.inzynierka.domain.models.Benchmark
 import io.kvision.types.KFile
 
 data class UploadFilesState(
@@ -8,17 +9,19 @@ data class UploadFilesState(
     val error: DomainError? = null,
     val kFiles: List<KFile>? = null,
     val success: Boolean? = null,
-    val benchmarkNames: List<String> = listOf(),
+    val benchmarks: List<Benchmark> = listOf(),
     val selectedBenchmarkName: String? = null
 ) {
     val selectedFiles
         get() = kFiles?.map { it.name }
     val uploadButtonDisabled
         get() = kFiles.isNullOrEmpty() || isUploading || selectedBenchmarkName.isNullOrEmpty()
+    val currentBenchmark
+        get() = benchmarks.find { it.name == selectedBenchmarkName }
 }
 
 sealed class UploadAction : MainAppAction() {
-    data class FetchAvailableBenchmarksSuccess(val benchmarkNames: List<String>) : UploadAction()
+    data class FetchAvailableBenchmarksSuccess(val benchmarks: List<Benchmark>) : UploadAction()
     data class FetchAvailableBenchmarksFailed(val error: DomainError) : UploadAction()
     data class BenchmarkSelected(val benchmarkName: String) : UploadAction()
     object ResultHandled : UploadAction()
@@ -36,8 +39,8 @@ fun uploadReducer(state: UploadFilesState, action: UploadAction) = when (action)
     is UploadAction.UploadFormOnChangeHandler -> state.copy(kFiles = action.kFiles)
     is UploadAction.ResultHandled -> state.copy(error = null, success = null, kFiles = null)
     is UploadAction.FetchAvailableBenchmarksSuccess -> state.copy(
-        benchmarkNames = action.benchmarkNames,
-        selectedBenchmarkName = action.benchmarkNames.firstOrNull()
+        benchmarks = action.benchmarks,
+        selectedBenchmarkName = action.benchmarks.firstOrNull()?.name
     )
 
     is UploadAction.FetchAvailableBenchmarksFailed -> state.copy(error = action.error)

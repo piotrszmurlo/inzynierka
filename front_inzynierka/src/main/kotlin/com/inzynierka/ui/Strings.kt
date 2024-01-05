@@ -59,6 +59,7 @@ object StringResources {
     var BROWSE_RANKINGS_LABEL = tr("Browse rankings")
     var NAVBAR_TITLE = tr("AE comparison")
     var ADMIN_CONSOLE_LABEL = tr("Admin console")
+    var VERIFY_ACCOUNT = tr("Verify account")
     var LOGIN_LABEL = tr("Log in")
     var REGISTER_LABEL_PROMPT = tr("Create new account")
     var LOGIN_FAILED_TOAST = tr("Failed to log in. Check credentials.")
@@ -107,8 +108,12 @@ object StringResources {
     var TRIAL_COUNT = tr("Trial Count")
     var FUNCTION_COUNT = tr("Function count")
     var CREATE = tr("Create")
+    var SELECT_BENCHMARK = tr("Select benchmark to upload data for")
 
     fun FILE_UPLOAD_ERROR(message: String?) = gettext("Files upload failed: %1", message)
+    fun TRIAL_COUNT_DESCRIPTION(count: Int) = gettext("Trial count: %1", count)
+    fun FUNCTION_COUNT_DESCRIPTION(count: Int) = gettext("Function count: %1", count)
+    fun BENCHMARK_DESCRIPTION(description: String) = gettext("Benchmark description: %1", description)
 
     fun DIMENSION_FUNCTION_GROUP_EQUALS(dim: Int, functionGroup: String) =
         gettext("Dimension = %1, Function Group: %2", dim, functionGroup)

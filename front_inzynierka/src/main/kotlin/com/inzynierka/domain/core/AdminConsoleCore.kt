@@ -1,6 +1,7 @@
 package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
+import com.inzynierka.domain.models.Benchmark
 
 data class AdminConsoleState(
     val algorithmNames: List<String> = listOf(),
@@ -27,7 +28,7 @@ sealed class AdminConsoleAction : MainAppAction() {
     data class FetchAlgorithmsSuccess(val algorithmNames: List<String>) : AdminConsoleAction()
 
     object FetchBenchmarksFailed : AdminConsoleAction()
-    data class FetchBenchmarksSuccess(val benchmarkNames: List<String>) : AdminConsoleAction()
+    data class FetchBenchmarksSuccess(val benchmark: List<Benchmark>) : AdminConsoleAction()
     object PromoteUserStarted : AdminConsoleAction()
     object PromoteUserSuccess : AdminConsoleAction()
     object PromoteUserFailed : AdminConsoleAction()
@@ -61,9 +62,9 @@ fun adminConsoleReducer(state: AdminConsoleState, action: AdminConsoleAction) = 
     is AdminConsoleAction.FetchBenchmarksFailed -> state.copy(isFetching = false)
     is AdminConsoleAction.FetchBenchmarksSuccess -> {
         state.copy(
-            benchmarkNames = action.benchmarkNames,
-            selectedBenchmarkName = action.benchmarkNames.firstOrNull(),
-            selectedBenchmarkNameToDelete = action.benchmarkNames.firstOrNull(),
+            benchmarkNames = action.benchmark.map { it.name },
+            selectedBenchmarkName = action.benchmark.firstOrNull()?.name,
+            selectedBenchmarkNameToDelete = action.benchmark.firstOrNull()?.name,
             isFetching = false
         )
     }

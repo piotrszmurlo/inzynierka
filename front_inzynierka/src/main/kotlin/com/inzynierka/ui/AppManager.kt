@@ -149,7 +149,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Success -> {
                 store.dispatch(AdminConsoleAction.FetchBenchmarksSuccess(result.data))
                 result.data.firstOrNull()?.let {
-                    getAlgorithmNamesForBenchmark(it)
+                    getAlgorithmNamesForBenchmark(it.name)
                 } ?: store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
             }
 
@@ -165,7 +165,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Success -> {
                 store.dispatch(RankingsAction.FetchAvailableBenchmarksSuccess(result.data))
                 console.log(result.data.firstOrNull())
-                result.data.firstOrNull()?.let { loadCec2022Scores(it) }
+                result.data.firstOrNull()?.let { loadCec2022Scores(it.name) }
             }
 
             is Result.Error -> {

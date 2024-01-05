@@ -2,17 +2,14 @@ package com.inzynierka.domain.service
 
 import com.inzynierka.common.Result
 import com.inzynierka.domain.core.UserData
-import com.inzynierka.domain.models.PairTestEntry
-import com.inzynierka.domain.models.RevisitedRankingEntry
-import com.inzynierka.domain.models.ScoreRankingEntry
-import com.inzynierka.domain.models.StatisticsRankingEntry
+import com.inzynierka.domain.models.*
 import com.inzynierka.model.BenchmarkData
 import com.inzynierka.model.EcdfData
 import io.kvision.types.KFile
 
 interface IDataService {
 
-    suspend fun getAvailableBenchmarks(): Result<List<String>>
+    suspend fun getAvailableBenchmarks(): Result<List<Benchmark>>
     suspend fun getAvailableBenchmarkData(benchmarkName: String): Result<BenchmarkData>
     suspend fun getAvailableDimensions(benchmarkName: String): Result<List<Int>>
     suspend fun getCec2022Scores(benchmarkName: String): Result<List<ScoreRankingEntry>>
