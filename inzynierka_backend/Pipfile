@@ -18,6 +18,7 @@ python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 pydantic-settings = "*"
 pydantic = "*"
+locust = "*"
 
 [dev-packages]
 

@@ -300,3 +300,5 @@ async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
         raise HTTPException(422, detail=str(e))
+    except UnicodeDecodeError as e:
+        raise HTTPException(422, detail=str(e))
