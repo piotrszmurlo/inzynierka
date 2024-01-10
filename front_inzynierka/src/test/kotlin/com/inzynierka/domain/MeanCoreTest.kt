@@ -1,27 +1,27 @@
 package com.inzynierka.domain
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.domain.core.MeanRankingAction
 import com.inzynierka.domain.core.NumberNotation
+import com.inzynierka.domain.core.StatisticsRankingAction
 import com.inzynierka.domain.core.StatisticsRankingState
-import com.inzynierka.domain.core.meanReducer
+import com.inzynierka.domain.core.statisticsReducer
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import io.kvision.redux.createTypedReduxStore
 import kotlin.test.*
 
 class MeanCoreTest {
     private val initialMeanState = StatisticsRankingState()
-    private val store = createTypedReduxStore(::meanReducer, initialMeanState)
+    private val store = createTypedReduxStore(::statisticsReducer, initialMeanState)
 
     @Test
     fun test_fetch_rankings_started() {
-        store.dispatch(MeanRankingAction.FetchRankingsStarted)
+        store.dispatch(StatisticsRankingAction.FetchRankingsStarted)
         assertTrue(store.getState().isFetching)
     }
 
     @Test
     fun test_fetch_rankings_success() {
-        store.dispatch(MeanRankingAction.FetchRankingsSuccess(statisticsRankingEntries))
+        store.dispatch(StatisticsRankingAction.FetchRankingsSuccess(statisticsRankingEntries))
         assertFalse(store.getState().isFetching)
         assertEquals(
             setOf(10, 20),
@@ -93,30 +93,30 @@ class MeanCoreTest {
     @Test
     fun test_fetch_rankings_failed() {
         val error = DomainError("Fake error message")
-        store.dispatch(MeanRankingAction.FetchRankingsFailed(error))
+        store.dispatch(StatisticsRankingAction.FetchRankingsFailed(error))
         assertFalse(store.getState().isFetching)
         assertEquals(error, store.getState().error)
     }
 
     @Test
     fun test_toggle_number_notation() {
-        store.dispatch(MeanRankingAction.ToggleNumberNotation)
+        store.dispatch(StatisticsRankingAction.ToggleNumberNotation)
         assertEquals(NumberNotation.Decimal, store.getState().numberNotation)
 
-        store.dispatch(MeanRankingAction.ToggleNumberNotation)
+        store.dispatch(StatisticsRankingAction.ToggleNumberNotation)
         assertEquals(NumberNotation.Scientific, store.getState().numberNotation)
     }
 
     @Test
     fun test_change_precision() {
         val newPrecision = 4
-        store.dispatch(MeanRankingAction.ChangePrecision(newPrecision))
+        store.dispatch(StatisticsRankingAction.ChangePrecision(newPrecision))
         assertEquals(newPrecision, store.getState().numberPrecision)
     }
 
     @Test
     fun test_error_handled() {
-        store.dispatch(MeanRankingAction.ErrorHandled)
+        store.dispatch(StatisticsRankingAction.ErrorHandled)
         assertNull(store.getState().error)
     }
 

@@ -36,14 +36,20 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
     private val dataService: IDataService by inject()
     val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
 
-    fun loadMeanRanking(benchmarkName: String) {
+    fun loadStatisticsRanking(benchmarkName: String, rankingType: RankingType) {
         launch {
-            store.dispatch(MeanRankingAction.FetchRankingsStarted)
+            store.dispatch(StatisticsRankingAction.FetchRankingsStarted)
             when (val result = dataService.getStatisticsRankingEntries(benchmarkName)) {
-                is Result.Success -> store.dispatch(MeanRankingAction.FetchRankingsSuccess(result.data))
+                is Result.Success -> store.dispatch(
+                    StatisticsRankingAction.FetchRankingsSuccess(
+                        result.data,
+                        rankingType
+                    )
+                )
+
                 is Result.Error -> {
                     Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
-                    store.dispatch(MeanRankingAction.FetchRankingsFailed(result.domainError))
+                    store.dispatch(StatisticsRankingAction.FetchRankingsFailed(result.domainError))
                 }
             }
         }
@@ -129,17 +135,6 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
                 store.dispatch(EcdfAction.FetchRankingsFailed(result.domainError))
-            }
-        }
-    }
-
-    fun loadMedianRanking(benchmarkName: String) = launch {
-        store.dispatch(MedianRankingAction.FetchRankingsStarted)
-        when (val result = dataService.getStatisticsRankingEntries(benchmarkName)) {
-            is Result.Success -> store.dispatch(MedianRankingAction.FetchRankingsSuccess(result.data))
-            is Result.Error -> {
-                Toast.show(TOAST_FAILED_TO_LOAD_RANKING)
-                store.dispatch(MedianRankingAction.FetchRankingsFailed(result.domainError))
             }
         }
     }

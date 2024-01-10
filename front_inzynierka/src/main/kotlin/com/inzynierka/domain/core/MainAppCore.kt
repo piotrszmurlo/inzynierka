@@ -29,11 +29,9 @@ data class MainAppState(
     val isUserVerified = loginState.loggedInUserData?.disabled == false
 }
 
-
 sealed class MainAppAction : RAction {
     data class TabSelected(val tab: Tab) : MainAppAction()
 }
-
 
 fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = when (action) {
     is UploadAction -> state.copy(uploadFilesState = uploadReducer(state.uploadFilesState, action))
