@@ -51,7 +51,7 @@ class Rankings:
                 benchmark.function_count
             )
             score_entries = extensions.calculate_cec2022_scores(
-                TRIALS_COUNT, dimension, errors
+                benchmark.trial_count, dimension, errors
             )
             _cec2022_ranking_scores.extend(
                 map_score_ranking_entries_to_pydantic_model(score_entries))
@@ -64,7 +64,7 @@ class Rankings:
             benchmark.function_count
         )
         score_entries = extensions.calculate_friedman_scores(
-            TRIALS_COUNT, errors
+            benchmark.trial_count, errors
         )
         _friedman_ranking_scores = map_score_ranking_entries_to_pydantic_model(score_entries)
         return _friedman_ranking_scores

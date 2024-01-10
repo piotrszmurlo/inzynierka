@@ -1,5 +1,4 @@
 from src import LocalFile, FINAL_ERROR_INDEX, FINAL_FES_INDEX
-import python_extensions as extensions
 
 def cec2022(trial_count: int, dimension: int, input: list):
     number_of_functions = len(input)
@@ -28,11 +27,6 @@ def cec2022(trial_count: int, dimension: int, input: list):
     return output
 
 def get_final_error_and_evaluation_number_for_filestest(data_files: list[LocalFile], function_count: int):
-    """
-    :param function_count: number of functions
-    :param data_files: list of LocalFile(s) with already preprocessed contents
-    :return: FunctionTrialsVector[TrialsVector[Trial]] with all final results provided
-    """
     results = []
     for _ in range(function_count):
         results.append([])
@@ -41,10 +35,6 @@ def get_final_error_and_evaluation_number_for_filestest(data_files: list[LocalFi
     return results
 
 def get_final_error_and_evaluations_numbertest(data_file: LocalFile):
-    """
-    :param data_file: LocalFile with already preprocessed contents
-    :return: TrialsVector containing final results from the file in form of Trial
-    """
     rows = data_file.contents.split("\n")
     evaluations = rows[FINAL_FES_INDEX].split()
     results = []
@@ -59,12 +49,3 @@ def get_final_error_and_evaluations_numbertest(data_file: LocalFile):
             )
         )
     return results
-
-def perform():
-    for i in range(1000):
-        # testcec2022(30, 12, res)
-        score_entries = extensions.calculate_cec2022_scores(
-            TRIALS_COUNT, 10, errors
-        )
-    time2 = time.process_time()
-    print(f"time: {time2 - time1}")
