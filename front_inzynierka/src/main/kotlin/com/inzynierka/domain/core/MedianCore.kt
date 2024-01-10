@@ -20,7 +20,7 @@ fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = 
         val sorted = action.scores.createRankings(
             compareBy({ score -> score.median },
                 { score -> score.minEvaluations })
-        )
+        ) { it.median }
         state.copy(isFetching = false, scores = sorted)
     }
 
@@ -32,7 +32,10 @@ fun medianReducer(state: StatisticsRankingState, action: MedianRankingAction) = 
     is MedianRankingAction.ErrorHandled -> state.copy(error = null)
 }
 
-fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<StatisticsRankingEntry>): Map<Int, Map<Int, List<StatisticsRankingEntry>>> {
+fun List<StatisticsRankingEntry>.createRankings(
+    comparator: Comparator<StatisticsRankingEntry>,
+    extractor: (StatisticsRankingEntry) -> Double
+): Map<Int, Map<Int, List<StatisticsRankingEntry>>> {
     return this.groupBy { it.dimension }
         .mapValues {
             it.value
@@ -40,7 +43,17 @@ fun List<StatisticsRankingEntry>.createRankings(comparator: Comparator<Statistic
                 .mapValues { scores ->
                     scores.value
                         .sortedWith(comparator)
-                        .mapIndexed { index, score -> score.copy(rank = index + 1) }
+                        .let { entries ->
+                            val rankedEntries = mutableListOf<StatisticsRankingEntry>()
+                            var rank = 1
+                            entries.forEachIndexed { i, el ->
+                                rankedEntries.add(el.copy(rank = rank))
+                                if (i < entries.size - 1 && extractor(el) != extractor(entries[i + 1])) {
+                                    rank++
+                                }
+                            }
+                            rankedEntries
+                        }
                 }
         }
 }

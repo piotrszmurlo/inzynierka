@@ -6,4 +6,3 @@ data class Benchmark(
     val functionCount: Int,
     val trialCount: Int
 )
-

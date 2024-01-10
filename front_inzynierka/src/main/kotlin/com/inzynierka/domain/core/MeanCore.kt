@@ -37,7 +37,7 @@ fun meanReducer(state: StatisticsRankingState, action: MeanRankingAction) = when
     is MeanRankingAction.FetchRankingsFailed -> state.copy(isFetching = false, error = action.error)
     is MeanRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is MeanRankingAction.FetchRankingsSuccess -> {
-        val sorted = action.scores.createRankings(compareBy({ it.mean }, { it.minEvaluations }))
+        val sorted = action.scores.createRankings(compareBy({ it.mean }, { it.minEvaluations })) { it.mean }
         state.copy(isFetching = false, scores = sorted)
     }
 

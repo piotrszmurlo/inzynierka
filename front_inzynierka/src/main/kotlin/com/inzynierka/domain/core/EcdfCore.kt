@@ -21,7 +21,13 @@ data class EcdfState(
 )
 
 fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
-    is EcdfAction.FetchRankingsFailed -> state.copy(isFetching = false)
+    is EcdfAction.FetchRankingsFailed -> state.copy(
+        isFetching = false,
+        splitData = null,
+        combinedData = null,
+        functionGroupData = null
+    )
+
     is EcdfAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is EcdfAction.FetchRankingsSuccess -> {
         val combinedData = action.data.groupBy { it.dimension }
@@ -35,22 +41,30 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
                         oneAlgorithmData.averageThresholdsAchieved()
                     }
             },
-            functionGroupData = combinedData
-                .mapValues { (_, dimensionData) ->
-                    dimensionData
-                        .groupBy { ecdfData -> getFunctionGroup(ecdfData.functionNumber) }
-                        .mapValues { (_, functionGroupData) ->
-                            functionGroupData
-                                .groupBy { ecdfData -> ecdfData.algorithmName }.values
-                                .map { oneAlgorithmData ->
-                                    oneAlgorithmData.averageThresholdsAchieved()
-                                }
-                        }
-                }
+            functionGroupData = groupsData(combinedData)
         )
     }
 
     is EcdfAction.EcdfTypeChanged -> state.copy(rankingType = action.type)
+}
+
+private fun groupsData(data: Map<Dimension, List<EcdfData>>): Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? {
+    return data
+        .mapValues { (_, dimensionData) ->
+            dimensionData.also {
+                val functionsSet = mutableSetOf<FunctionNumber>()
+                it.forEach { functionsSet.add(it.functionNumber) }
+                if (functionsSet != setOf(1..12)) return null
+            }
+                .groupBy { ecdfData -> getFunctionGroup(ecdfData.functionNumber) }
+                .mapValues { (_, functionGroupData) ->
+                    functionGroupData
+                        .groupBy { ecdfData -> ecdfData.algorithmName }.values
+                        .map { oneAlgorithmData ->
+                            oneAlgorithmData.averageThresholdsAchieved()
+                        }
+                }
+        }
 }
 
 fun List<EcdfData>.averageThresholdsAchieved(): EcdfData {
