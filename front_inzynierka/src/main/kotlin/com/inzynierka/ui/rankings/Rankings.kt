@@ -124,7 +124,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab, benchmarkName: String?) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Mean))
-                AppManager.loadStatisticsRanking(benchmarkName, RankingType.Mean)
+                AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Mean)
             }
         button(
             text = MEDIAN_TAB_LABEL,
@@ -132,7 +132,7 @@ fun Container.rankingTabs(tab: Tab.ResultsTab, benchmarkName: String?) {
         )
             .onClickLaunch {
                 AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Median))
-                AppManager.loadStatisticsRanking(benchmarkName, RankingType.Median)
+                AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Median)
             }
         button(
             text = ECDF_TAB_LABEL,

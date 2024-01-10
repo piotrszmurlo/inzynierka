@@ -1,10 +1,7 @@
 package com.inzynierka.domain
 
 import com.inzynierka.common.DomainError
-import com.inzynierka.domain.core.NumberNotation
-import com.inzynierka.domain.core.StatisticsRankingAction
-import com.inzynierka.domain.core.StatisticsRankingState
-import com.inzynierka.domain.core.statisticsReducer
+import com.inzynierka.domain.core.*
 import com.inzynierka.domain.models.StatisticsRankingEntry
 import io.kvision.redux.createTypedReduxStore
 import kotlin.test.*
@@ -21,7 +18,12 @@ class MeanCoreTest {
 
     @Test
     fun test_fetch_rankings_success() {
-        store.dispatch(StatisticsRankingAction.FetchRankingsSuccess(statisticsRankingEntries))
+        store.dispatch(
+            StatisticsRankingAction.FetchRankingsSuccess(
+                statisticsRankingEntries,
+                StatisticsRankingType.Mean
+            )
+        )
         assertFalse(store.getState().isFetching)
         assertEquals(
             setOf(10, 20),

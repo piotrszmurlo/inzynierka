@@ -19,9 +19,9 @@ data class StatisticsRankingState(
         get() = AVAILABLE_PRECISIONS
 }
 
-sealed class RankingType {
-    object Mean : RankingType()
-    object Median : RankingType()
+sealed class StatisticsRankingType {
+    object Mean : StatisticsRankingType()
+    object Median : StatisticsRankingType()
 
 }
 
@@ -35,7 +35,10 @@ sealed class StatisticsRankingAction : RankingsAction() {
     object FetchRankingsStarted : StatisticsRankingAction()
     object ToggleNumberNotation : StatisticsRankingAction()
     data class ChangePrecision(val precision: Int) : StatisticsRankingAction()
-    data class FetchRankingsSuccess(val scores: List<StatisticsRankingEntry>, val rankingType: RankingType) :
+    data class FetchRankingsSuccess(
+        val scores: List<StatisticsRankingEntry>,
+        val statisticsRankingType: StatisticsRankingType
+    ) :
         StatisticsRankingAction()
 
     data class FetchRankingsFailed(val error: DomainError?) : StatisticsRankingAction()
@@ -46,7 +49,7 @@ fun statisticsReducer(state: StatisticsRankingState, action: StatisticsRankingAc
     is StatisticsRankingAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is StatisticsRankingAction.FetchRankingsSuccess -> {
         val sorted = action.scores.createRankings(compareBy({ it.mean }, { it.minEvaluations })) {
-            if (action.rankingType is RankingType.Mean) it.mean else it.mean
+            if (action.statisticsRankingType is StatisticsRankingType.Mean) it.mean else it.mean
         }
         state.copy(isFetching = false, scores = sorted)
     }

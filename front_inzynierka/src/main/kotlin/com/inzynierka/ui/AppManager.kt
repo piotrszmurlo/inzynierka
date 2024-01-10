@@ -36,14 +36,14 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
     private val dataService: IDataService by inject()
     val store = createTypedReduxStore(::mainAppReducer, initialMainAppState)
 
-    fun loadStatisticsRanking(benchmarkName: String, rankingType: RankingType) {
+    fun loadStatisticsRanking(benchmarkName: String, statisticsRankingType: StatisticsRankingType) {
         launch {
             store.dispatch(StatisticsRankingAction.FetchRankingsStarted)
             when (val result = dataService.getStatisticsRankingEntries(benchmarkName)) {
                 is Result.Success -> store.dispatch(
                     StatisticsRankingAction.FetchRankingsSuccess(
                         result.data,
-                        rankingType
+                        statisticsRankingType
                     )
                 )
 
