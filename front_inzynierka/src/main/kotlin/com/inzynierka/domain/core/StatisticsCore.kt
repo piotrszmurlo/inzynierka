@@ -74,18 +74,40 @@ fun List<StatisticsRankingEntry>.createRankings(
                     scores.value
                         .sortedWith(comparator)
                         .let { entries ->
-                            val rankedEntries = mutableListOf<StatisticsRankingEntry>()
-                            var rank = 1
-                            entries.forEachIndexed { i, el ->
-                                rankedEntries.add(el.copy(rank = rank))
-                                if (i < entries.size - 1 && extractor(el) != extractor(entries[i + 1])) {
-                                    rank++
-                                }
-                            }
-                            rankedEntries
+                            rankSortedList(
+                                entries,
+                                extractor
+                            ) { entry, rank -> entry.copy(rank = rank) }
                         }
+//                        .let { entries ->
+//                            val rankedEntries = mutableListOf<StatisticsRankingEntry>()
+//                            var rank = 1
+//                            entries.forEachIndexed { i, el ->
+//                                rankedEntries.add(el.copy(rank = rank))
+//                                if (i < entries.size - 1 && extractor(el) != extractor(entries[i + 1])) {
+//                                    rank++
+//                                }
+//                            }
+//                            rankedEntries
+//                        }
                 }
         }
+}
+
+inline fun <reified T : Any> rankSortedList(
+    list: List<T>,
+    extractor: (T) -> Double,
+    rankTFactory: (T, Int) -> T
+): List<T> {
+    val rankedEntries = mutableListOf<T>()
+    var rank = 1
+    list.forEachIndexed { i, el ->
+        rankedEntries.add(rankTFactory(el, rank))
+        if (i < list.size - 1 && extractor(el) != extractor(list[i + 1])) {
+            rank++
+        }
+    }
+    return rankedEntries
 }
 
 fun toggleNotation(numberNotation: NumberNotation): NumberNotation {

@@ -40,8 +40,13 @@ fun List<ScoreRankingEntry>.createFriedmanRankings(): FriedmanRankingState {
             }.let { it.copy(score = it.score / scores.size) }
         }.values
         .sortedWith(compareBy { it.score })
-        .mapIndexed { index, score ->
-            score.copy(rank = index + 1)
+        .let { entries ->
+            rankSortedList(
+                entries,
+                { it.score }) { el, rank ->
+                el.copy(rank = rank)
+            }
         }
     return FriedmanRankingState(scores = scores, combinedScores = combinedScores, isFetching = false)
 }
+

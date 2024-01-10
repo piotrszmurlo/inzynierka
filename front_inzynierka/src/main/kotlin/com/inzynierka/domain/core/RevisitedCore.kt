@@ -28,13 +28,17 @@ fun revisitedReducer(state: RevisitedRankingState, action: RevisitedRankingActio
             )
         } else {
             val splitEntries = action.scores.groupBy { it.dimension }
-                .mapValues {
-                    it.value
+                .mapValues { values ->
+                    values.value
                         .groupBy { entry -> entry.functionNumber }
-                        .mapValues { entries ->
-                            entries.value
+                        .mapValues { functionEntries ->
+                            functionEntries.value
                                 .sortedByDescending { entry -> entry.score }
-                                .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+                                .let { entries ->
+                                    rankSortedList(
+                                        entries,
+                                        { it.score }) { el, rank -> el.copy(rank = rank) }
+                                }
                         }
                 }
             var entriesPerAlgorithm: Int
@@ -59,7 +63,7 @@ fun revisitedReducer(state: RevisitedRankingState, action: RevisitedRankingActio
                     )
                 }
                 .sortedByDescending { it.score }
-                .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+                .let { entries -> rankSortedList(entries, { it.score }) { el, rank -> el.copy(rank = rank) } }
 
             state.copy(
                 isFetching = false,
