@@ -2,7 +2,9 @@ package com.inzynierka.domain.core
 
 import com.inzynierka.common.DomainError
 import com.inzynierka.domain.models.RankingType
+import com.inzynierka.domain.models.ScoreRankingEntry
 import com.inzynierka.model.EcdfData
+import com.inzynierka.ui.rankings.DIM_MAX_FES
 
 sealed class EcdfAction : RankingsAction() {
     object FetchRankingsStarted : EcdfAction()
@@ -16,8 +18,10 @@ data class EcdfState(
     val isFetching: Boolean = false,
     val rankingType: RankingType = RankingType.PerFunction,
     val splitData: Map<Dimension, Map<FunctionNumber, List<EcdfData>>>? = null,
+    val splitAreas: Map<Dimension, Map<FunctionNumber, List<ScoreRankingEntry>>>? = null,
     val combinedData: Map<Dimension, List<EcdfData>>? = null,
-    val functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? = null
+    val functionGroupData: Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? = null,
+    val averageRankSplitAreas: List<ScoreRankingEntry>? = null
 )
 
 fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
@@ -31,9 +35,19 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
     is EcdfAction.FetchRankingsStarted -> state.copy(isFetching = true)
     is EcdfAction.FetchRankingsSuccess -> {
         val combinedData = action.data.groupBy { it.dimension }
+        val splitData = splitEcdfs(action.data)
+        val areaData = areaData(action.data)
+        val splitAreaData =
+            areaData.splitData().mapValues { dimensionEntries ->
+                dimensionEntries.value.mapValues { functionEntries ->
+                    functionEntries.value.sortedBy { score -> -score.score }.let { scores ->
+                        rankSortedList(scores, { score -> score.score }) { entry, rank -> entry.copy(rank = rank) }
+                    }
+                }
+            }
         state.copy(
             isFetching = false,
-            splitData = splitEcdfs(action.data),
+            splitData = splitData,
             combinedData = combinedData.mapValues {
                 it.value
                     .groupBy { ecdfData -> ecdfData.algorithmName }
@@ -41,12 +55,38 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
                         oneAlgorithmData.averageThresholdsAchieved()
                     }
             },
-            functionGroupData = groupsData(combinedData)
+            functionGroupData = groupsData(combinedData),
+            splitAreas = splitAreaData,
+            averageRankSplitAreas = createAverageRanksRanking(splitAreaData)
         )
     }
 
     is EcdfAction.EcdfTypeChanged -> state.copy(rankingType = action.type)
 }
+
+fun createAverageRanksRanking(splitData: Map<Dimension, Map<FunctionNumber, List<ScoreRankingEntry>>>) =
+    splitData.flatMap { it.value.flatMap { it.value } }
+        .groupBy { it.algorithmName }.mapValues { perAlgorithmData ->
+            perAlgorithmData.value.reduce { acc, next ->
+                acc.copy(score = acc.score + next.score)
+            }.let { it.copy(score = it.score / perAlgorithmData.value.size) }
+        }.values.toList().let { rankSortedList(it, { score -> score.score }) { el, rank -> el.copy(rank = rank) } }
+
+private fun areaData(dataList: List<EcdfData>) =
+    dataList.map { data ->
+        ScoreRankingEntry(
+            rank = null,
+            dimension = data.dimension,
+            algorithmName = data.algorithmName,
+            functionNumber = data.functionNumber,
+            score = percentageArea(
+                calculateAreaUnderCurve(
+                    data.functionEvaluations,
+                    data.thresholdAchievedFractions
+                ), data.dimension
+            )
+        )
+    }
 
 private fun groupsData(data: Map<Dimension, List<EcdfData>>): Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? {
     return data
@@ -104,3 +144,13 @@ fun getFunctionGroup(functionNumber: FunctionNumber): FunctionGroup {
     }
 }
 
+fun calculateAreaUnderCurve(x: List<Double>, y: List<Double>): Double {
+    var sm = 0.0
+    for (i in 1 until x.size) {
+        val h = x[i] - x[i - 1]
+        sm += h * (y[i - 1] + y[i]) / 2
+    }
+    return sm
+}
+
+private fun percentageArea(area: Double, dimension: Dimension) = area / DIM_MAX_FES[dimension]!! * 100 * dimension

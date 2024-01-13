@@ -79,17 +79,6 @@ fun List<StatisticsRankingEntry>.createRankings(
                                 extractor
                             ) { entry, rank -> entry.copy(rank = rank) }
                         }
-//                        .let { entries ->
-//                            val rankedEntries = mutableListOf<StatisticsRankingEntry>()
-//                            var rank = 1
-//                            entries.forEachIndexed { i, el ->
-//                                rankedEntries.add(el.copy(rank = rank))
-//                                if (i < entries.size - 1 && extractor(el) != extractor(entries[i + 1])) {
-//                                    rank++
-//                                }
-//                            }
-//                            rankedEntries
-//                        }
                 }
         }
 }

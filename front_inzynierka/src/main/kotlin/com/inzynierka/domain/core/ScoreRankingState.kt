@@ -31,3 +31,13 @@ fun List<ScoreRankingEntry>.createRankings(
         }
     return ScoreRankingState(scores = scores, combinedScores = combinedScores, isFetching = false)
 }
+
+fun List<ScoreRankingEntry>.splitData(): Map<Dimension, Map<FunctionNumber, List<ScoreRankingEntry>>> {
+    val scores = this
+        .groupBy { it.dimension }
+        .mapValues { (_, scoresGroupedByDimension) ->
+            scoresGroupedByDimension
+                .groupBy { it.functionNumber!! }
+        }
+    return scores
+}

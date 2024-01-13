@@ -21,6 +21,7 @@ object StringResources {
     var REVISITED_DESCRIPTION =
         tr("Ranking method proposed in \"Revisiting CEC 2022 ranking for bound constrained single objective optimization\" article")
     var RANK = tr("Rank")
+    var AREA_UNDER_CURVE = tr("Percentage area under ECDF")
     var ALGORITHM = tr("Algorithm")
     var ALGORITHM_NAME = tr("Algorithm name")
     var SUCCESSFUL_TRIALS = tr("Successful trials")
@@ -38,6 +39,7 @@ object StringResources {
     var ECDF_X_AXIS_LABEL = tr("f-evaluations / dimension")
     var PER_FUNCTION = tr("Per function")
     var AVERAGED = tr("Averaged")
+    var AOC = tr("AOC")
 
     var SELECT_DIMENSION = tr("Select dimension")
     var SELECT_ALGORITHMS = tr("Select algorithms")
