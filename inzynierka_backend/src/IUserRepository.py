@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class IUserRepository(ABC):
 
     @abstractmethod
-    def get_user(self, username: str):
+    def get_user(self, email: str):
         raise NotImplementedError
 
     @abstractmethod
@@ -17,6 +18,10 @@ class IUserRepository(ABC):
 
     @abstractmethod
     def verify_account(self, email):
+        raise NotImplementedError
+
+    @abstractmethod
+    def modify_account(self, user_id: int, **kwargs):
         raise NotImplementedError
 
     @abstractmethod

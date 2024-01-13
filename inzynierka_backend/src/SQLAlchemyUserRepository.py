@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 
@@ -25,6 +27,11 @@ class SQLAlchemyUserRepository(IUserRepository):
 
     def verify_account(self, email):
         query = update(models.UserTable).where(models.UserTable.email == email).values(disabled = False)
+        self._db.execute(query)
+        self._db.commit()
+
+    def modify_account(self, user_id: int, **kwargs):
+        query = update(models.UserTable).where(models.UserTable.id == user_id).values(**kwargs)
         self._db.execute(query)
         self._db.commit()
 

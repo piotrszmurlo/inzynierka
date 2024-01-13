@@ -31,4 +31,7 @@ interface IDataRepository {
         dimension: Int,
         benchmarkName: String
     ): List<PairTestEntryDTO>
+
+    suspend fun changePassword(newPassword: String, oldPassword: String)
+    suspend fun changeEmail(email: String)
 }

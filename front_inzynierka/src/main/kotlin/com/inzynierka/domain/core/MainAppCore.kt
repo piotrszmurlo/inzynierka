@@ -6,6 +6,7 @@ import org.koin.core.component.KoinComponent
 sealed class Tab {
     object Upload : Tab()
     object Login : Tab()
+    object AccountSettings : Tab()
     object AdminConsole : Tab()
     sealed class ResultsTab : Tab() {
         object PairTest : ResultsTab()
@@ -23,7 +24,8 @@ data class MainAppState(
     val uploadFilesState: UploadFilesState = UploadFilesState(),
     val rankingsState: RankingsState = RankingsState(),
     val adminConsoleState: AdminConsoleState = AdminConsoleState(),
-    val loginState: LoginState = LoginState()
+    val loginState: LoginState = LoginState(),
+    val accountSettingsState: AccountSettingsState = AccountSettingsState()
 ) : KoinComponent {
     val isUserLoggedIn = loginState.isUserLoggedIn
     val isUserVerified = loginState.loggedInUserData?.disabled == false
@@ -41,5 +43,12 @@ fun mainAppReducer(state: MainAppState, action: MainAppAction): MainAppState = w
     is MainAppAction.TabSelected -> state.copy(
         tab = action.tab,
         rankingsState = state.rankingsState
+    )
+
+    is AccountSettingsAction -> state.copy(
+        accountSettingsState = accountSettingsReducer(
+            state.accountSettingsState,
+            action
+        )
     )
 }

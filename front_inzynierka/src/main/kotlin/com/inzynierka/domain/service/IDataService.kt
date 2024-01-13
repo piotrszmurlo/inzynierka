@@ -41,4 +41,7 @@ interface IDataService {
         dimension: Int,
         benchmarkName: String
     ): Result<List<PairTestEntry>>
+
+    suspend fun changePassword(newPassword: String, oldPassword: String): Result<Unit>
+    suspend fun changeEmail(email: String): Result<Unit>
 }

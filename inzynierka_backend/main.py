@@ -17,7 +17,7 @@ from src.SQLAlchemyFileRepository import SQLAlchemyFileRepository, engine, Sessi
 from src.SQLAlchemyUserRepository import SQLAlchemyUserRepository
 from src.UserService import UserService
 from src.auth_helpers import TokenData, Token, authenticate_user, create_access_token, \
-    get_password_hash, generate_verification_code
+    get_password_hash, generate_verification_code, verify_password
 from src.config import settings
 from src.models import ParseError, User
 from src.parser import parse_remote_results_file, ALL_DIMENSIONS, parse_remote_filename, \
@@ -101,6 +101,32 @@ async def login_for_access_token(code: str, current_user: Annotated[User, Depend
         )
 
 
+@app.post("/users/password")
+async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()],
+                          current_user: Annotated[User, Depends(get_current_user)]):
+    user = user_service.get_user(current_user.email)
+    if not verify_password(old_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Incorrect password"
+        )
+    user_service.change_password(user.email, get_password_hash(new_password))
+
+
+@app.post("/users/email")
+async def change_email(new_email: Annotated[str, Form()],
+                       current_user: Annotated[User, Depends(get_current_active_user)]):
+    try:
+        user = user_service.get_user(current_user.email)
+        user_service.change_email(user.email, new_email)
+        access_token = create_access_token(
+            data={"sub": user.email}
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+    except IntegrityError:
+        raise HTTPException(409, detail='User with this email already exists')
+
+
 async def send_verification_email(email: str, code: str):
     try:
         with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
@@ -156,12 +182,12 @@ async def get_all_benchmarks():
 
 @app.delete("/benchmarks/{benchmark_name}")
 async def delete_benchmark(benchmark_name: str):
-    print(benchmark_name)
     return file_service.delete_benchmark(benchmark_name)
 
 
 @app.post("/benchmarks")
-async def create_benchmark(name: Annotated[str, Form()], description: Annotated[str, Form()], function_count: Annotated[int, Form()], trial_count: Annotated[int, Form()]):
+async def create_benchmark(name: Annotated[str, Form()], description: Annotated[str, Form()],
+                           function_count: Annotated[int, Form()], trial_count: Annotated[int, Form()]):
     try:
         file_service.create_benchmark(name, description, function_count, trial_count)
     except IntegrityError:
@@ -186,6 +212,11 @@ async def promote_user(email: str, current_user: Annotated[User, Depends(get_cur
             detail="Current user does not have permission to perform this action"
         )
     user = user_service.get_user(email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"User with email: {email} is not verified"
+        )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -260,7 +291,8 @@ async def get_ecdf_data(benchmark_name: str):
 
 
 @app.delete("/file/{algorithm_name}")
-async def delete_files(algorithm_name: str, benchmark_name: str, current_user: Annotated[User, Depends(get_current_active_user)]):
+async def delete_files(algorithm_name: str, benchmark_name: str,
+                       current_user: Annotated[User, Depends(get_current_active_user)]):
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

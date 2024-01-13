@@ -3,6 +3,7 @@ package com.inzynierka.ui
 import com.inzynierka.di.appModule
 import com.inzynierka.domain.core.Tab
 import com.inzynierka.ui.console.adminConsole
+import com.inzynierka.ui.login.accountSettings
 import com.inzynierka.ui.login.login
 import com.inzynierka.ui.rankings.rankings
 import io.kvision.*
@@ -49,6 +50,10 @@ class App : Application(), KoinComponent {
 
                     is Tab.Login -> {
                         login(state.loginState)
+                    }
+
+                    is Tab.AccountSettings -> {
+                        accountSettings(state.accountSettingsState)
                     }
                 }
             }

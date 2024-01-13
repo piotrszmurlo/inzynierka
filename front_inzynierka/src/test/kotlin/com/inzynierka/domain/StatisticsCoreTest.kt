@@ -6,7 +6,7 @@ import com.inzynierka.domain.models.StatisticsRankingEntry
 import io.kvision.redux.createTypedReduxStore
 import kotlin.test.*
 
-class MeanCoreTest {
+class StatisticsCoreTest {
     private val initialMeanState = StatisticsRankingState()
     private val store = createTypedReduxStore(::statisticsReducer, initialMeanState)
 

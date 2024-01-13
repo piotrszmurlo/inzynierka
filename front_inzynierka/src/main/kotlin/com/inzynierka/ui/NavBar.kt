@@ -3,6 +3,7 @@ package com.inzynierka.ui
 import com.inzynierka.domain.core.MainAppAction
 import com.inzynierka.domain.core.Tab
 import com.inzynierka.domain.core.UserData
+import com.inzynierka.ui.StringResources.ACCOUNT
 import com.inzynierka.ui.StringResources.ADMIN_CONSOLE_LABEL
 import com.inzynierka.ui.StringResources.BROWSE_RANKINGS_LABEL
 import com.inzynierka.ui.StringResources.LOGIN_LABEL
@@ -51,6 +52,15 @@ fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
                     padding = 4.px
                     button(VERIFY_ACCOUNT, style = tabButtonStyle(activeTab is Tab.Login)).onClick {
                         AppManager.store.dispatch(MainAppAction.TabSelected(Tab.Login))
+                    }
+                }
+            }
+
+            if (isLoggedIn) {
+                div {
+                    padding = 4.px
+                    button(ACCOUNT, style = tabButtonStyle(activeTab is Tab.AccountSettings)).onClick {
+                        AppManager.store.dispatch(MainAppAction.TabSelected(Tab.AccountSettings))
                     }
                 }
             }

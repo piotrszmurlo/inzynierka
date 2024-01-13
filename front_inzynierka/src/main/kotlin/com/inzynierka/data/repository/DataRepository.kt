@@ -186,4 +186,28 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
             }
         ).body()
     }
+
+    override suspend fun changePassword(newPassword: String, oldPassword: String) {
+        client.submitForm(
+            url = "users/password",
+            formParameters = parameters {
+                append("new_password", newPassword)
+                append("old_password", oldPassword)
+            }
+        ) {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }
+    }
+
+    override suspend fun changeEmail(email: String) {
+        val token = client.submitForm(
+            url = "users/email",
+            formParameters = parameters {
+                append("new_email", email)
+            }
+        ) {
+            header("Authorization", "Bearer ${bearerToken?.accessToken}")
+        }.body<BearerToken>()
+        bearerToken = token
+    }
 }

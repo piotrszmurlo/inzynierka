@@ -4,8 +4,7 @@ from scipy.stats import wilcoxon
 
 from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, \
     StatisticRankingEntry, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
-    get_final_error_and_evaluation_number_for_files, TRIALS_COUNT, \
-    get_all_errors_and_evaluations_numbers_for_files
+    get_final_error_and_evaluation_number_for_files, get_all_errors_and_evaluations_numbers_for_files
 from src.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model, \
     map_revisited_ranking_entries_to_pydantic_model, map_ecdf_entries_to_pydantic_model
 from src.models import PairTestEntry, Benchmark

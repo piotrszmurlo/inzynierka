@@ -207,4 +207,20 @@ class DataService(private val dataRepository: IDataRepository) : IDataService {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }
     }
+
+    override suspend fun changePassword(newPassword: String, oldPassword: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.changePassword(newPassword, oldPassword))
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
+
+    override suspend fun changeEmail(email: String): Result<Unit> {
+        return try {
+            Result.Success(dataRepository.changeEmail(email))
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
 }

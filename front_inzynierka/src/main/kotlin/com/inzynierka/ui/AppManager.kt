@@ -336,4 +336,19 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
+    fun changePassword(newPassword: String, oldPassword: String) = launch {
+        store.dispatch(AccountSettingsAction.ChangeStarted)
+        when (val result = dataService.changePassword(newPassword, oldPassword)) {
+            is Result.Success -> store.dispatch(AccountSettingsAction.ChangePasswordSuccess)
+            is Result.Error -> store.dispatch(AccountSettingsAction.ChangePasswordFailed(result.domainError))
+        }
+    }
+
+    fun changeEmail(email: String) = launch {
+        store.dispatch(AccountSettingsAction.ChangeStarted)
+        when (val result = dataService.changeEmail(email)) {
+            is Result.Success -> store.dispatch(AccountSettingsAction.ChangeEmailSuccess)
+            is Result.Error -> store.dispatch(AccountSettingsAction.ChangeEmailFailed(result.domainError))
+        }
+    }
 }
