@@ -7,6 +7,7 @@ import com.inzynierka.domain.core.isPasswordValid
 import com.inzynierka.ui.*
 import com.inzynierka.ui.StringResources.TOAST_UPDATE_SUCCESS
 import io.kvision.core.*
+import io.kvision.form.ValidationStatus
 import io.kvision.form.text.text
 import io.kvision.html.InputType
 import io.kvision.html.button
@@ -44,7 +45,8 @@ fun Container.changePasswordForm(state: AccountSettingsState) {
         val oldPasswordField = text(
             label = StringResources.OLD_PASSWORD,
             value = state.oldPasswordField,
-            type = InputType.PASSWORD
+            type = InputType.PASSWORD,
+            maxlength = MAX_PASSWORD_LENGTH,
         ) {
             paddingTop = 24.px
             width = 250.px
@@ -52,10 +54,12 @@ fun Container.changePasswordForm(state: AccountSettingsState) {
         val newPasswordField = text(
             label = StringResources.NEW_PASSWORD,
             value = state.passwordField,
-            type = InputType.PASSWORD
+            type = InputType.PASSWORD,
+            maxlength = MAX_PASSWORD_LENGTH,
         ) {
             paddingTop = 24.px
             width = 250.px
+            validationStatus = if (!state.passwordValid) ValidationStatus.INVALID else null
             enableTooltip(
                 TooltipOptions(
                     title = StringResources.PASSWORD_TOOLTIP,
@@ -71,6 +75,12 @@ fun Container.changePasswordForm(state: AccountSettingsState) {
         ) {
             width = 250.px
         }.onClick {
+            AppManager.store.dispatch(
+                AccountSettingsAction.PasswordFieldChanged(
+                    newPasswordField.value,
+                    oldPasswordField.value
+                )
+            )
             if (newPasswordField.value != null && isPasswordValid(newPasswordField.value) && oldPasswordField.value != null) {
                 AppManager.changePassword(newPasswordField.value!!, oldPasswordField.value!!)
             }
@@ -86,7 +96,9 @@ fun Container.changeEmailForm(state: AccountSettingsState) {
             label = StringResources.NEW_EMAIL,
             value = state.emailField,
             type = InputType.EMAIL,
+            maxlength = MAX_EMAIL_LENGTH,
         ) {
+            validationStatus = if (!state.emailValid) ValidationStatus.INVALID else null
             paddingTop = 24.px
             width = 250.px
         }
@@ -96,6 +108,7 @@ fun Container.changeEmailForm(state: AccountSettingsState) {
         ) {
             width = 250.px
         }.onClick {
+            AppManager.store.dispatch(AccountSettingsAction.EmailFieldChanged(textField.value))
             if (textField.value != null && isEmailValid(textField.value)) {
                 AppManager.changeEmail(textField.value!!)
             }

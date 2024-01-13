@@ -3,6 +3,7 @@ package com.inzynierka.ui.rankings
 import com.inzynierka.domain.core.*
 import com.inzynierka.ui.AppManager
 import com.inzynierka.ui.StringResources.ALGORITHM
+import com.inzynierka.ui.StringResources.BENCHMARK
 import com.inzynierka.ui.StringResources.BEST
 import com.inzynierka.ui.StringResources.CEC2022_RANKING_DESCRIPTION
 import com.inzynierka.ui.StringResources.CEC2022_RANKING_TABLE_HEADER
@@ -35,21 +36,7 @@ fun Container.rankings(
 ) {
     flexPanel(direction = FlexDirection.COLUMN, alignItems = AlignItems.CENTER) {
         rankingTabs(tab, state.selectedBenchmarkName)
-        select(
-            options = state.benchmarkNames.map { it to it },
-            value = state.selectedBenchmarkName,
-            label = "Benchmark"
-        ) {
-            width = 250.px
-        }.onChange {
-            AppManager.store.dispatch(
-                RankingsAction.BenchmarkSelected(
-                    benchmarkName = this.value!!,
-                )
-            )
-            AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
-            AppManager.loadCec2022Scores(this.value!!)
-        }
+        benchmarkSelect(state, tab)
         when (tab) {
             is Tab.ResultsTab.Cec2022 -> {
                 h5(CEC2022_RANKING_DESCRIPTION)
@@ -110,63 +97,80 @@ fun Container.rankingTabs(tab: Tab.ResultsTab, benchmarkName: String?) {
     flexPanel(direction = FlexDirection.ROW, spacing = 8) {
         padding = 16.px
         paddingBottom = 32.px
-        button(
-            text = CEC2022_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.Cec2022)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
-                AppManager.loadCec2022Scores(benchmarkName)
-            }
-        button(
-            text = MEAN_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.Mean)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Mean))
-                AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Mean)
-            }
-        button(
-            text = MEDIAN_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.Median)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Median))
-                AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Median)
-            }
-        button(
-            text = ECDF_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.Ecdf)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Ecdf))
-                AppManager.loadEcdfData(benchmarkName)
-            }
-        button(
-            text = FRIEDMAN_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.Friedman)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Friedman))
-                AppManager.loadFriedmanScores(benchmarkName)
-            }
-        button(
-            text = COMPARE_TWO_ALGORITHMS_TAB_LABEL,
-            style = tabButtonStyle(tab is Tab.ResultsTab.PairTest)
-        )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.PairTest))
-                AppManager.getAvailableBenchmarkData(benchmarkName)
-            }
-        button(
-            text = REVISITED_TAB_LABEL,
-            style = tabButtonStyle(
-                tab is Tab.ResultsTab.Revisited
+        tabButton(
+            CEC2022_TAB_LABEL,
+            Tab.ResultsTab.Cec2022,
+            tab is Tab.ResultsTab.Cec2022
+        ) { AppManager.loadCec2022Scores(benchmarkName) }
+        tabButton(
+            MEAN_TAB_LABEL,
+            Tab.ResultsTab.Mean,
+            tab is Tab.ResultsTab.Mean
+        ) { AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Mean) }
+        tabButton(
+            MEDIAN_TAB_LABEL,
+            Tab.ResultsTab.Median,
+            tab is Tab.ResultsTab.Median
+        ) { AppManager.loadStatisticsRanking(benchmarkName, StatisticsRankingType.Median) }
+        tabButton(
+            ECDF_TAB_LABEL,
+            Tab.ResultsTab.Ecdf,
+            tab is Tab.ResultsTab.Ecdf
+        ) { AppManager.loadEcdfData(benchmarkName) }
+        tabButton(
+            FRIEDMAN_TAB_LABEL,
+            Tab.ResultsTab.Friedman,
+            tab is Tab.ResultsTab.Friedman
+        ) { AppManager.loadFriedmanScores(benchmarkName) }
+        tabButton(
+            COMPARE_TWO_ALGORITHMS_TAB_LABEL,
+            Tab.ResultsTab.PairTest,
+            tab is Tab.ResultsTab.PairTest
+        ) { AppManager.getAvailableBenchmarkData(benchmarkName) }
+        tabButton(
+            REVISITED_TAB_LABEL,
+            Tab.ResultsTab.Revisited,
+            tab is Tab.ResultsTab.Revisited
+        ) { AppManager.loadRevisitedRanking(benchmarkName) }
+    }
+}
+
+fun Container.tabButton(label: String, tab: Tab.ResultsTab, isSelected: Boolean, loadAction: () -> Unit) = button(
+    text = label,
+    style = tabButtonStyle(
+        isSelected
+    )
+).onClickLaunch {
+    AppManager.store.dispatch(MainAppAction.TabSelected(tab))
+    loadAction()
+}
+
+
+fun Container.benchmarkSelect(state: RankingsState, tab: Tab.ResultsTab) {
+    select(
+        options = state.benchmarkNames.map { it to it },
+        value = state.selectedBenchmarkName,
+        label = BENCHMARK
+    ) {
+        width = 250.px
+    }.onChange {
+        AppManager.store.dispatch(
+            RankingsAction.BenchmarkSelected(
+                benchmarkName = this.value!!,
             )
         )
-            .onClickLaunch {
-                AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Revisited))
-                AppManager.loadRevisitedRanking(benchmarkName)
+        with(this.value!!) {
+            AppManager.store.dispatch(MainAppAction.TabSelected(tab))
+            when (tab) {
+                is Tab.ResultsTab.Cec2022 -> AppManager.loadCec2022Scores(this)
+                is Tab.ResultsTab.Ecdf -> AppManager.loadEcdfData(this)
+                is Tab.ResultsTab.Friedman -> AppManager.loadFriedmanScores(this)
+                is Tab.ResultsTab.Mean -> AppManager.loadStatisticsRanking(this, StatisticsRankingType.Mean)
+                is Tab.ResultsTab.Median -> AppManager.loadStatisticsRanking(this, StatisticsRankingType.Median)
+                is Tab.ResultsTab.PairTest -> AppManager.getAvailableBenchmarkData(this)
+                is Tab.ResultsTab.Revisited -> AppManager.loadRevisitedRanking(this)
             }
+
+        }
     }
 }

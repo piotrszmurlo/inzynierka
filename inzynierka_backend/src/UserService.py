@@ -12,9 +12,9 @@ class UserService:
         user = self.get_user(email)
         return self._repository.modify_account(user.id, password_hash=new_password_hash)
 
-    def change_email(self, old_email: str, new_email: str):
+    def change_email(self, old_email: str, new_email: str, new_verification_hash: str):
         user = self.get_user(old_email)
-        return self._repository.modify_account(user.id, email=new_email)
+        return self._repository.modify_account(user.id, email=new_email, verification_hash=new_verification_hash)
 
     def get_users(self):
         return self._repository.get_users()

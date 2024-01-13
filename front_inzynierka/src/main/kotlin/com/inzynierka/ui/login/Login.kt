@@ -29,8 +29,8 @@ import io.kvision.panel.flexPanel
 import io.kvision.utils.px
 import kotlinx.serialization.Serializable
 
-private const val MAX_PASSWORD_LENGTH = 32
-private const val MAX_EMAIL_LENGTH = 64
+const val MAX_PASSWORD_LENGTH = 32
+const val MAX_EMAIL_LENGTH = 64
 
 @Serializable
 data class LoginForm(

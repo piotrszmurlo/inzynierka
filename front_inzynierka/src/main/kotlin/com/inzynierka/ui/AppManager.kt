@@ -256,14 +256,7 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         store.dispatch(LoginAction.Login)
         when (val result = dataService.loginUser(email, password)) {
             is Result.Success -> {
-                when (val userData = dataService.getUserData()) {
-                    is Result.Success -> {
-                        store.dispatch(LoginAction.LoginSuccess(userData.data))
-                    }
-
-                    is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
-                }
-                initializeUploadTab()
+                refreshUserData()
                 store.dispatch(MainAppAction.TabSelected(Tab.Upload))
             }
 
@@ -272,6 +265,17 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
                 store.dispatch(LoginAction.LoginFailed(result.domainError))
             }
         }
+    }
+
+    fun refreshUserData() = launch {
+        when (val userData = dataService.getUserData()) {
+            is Result.Success -> {
+                store.dispatch(LoginAction.LoginSuccess(userData.data))
+            }
+
+            is Result.Error -> store.dispatch(LoginAction.LoginSuccess(null))
+        }
+        initializeUploadTab()
     }
 
     fun registerUser(email: String, password: String) = launch {
@@ -349,7 +353,12 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
     fun changeEmail(email: String) = launch {
         store.dispatch(AccountSettingsAction.ChangeStarted)
         when (val result = dataService.changeEmail(email)) {
-            is Result.Success -> store.dispatch(AccountSettingsAction.ChangeEmailSuccess)
+            is Result.Success -> {
+                refreshUserData()
+                store.dispatch(AccountSettingsAction.ChangeEmailSuccess)
+                store.dispatch(MainAppAction.TabSelected(Tab.Login))
+            }
+
             is Result.Error -> store.dispatch(AccountSettingsAction.ChangeEmailFailed(result.domainError))
         }
     }

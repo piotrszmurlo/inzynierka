@@ -121,13 +121,16 @@ async def change_password(new_password: Annotated[str, Form()], old_password: An
 
 @app.post("/users/email")
 async def change_email(new_email: Annotated[str, Form()],
-                       current_user: Annotated[User, Depends(get_current_active_user)]):
+                       current_user: Annotated[User, Depends(get_current_user)]):
     try:
         user = user_service.get_user(current_user.email)
-        user_service.change_email(user.email, new_email)
+        code = generate_verification_code()
+        user_service.change_email(user.email, new_email, code)
         access_token = create_access_token(
-            data={"sub": user.email}
+            data={"sub": new_email}
         )
+
+        asyncio.create_task(send_verification_email(new_email, code))
         return {"access_token": access_token, "token_type": "bearer"}
     except IntegrityError:
         raise HTTPException(409, detail='User with this email already exists')
