@@ -39,7 +39,7 @@ object StringResources {
     var ECDF_X_AXIS_LABEL = tr("f-evaluations / dimension")
     var PER_FUNCTION = tr("Per function")
     var AVERAGED = tr("Averaged")
-    var AOC = tr("AOC")
+    var AUC = tr("AUC")
 
     var SELECT_DIMENSION = tr("Select dimension")
     var SELECT_ALGORITHMS = tr("Select algorithms")

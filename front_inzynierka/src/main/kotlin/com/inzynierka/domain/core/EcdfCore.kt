@@ -36,7 +36,7 @@ fun ecdfReducer(state: EcdfState, action: EcdfAction) = when (action) {
     is EcdfAction.FetchRankingsSuccess -> {
         val combinedData = action.data.groupBy { it.dimension }
         val splitData = splitEcdfs(action.data)
-        val areaData = areaData(action.data)
+        val areaData = action.data.map { it.toAreaData() }
         val splitAreaData =
             areaData.splitData().mapValues { dimensionEntries ->
                 dimensionEntries.value.mapValues { functionEntries ->
@@ -72,21 +72,19 @@ fun createAverageRanksRanking(splitData: Map<Dimension, Map<FunctionNumber, List
             }.let { it.copy(score = it.score / perAlgorithmData.value.size) }
         }.values.toList().let { rankSortedList(it, { score -> score.score }) { el, rank -> el.copy(rank = rank) } }
 
-private fun areaData(dataList: List<EcdfData>) =
-    dataList.map { data ->
-        ScoreRankingEntry(
-            rank = null,
-            dimension = data.dimension,
-            algorithmName = data.algorithmName,
-            functionNumber = data.functionNumber,
-            score = percentageArea(
-                calculateAreaUnderCurve(
-                    data.functionEvaluations,
-                    data.thresholdAchievedFractions
-                ), data.dimension
-            )
-        )
-    }
+
+private fun EcdfData.toAreaData() = ScoreRankingEntry(
+    rank = null,
+    dimension = this.dimension,
+    algorithmName = this.algorithmName,
+    functionNumber = this.functionNumber,
+    score = percentageArea(
+        calculateAreaUnderCurve(
+            this.functionEvaluations,
+            this.thresholdAchievedFractions
+        ), this.dimension
+    )
+)
 
 private fun groupsData(data: Map<Dimension, List<EcdfData>>): Map<Dimension, Map<FunctionGroup, List<EcdfData>>>? {
     return data
@@ -94,7 +92,9 @@ private fun groupsData(data: Map<Dimension, List<EcdfData>>): Map<Dimension, Map
             dimensionData.also {
                 val functionsSet = mutableSetOf<FunctionNumber>()
                 it.forEach { functionsSet.add(it.functionNumber) }
-                if (functionsSet != setOf(1..12)) return null
+                if (!(functionsSet.containsAll((1..12).toList()) && (functionsSet.size == 12))) {
+                    return null
+                }
             }
                 .groupBy { ecdfData -> getFunctionGroup(ecdfData.functionNumber) }
                 .mapValues { (_, functionGroupData) ->

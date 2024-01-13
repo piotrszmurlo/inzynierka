@@ -4,7 +4,7 @@ import com.inzynierka.domain.core.*
 import com.inzynierka.domain.models.RankingType
 import com.inzynierka.model.EcdfData
 import com.inzynierka.ui.*
-import com.inzynierka.ui.StringResources.AOC
+import com.inzynierka.ui.StringResources.AUC
 import com.inzynierka.ui.StringResources.AVERAGED
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_COMBINED
 import com.inzynierka.ui.StringResources.DIMENSION_FUNCTION_GROUP_EQUALS
@@ -59,7 +59,7 @@ fun Container.ecdfTab(state: EcdfState) {
                 style = tabButtonStyle(state.rankingType is RankingType.Averaged)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(RankingType.Averaged)) }
             button(
-                AOC,
+                AUC,
                 style = tabButtonStyle(state.rankingType is RankingType.Area)
             ).onClick { AppManager.store.dispatch(EcdfAction.EcdfTypeChanged(RankingType.Area)) }
         }
