@@ -17,7 +17,7 @@ import io.kvision.navbar.nav
 import io.kvision.navbar.navbar
 import io.kvision.utils.px
 
-fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
+fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab, initialBenchmark: String?) {
     navbar(NAVBAR_TITLE) {
         nav(rightAlign = true) {
             div {
@@ -34,7 +34,7 @@ fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab) {
                 padding = 4.px
                 button(BROWSE_RANKINGS_LABEL, style = tabButtonStyle(activeTab is Tab.ResultsTab)).onClick {
                     AppManager.store.dispatch(MainAppAction.TabSelected(Tab.ResultsTab.Cec2022))
-                    AppManager.initializeRankings()
+                    AppManager.initializeRankings(initialBenchmark)
 
                 }
             }

@@ -106,6 +106,11 @@ async def login_for_access_token(code: str, current_user: Annotated[User, Depend
 async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()],
                           current_user: Annotated[User, Depends(get_current_user)]):
     user = user_service.get_user(current_user.email)
+    if verify_password(new_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="New password must be different than previous one"
+        )
     if not verify_password(old_password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

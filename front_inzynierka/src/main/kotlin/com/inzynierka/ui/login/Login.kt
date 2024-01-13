@@ -16,6 +16,7 @@ import com.inzynierka.ui.StringResources.VERIFY_BUTTON_LABEL
 import com.inzynierka.ui.StringResources.VERIFY_LABEL
 import com.inzynierka.ui.StringResources.VERIFY_TEXT_FIELD_PLACEHOLDER
 import com.inzynierka.ui.divider
+import com.inzynierka.ui.withLoadingSpinner
 import io.kvision.core.*
 import io.kvision.form.ValidationStatus
 import io.kvision.form.formPanel
@@ -113,31 +114,32 @@ fun Container.loginForm(state: LoginState) {
                 )
             }.bind(LoginForm::password)
         }
-        button(
-            LOGIN_LABEL
-        ).onClick {
-            val email = form.getData().username
-            val password = form.getData().password
-            AppManager.store.dispatch(LoginAction.EmailChanged(email))
-            AppManager.store.dispatch(LoginAction.PasswordChanged(password))
-            if (email != null && password != null && isEmailValid(email) && isPasswordValid(password)) {
-                AppManager.loginUser(email, password)
+        withLoadingSpinner(state.isRegisteringOrLoggingIn) {
+            button(
+                LOGIN_LABEL
+            ).onClick {
+                val email = form.getData().username
+                val password = form.getData().password
+                AppManager.store.dispatch(LoginAction.EmailChanged(email))
+                AppManager.store.dispatch(LoginAction.PasswordChanged(password))
+                if (email != null && password != null && isEmailValid(email) && isPasswordValid(password)) {
+                    AppManager.loginUser(email, password)
+                }
             }
-        }
-        h5(REGISTER_LABEL_PROMPT) {
-            paddingTop = 16.px
-        }
-        button(
-            REGISTER_LABEL
-        ).onClick {
-            val email = form.getData().username
-            val password = form.getData().password
-            AppManager.store.dispatch(LoginAction.EmailChanged(email))
-            AppManager.store.dispatch(LoginAction.PasswordChanged(password))
-            if (email != null && password != null && isEmailValid(email) && isPasswordValid(password)) {
-                AppManager.registerUser(email, password)
+            h5(REGISTER_LABEL_PROMPT) {
+                paddingTop = 16.px
             }
-
+            button(
+                REGISTER_LABEL
+            ).onClick {
+                val email = form.getData().username
+                val password = form.getData().password
+                AppManager.store.dispatch(LoginAction.EmailChanged(email))
+                AppManager.store.dispatch(LoginAction.PasswordChanged(password))
+                if (email != null && password != null && isEmailValid(email) && isPasswordValid(password)) {
+                    AppManager.registerUser(email, password)
+                }
+            }
         }
     }
 }

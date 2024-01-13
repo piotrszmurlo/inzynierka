@@ -155,11 +155,13 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun initializeRankings() = launch {
+    fun initializeRankings(initialBenchmark: String?) = launch {
         when (val result = dataService.getAvailableBenchmarks()) {
             is Result.Success -> {
                 store.dispatch(RankingsAction.FetchAvailableBenchmarksSuccess(result.data))
-                result.data.firstOrNull()?.let { loadCec2022Scores(it.name) }
+                initialBenchmark?.let {
+                    loadCec2022Scores(it)
+                } ?: result.data.firstOrNull()?.let { loadCec2022Scores(it.name) }
             }
 
             is Result.Error -> {

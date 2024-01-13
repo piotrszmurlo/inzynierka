@@ -6,9 +6,7 @@ import com.inzynierka.domain.core.isEmailValid
 import com.inzynierka.domain.core.isPasswordValid
 import com.inzynierka.ui.*
 import com.inzynierka.ui.StringResources.TOAST_UPDATE_SUCCESS
-import io.kvision.core.AlignItems
-import io.kvision.core.Container
-import io.kvision.core.FlexDirection
+import io.kvision.core.*
 import io.kvision.form.text.text
 import io.kvision.html.InputType
 import io.kvision.html.button
@@ -58,6 +56,14 @@ fun Container.changePasswordForm(state: AccountSettingsState) {
         ) {
             paddingTop = 24.px
             width = 250.px
+            enableTooltip(
+                TooltipOptions(
+                    title = StringResources.PASSWORD_TOOLTIP,
+                    placement = Placement.AUTO,
+                    triggers = listOf(Trigger.HOVER, Trigger.MANUAL),
+                    animation = false
+                )
+            )
         }
         button(
             StringResources.CHANGE_PASSWORD,
