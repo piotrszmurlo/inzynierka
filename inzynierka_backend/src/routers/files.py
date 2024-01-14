@@ -49,7 +49,14 @@ async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
                 )
             )
         if overwrite:
-            file_service.delete_files(parsed_file_tuples[0][0], benchmark_data.name)
+            existing_file = file_service.get_file(algorithm_name=parsed_file_tuples[0][0], function_number=parsed_file_tuples[0][1], dimension=parsed_file_tuples[0][2], benchmark_name=benchmark)
+            if existing_file:
+                if existing_file.owner_id != current_user.id and not current_user.is_admin:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Current user does not have permission to perform this action"
+                    )
+                file_service.delete_files(parsed_file_tuples[0][0], benchmark_data.name)
         for algorithm_name, function_number, dimension, content in parsed_file_tuples:
             file_service.create_file(algorithm_name=algorithm_name, function_number=function_number,
                                      dimension=dimension, content=content, benchmark_id=benchmark_data.id, owner_id=current_user.id)
