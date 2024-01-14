@@ -23,6 +23,7 @@ data class LoginState(
 
 sealed class LoginAction : MainAppAction() {
     object Login : LoginAction()
+    object Logout : LoginAction()
     data class LoginSuccess(val loggedInUserData: UserData?) : LoginAction()
     object Register : LoginAction()
     data class RegisterSuccess(val data: UserData?) : LoginAction()
@@ -68,6 +69,8 @@ fun loginReducer(state: LoginState, action: LoginAction) = when (action) {
         isRegisteringOrLoggingIn = false,
         loggedInUserData = action.data
     )
+
+    is LoginAction.Logout -> state.copy(isUserLoggedIn = false, loggedInUserData = null)
 }
 
 

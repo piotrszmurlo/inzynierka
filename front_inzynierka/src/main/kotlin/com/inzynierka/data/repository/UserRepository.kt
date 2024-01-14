@@ -86,9 +86,14 @@ class UserRepository(private val client: HttpClient) : IUserRepository {
         }
     }
 
+
     override suspend fun getUserData(): UserData {
         return client.get(urlString = "/users/me") {
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
         }.body()
+    }
+
+    override fun logout() {
+        bearerToken = null
     }
 }

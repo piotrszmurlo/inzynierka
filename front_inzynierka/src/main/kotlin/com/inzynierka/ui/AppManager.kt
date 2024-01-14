@@ -273,7 +273,11 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun refreshUserData() = launch {
+    fun logoutUser() {
+        userService.logout()
+    }
+
+    private fun refreshUserData() = launch {
         when (val userData = userService.getUserData()) {
             is Result.Success -> {
                 store.dispatch(LoginAction.LoginSuccess(userData.data))

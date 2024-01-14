@@ -65,6 +65,7 @@ object StringResources {
     var VERIFY_ACCOUNT = tr("Verify account")
     var ACCOUNT = tr("Account")
     var LOGIN_LABEL = tr("Log in")
+    var LOG_OUT = tr("Log out")
     var REGISTER_LABEL_PROMPT = tr("Create new account")
     var LOGIN_FAILED_TOAST = tr("Failed to log in. Check credentials.")
     var REGISTER_SUCCESS_TOAST = tr("Successfully registered. Check your inbox for verification code.")

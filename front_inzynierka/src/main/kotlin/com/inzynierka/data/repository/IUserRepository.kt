@@ -11,4 +11,5 @@ interface IUserRepository {
     suspend fun changeEmail(email: String)
     suspend fun verifyAccount(code: String)
     suspend fun resendVerificationCode()
+    fun logout()
 }

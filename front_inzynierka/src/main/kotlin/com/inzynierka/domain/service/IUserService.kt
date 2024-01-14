@@ -12,4 +12,5 @@ interface IUserService {
     suspend fun getUserData(): Result<UserData>
     suspend fun changePassword(newPassword: String, oldPassword: String): Result<Unit>
     suspend fun changeEmail(email: String): Result<Unit>
+    fun logout()
 }

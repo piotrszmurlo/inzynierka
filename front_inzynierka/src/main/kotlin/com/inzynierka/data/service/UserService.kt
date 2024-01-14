@@ -88,4 +88,8 @@ class UserService(private val userRepository: IUserRepository) : IUserService {
         }
     }
 
+    override fun logout() {
+        userRepository
+    }
+
 }
