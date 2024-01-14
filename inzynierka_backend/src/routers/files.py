@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from pymysql import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from starlette import status
 
 from src.dependencies.auth import file_service, get_current_active_user

@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Form
 from fastapi.security import OAuth2PasswordRequestForm
-from pymysql import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from starlette import status
 
 from src.dependencies.auth_helpers import verify_password, get_password_hash, generate_verification_code, create_access_token, Token, \

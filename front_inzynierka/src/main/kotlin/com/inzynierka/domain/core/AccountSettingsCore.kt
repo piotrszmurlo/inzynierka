@@ -46,6 +46,7 @@ fun accountSettingsReducer(state: AccountSettingsState, action: AccountSettingsA
     is AccountSettingsAction.PasswordFieldChanged -> state.copy(
         passwordValid = isPasswordValid(action.password),
         passwordField = action.password,
+        oldPasswordField = action.oldPassword,
         oldPasswordValid = isPasswordValid(action.oldPassword)
     )
 }

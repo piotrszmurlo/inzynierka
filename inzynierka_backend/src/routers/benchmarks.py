@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException
-from pymysql import IntegrityError
+from sqlalchemy.exc import IntegrityError
 
 from src.dependencies.auth import file_service
 

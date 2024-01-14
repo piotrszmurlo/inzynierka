@@ -3,7 +3,7 @@ import python_extensions as extensions
 from scipy.stats import wilcoxon
 
 from src.models.benchmark import Benchmark
-from src.models.ranking_entry import StatisticRankingEntry
+from src.models.ranking_entry import StatisticRankingEntry, PairTestEntry
 from src.services import FileService
 from src.dependencies.parser import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
     get_final_error_and_evaluation_number_for_files, get_all_errors_and_evaluations_numbers_for_files
@@ -24,7 +24,7 @@ class Rankings:
             file_service: FileService,
             thresholds=np.logspace(3, -8, num=51),
             revisited_ranking_weight=0.01,
-            dimensionBudget: dict[int, int] = {10: 200000, 20: 1000000}
+            dimensionBudget: dict[int, int] = DIM2BUDGET
     ):
         self.dimensionBudget = dimensionBudget
         self._file_service = file_service
