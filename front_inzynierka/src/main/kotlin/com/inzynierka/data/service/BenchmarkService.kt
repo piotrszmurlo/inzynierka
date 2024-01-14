@@ -41,7 +41,7 @@ class BenchmarkService(val benchmarkRepository: IBenchmarkRepository) : IBenchma
 
     override suspend fun getAvailableBenchmarkData(benchmarkName: String): Result<BenchmarkData> {
         return try {
-            val algorithms = benchmarkRepository.getAvailableAlgorithms(benchmarkName)
+            val algorithms = benchmarkRepository.getAvailableAlgorithms(benchmarkName, false)
             val dimensions = benchmarkRepository.getAvailableDimensions(benchmarkName)
             val functionNumbers = benchmarkRepository.getAvailableFunctionNumbers(benchmarkName)
             Result.Success(
@@ -55,6 +55,14 @@ class BenchmarkService(val benchmarkRepository: IBenchmarkRepository) : IBenchma
     override suspend fun getAvailableDimensions(benchmarkName: String): Result<List<Int>> {
         return try {
             Result.Success(benchmarkRepository.getAvailableDimensions(benchmarkName))
+        } catch (e: Throwable) {
+            Result.Error(DomainError(e.parsedRemoteExceptionMessage))
+        }
+    }
+
+    override suspend fun getMyAlgorithms(benchmarkName: String): Result<List<String>> {
+        return try {
+            Result.Success(benchmarkRepository.getAvailableAlgorithms(benchmarkName, true))
         } catch (e: Throwable) {
             Result.Error(DomainError(e.parsedRemoteExceptionMessage))
         }

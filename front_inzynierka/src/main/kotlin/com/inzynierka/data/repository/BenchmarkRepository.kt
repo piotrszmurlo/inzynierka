@@ -8,8 +8,14 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
 class BenchmarkRepository(private val client: HttpClient) : IBenchmarkRepository {
-    override suspend fun getAvailableAlgorithms(benchmarkName: String): List<String> {
-        return client.get(urlString = "/benchmarks/$benchmarkName/algorithms").body()
+    override suspend fun getAvailableAlgorithms(benchmarkName: String, ownedOnly: Boolean): List<String> {
+        return if (ownedOnly) {
+            client.get(urlString = "/benchmarks/$benchmarkName/algorithms/me") {
+                header("Authorization", "Bearer ${bearerToken?.accessToken}")
+            }.body()
+        } else {
+            return client.get(urlString = "/benchmarks/$benchmarkName/algorithms").body()
+        }
     }
 
     override suspend fun getAvailableDimensions(benchmarkName: String): List<Int> {

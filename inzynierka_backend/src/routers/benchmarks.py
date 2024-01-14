@@ -1,9 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter, Form, HTTPException, Depends
 from sqlalchemy.exc import IntegrityError
 
-from src.dependencies.auth import file_service
+from src.dependencies.auth import file_service, get_current_active_user, get_current_user
+from src.models.user import User
 
 router = APIRouter(prefix='/benchmarks')
 
@@ -30,6 +31,11 @@ async def create_benchmark(name: Annotated[str, Form()], description: Annotated[
 @router.get("/{benchmark_name}/algorithms")
 async def get_available_algorithms(benchmark_name: str):
     return file_service.get_algorithm_names(benchmark_name)
+
+
+@router.get("/{benchmark_name}/algorithms/me")
+async def get_available_algorithms(benchmark_name: str, current_user: Annotated[User, Depends(get_current_user)]):
+    return file_service.get_algorithm_names(benchmark_name, current_user.id)
 
 
 @router.get("/{benchmark_name}/dimensions")

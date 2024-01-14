@@ -61,7 +61,7 @@ object StringResources {
     var BROWSE_RANKINGS_LABEL = tr("Browse rankings")
     var NAVBAR_TITLE = tr("AE comparison")
     var ADMIN_CONSOLE_LABEL = tr("Admin console")
-    var ACCOUNT_SETTINGS = tr("Account settings")
+    var ACCOUNT_SETTINGS = tr("Account")
     var VERIFY_ACCOUNT = tr("Verify account")
     var ACCOUNT = tr("Account")
     var LOGIN_LABEL = tr("Log in")

@@ -6,6 +6,7 @@ import com.inzynierka.domain.core.isEmailValid
 import com.inzynierka.domain.core.isPasswordValid
 import com.inzynierka.ui.*
 import com.inzynierka.ui.StringResources.TOAST_UPDATE_SUCCESS
+import com.inzynierka.ui.console.removeAlgorithmForm
 import io.kvision.core.*
 import io.kvision.form.ValidationStatus
 import io.kvision.form.text.text
@@ -25,6 +26,44 @@ fun Container.accountSettings(state: AccountSettingsState) {
             flexPanel(FlexDirection.ROW, alignItems = AlignItems.STRETCH, spacing = 32) {
                 changePasswordForm(state)
                 changeEmailForm(state)
+                removeAlgorithmForm(
+                    state.deleteAlgorithmFormState,
+                    false,
+                    onChangeBenchmark = {
+                        AppManager.store.dispatch(
+                            AccountSettingsAction.BenchmarkSelected(it)
+                        )
+                        AppManager.getCurrentUserOwnedAlgorithmNamesForBenchmark(
+                            it,
+                            actionOnsuccess = {
+                                AppManager.store.dispatch(
+                                    AccountSettingsAction.FetchAlgorithmsSuccess(
+                                        it
+                                    )
+                                )
+                            },
+                            actionOnFail = { AppManager.store.dispatch(AccountSettingsAction.FetchAlgorithmsFailed) })
+                    },
+                    onChangeAlgorithm = {
+                        AppManager.store.dispatch(
+                            AccountSettingsAction.AlgorithmSelected(
+                                algorithmName = it,
+                            )
+                        )
+                    },
+                    deleteAlgorithmData = { algorithm, benchmark ->
+                        AppManager.deleteAlgorithmData(
+                            algorithm,
+                            benchmark,
+                            onSuccess = {
+                                Toast.show(StringResources.TOAST_DELETE_ALGORITHM_DATA_SUCCESS)
+                                AppManager.loadAccountSettings()
+                            }, onError = {
+                                Toast.show(StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA)
+                            }
+                        )
+                    }
+                )
             }
         }
         state.error?.let {

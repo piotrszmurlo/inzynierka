@@ -13,10 +13,8 @@ import com.inzynierka.ui.StringResources.REGISTER_ERROR_TOAST
 import com.inzynierka.ui.StringResources.REGISTER_SUCCESS_TOAST
 import com.inzynierka.ui.StringResources.TOAST_CREATE_BENCHMARK_FAILED
 import com.inzynierka.ui.StringResources.TOAST_CREATE_BENCHMARK_SUCCESS
-import com.inzynierka.ui.StringResources.TOAST_DELETE_ALGORITHM_DATA_SUCCESS
 import com.inzynierka.ui.StringResources.TOAST_DELETE_BENCHMARK_DATA_FAILED
 import com.inzynierka.ui.StringResources.TOAST_DELETE_BENCHMARK_DATA_SUCCESS
-import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_DELETE_ALGORITHM_DATA
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_LOAD_RANKING
 import com.inzynierka.ui.StringResources.TOAST_FAILED_TO_PROMOTE_USER
@@ -150,13 +148,35 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
             is Result.Success -> {
                 store.dispatch(AdminConsoleAction.FetchBenchmarksSuccess(result.data))
                 result.data.firstOrNull()?.let {
-                    getAlgorithmNamesForBenchmark(it.name)
+                    getAlgorithmNamesForBenchmark(
+                        it.name,
+                        actionOnsuccess = { store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(it)) },
+                        actionOnFail = { store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed) }
+                    )
                 } ?: store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
             }
 
             is Result.Error -> {
                 Toast.show(TOAST_FAILED_TO_LOAD_ADMIN_CONSOLE)
                 store.dispatch(AdminConsoleAction.FetchBenchmarksFailed)
+            }
+        }
+    }
+
+    fun loadAccountSettings() = launch {
+        when (val result = benchmarkService.getAvailableBenchmarks()) {
+            is Result.Success -> {
+                store.dispatch(AccountSettingsAction.FetchBenchmarksSuccess(result.data))
+                result.data.firstOrNull()?.let {
+                    getCurrentUserOwnedAlgorithmNamesForBenchmark(
+                        it.name,
+                        actionOnsuccess = { store.dispatch(AccountSettingsAction.FetchAlgorithmsSuccess(it)) },
+                        actionOnFail = { store.dispatch(AccountSettingsAction.FetchAlgorithmsFailed) })
+                } ?: store.dispatch(AccountSettingsAction.FetchAlgorithmsFailed)
+            }
+
+            is Result.Error -> {
+                store.dispatch(AccountSettingsAction.FetchBenchmarksFailed)
             }
         }
     }
@@ -176,10 +196,25 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
         }
     }
 
-    fun getAlgorithmNamesForBenchmark(benchmarkName: String) = launch {
+    fun getAlgorithmNamesForBenchmark(
+        benchmarkName: String,
+        actionOnsuccess: (List<String>) -> Unit,
+        actionOnFail: () -> Unit
+    ) = launch {
         when (val algorithmsResult = benchmarkService.getAvailableBenchmarkData(benchmarkName)) {
-            is Result.Success -> store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(algorithmsResult.data.algorithms))
-            is Result.Error -> store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed)
+            is Result.Success -> actionOnsuccess(algorithmsResult.data.algorithms)
+            is Result.Error -> actionOnFail()
+        }
+    }
+
+    fun getCurrentUserOwnedAlgorithmNamesForBenchmark(
+        benchmarkName: String,
+        actionOnsuccess: (List<String>) -> Unit,
+        actionOnFail: () -> Unit
+    ) = launch {
+        when (val algorithmsResult = benchmarkService.getMyAlgorithms(benchmarkName)) {
+            is Result.Success -> actionOnsuccess(algorithmsResult.data)
+            is Result.Error -> actionOnFail()
         }
     }
 
@@ -231,19 +266,16 @@ object AppManager : CoroutineScope by CoroutineScope(Dispatchers.Default + Super
 
     }
 
-    fun deleteAlgorithmData(algorithmName: String, benchmarkName: String) = launch {
+    fun deleteAlgorithmData(
+        algorithmName: String,
+        benchmarkName: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) = launch {
         store.dispatch(AdminConsoleAction.DeleteAlgorithmStarted)
         when (fileService.deleteFilesForAlgorithm(algorithmName, benchmarkName)) {
-            is Result.Success -> {
-                Toast.show(TOAST_DELETE_ALGORITHM_DATA_SUCCESS)
-                loadAdminConsole()
-                store.dispatch(AdminConsoleAction.DeleteAlgorithmSuccess)
-            }
-
-            is Result.Error -> {
-                Toast.show(TOAST_FAILED_TO_DELETE_ALGORITHM_DATA)
-                store.dispatch(AdminConsoleAction.DeleteAlgorithmFailed)
-            }
+            is Result.Success -> onSuccess()
+            is Result.Error -> onError()
         }
     }
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from src.models.file import LocalFile
 from src.repositories import IFileRepository
 
@@ -24,8 +26,12 @@ class FileService:
     def get_files(self, benchmark_name: str):
         return self._repository.get_files(benchmark_name)
 
-    def get_algorithm_names(self, benchmark_name: str):
-        return self._repository.get_algorithm_names(benchmark_name)
+    def get_algorithm_names(self, benchmark_name: str, user_id: Optional[int] = None):
+        if user_id:
+            return self._repository.get_algorithm_names_for_user(benchmark_name, user_id)
+        else:
+            return self._repository.get_algorithm_names(benchmark_name)
+
 
     def get_dimensions(self, benchmark_name: str):
         return self._repository.get_dimensions(benchmark_name)

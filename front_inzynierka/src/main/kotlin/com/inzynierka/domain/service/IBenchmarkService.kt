@@ -12,4 +12,5 @@ interface IBenchmarkService {
     suspend fun getAvailableBenchmarks(): Result<List<Benchmark>>
     suspend fun getAvailableBenchmarkData(benchmarkName: String): Result<BenchmarkData>
     suspend fun getAvailableDimensions(benchmarkName: String): Result<List<Int>>
+    suspend fun getMyAlgorithms(benchmarkName: String): Result<List<String>>
 }

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import create_engine, select, delete, and_
+from sqlalchemy import create_engine, select, delete, and_, ScalarResult
 from sqlalchemy.orm import sessionmaker, Session
 
 from src.models.benchmark import Benchmark
@@ -70,6 +70,13 @@ class SQLAlchemyFileRepository(IFileRepository):
                  .where(Benchmark.name == benchmark_name))
         return self._db.scalars(query).all()
 
+    def get_algorithm_names_for_user(self, benchmark_name: str, user_id: int):
+        query = (select(LocalFile.algorithm_name)
+                 .join(LocalFile.benchmark)
+                 .where(and_(Benchmark.name == benchmark_name, LocalFile.owner_id == user_id))
+                 .distinct(LocalFile.algorithm_name))
+        return self._db.scalars(query).all()
+
     def get_algorithm_names(self, benchmark_name: str):
         query = (select(LocalFile.algorithm_name)
                  .join(LocalFile.benchmark)
@@ -91,14 +98,15 @@ class SQLAlchemyFileRepository(IFileRepository):
                  .distinct(LocalFile.function_number))
         return self._db.scalars(query).all()
 
-    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int):
+    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int, owner_id: int):
         try:
             file = LocalFile(
                 algorithm_name=algorithm_name,
                 contents=content,
                 dimension=dimension,
                 function_number=function_number,
-                benchmark_id=benchmark_id
+                benchmark_id=benchmark_id,
+                owner_id=owner_id
             )
             self._db.add(file)
             self._db.commit()
@@ -119,6 +127,15 @@ class SQLAlchemyFileRepository(IFileRepository):
         except:
             self._db.rollback()
             raise
+
+    def get_files_for_algorithm_name(self, algorithm_name: str, benchmark_name: str) -> ScalarResult[LocalFile]:
+        benchmark_id = self.get_benchmark(benchmark_name).id
+        query = (select(LocalFile).where(
+            and_
+            (LocalFile.algorithm_name == algorithm_name,
+             LocalFile.benchmark_id == benchmark_id)
+        ))
+        return self._db.scalars(query)
 
     def delete_benchmark(self, benchmark_name: str):
         try:

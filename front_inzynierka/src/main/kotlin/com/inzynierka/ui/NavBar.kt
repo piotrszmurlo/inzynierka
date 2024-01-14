@@ -63,6 +63,7 @@ fun Container.navBar(isLoggedIn: Boolean, userData: UserData?, activeTab: Tab, i
                 div {
                     padding = 4.px
                     button(ACCOUNT, style = tabButtonStyle(activeTab is Tab.AccountSettings)).onClick {
+                        AppManager.loadAccountSettings()
                         AppManager.store.dispatch(MainAppAction.TabSelected(Tab.AccountSettings))
                     }
                 }

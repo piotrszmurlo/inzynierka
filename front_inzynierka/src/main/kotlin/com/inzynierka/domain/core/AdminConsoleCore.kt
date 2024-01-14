@@ -4,10 +4,7 @@ import com.inzynierka.common.DomainError
 import com.inzynierka.domain.models.Benchmark
 
 data class AdminConsoleState(
-    val algorithmNames: List<String> = listOf(),
-    val selectedAlgorithmName: String? = null,
-    val benchmarkNames: List<String> = listOf(),
-    val selectedBenchmarkName: String? = null,
+    val deleteAlgorithmFormState: DeleteAlgorithmFormState = DeleteAlgorithmFormState(),
     val selectedBenchmarkNameToDelete: String? = null,
     val userEmail: String? = null,
     val error: DomainError? = null,
@@ -18,8 +15,9 @@ data class AdminConsoleState(
     val newBenchmarkFunctionCount: Int? = null,
     val newBenchmarkTrialCount: Int? = null,
 ) {
-    val deleteAlgorithmButtonDisabled = algorithmNames.isEmpty() || benchmarkNames.isEmpty()
-    val deleteBenchmarkButtonDisabled = benchmarkNames.isEmpty()
+    val deleteAlgorithmButtonDisabled =
+        deleteAlgorithmFormState.algorithmNames.isEmpty() || deleteAlgorithmFormState.benchmarkNames.isEmpty()
+    val deleteBenchmarkButtonDisabled = deleteAlgorithmFormState.benchmarkNames.isEmpty()
 }
 
 sealed class AdminConsoleAction : MainAppAction() {
@@ -53,8 +51,10 @@ fun adminConsoleReducer(state: AdminConsoleState, action: AdminConsoleAction) = 
     is AdminConsoleAction.FetchAlgorithmsFailed -> state.copy(isFetching = false)
     is AdminConsoleAction.FetchAlgorithmsSuccess -> {
         state.copy(
-            algorithmNames = action.algorithmNames,
-            selectedAlgorithmName = action.algorithmNames.firstOrNull(),
+            deleteAlgorithmFormState = state.deleteAlgorithmFormState.copy(
+                algorithmNames = action.algorithmNames,
+                selectedAlgorithmName = action.algorithmNames.firstOrNull(),
+            ),
             isFetching = false
         )
     }
@@ -62,15 +62,27 @@ fun adminConsoleReducer(state: AdminConsoleState, action: AdminConsoleAction) = 
     is AdminConsoleAction.FetchBenchmarksFailed -> state.copy(isFetching = false)
     is AdminConsoleAction.FetchBenchmarksSuccess -> {
         state.copy(
-            benchmarkNames = action.benchmark.map { it.name },
-            selectedBenchmarkName = action.benchmark.firstOrNull()?.name,
+            deleteAlgorithmFormState = state.deleteAlgorithmFormState.copy(
+                benchmarkNames = action.benchmark.map { it.name },
+                selectedBenchmarkName = action.benchmark.firstOrNull()?.name,
+            ),
             selectedBenchmarkNameToDelete = action.benchmark.firstOrNull()?.name,
             isFetching = false
         )
     }
 
-    is AdminConsoleAction.AlgorithmSelected -> state.copy(selectedAlgorithmName = action.algorithmName)
-    is AdminConsoleAction.BenchmarkSelected -> state.copy(selectedBenchmarkName = action.benchmarkName)
+    is AdminConsoleAction.AlgorithmSelected -> state.copy(
+        deleteAlgorithmFormState = state.deleteAlgorithmFormState.copy(
+            selectedAlgorithmName = action.algorithmName
+        )
+    )
+
+    is AdminConsoleAction.BenchmarkSelected -> state.copy(
+        deleteAlgorithmFormState = state.deleteAlgorithmFormState.copy(
+            selectedBenchmarkName = action.benchmarkName
+        )
+    )
+
     is AdminConsoleAction.DeleteAlgorithmFailed -> state.copy(isDeleting = false)
     is AdminConsoleAction.DeleteAlgorithmStarted -> state.copy(isDeleting = false)
     is AdminConsoleAction.DeleteAlgorithmSuccess -> state.copy(isDeleting = true)
@@ -83,4 +95,5 @@ fun adminConsoleReducer(state: AdminConsoleState, action: AdminConsoleAction) = 
     is AdminConsoleAction.CreateBenchmarkFailed -> state.copy()
     is AdminConsoleAction.CreateBenchmarkSuccess -> state.copy()
     is AdminConsoleAction.BenchmarkDeleteSelected -> state.copy(selectedBenchmarkNameToDelete = action.benchmarkName)
+
 }

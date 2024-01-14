@@ -32,6 +32,11 @@ class IFileRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def get_algorithm_names_for_user(self, benchmark_name: str, user_id: int):
+        raise NotImplementedError
+
+
+    @abstractmethod
     def get_dimensions(self, benchmark_name: str):
         raise NotImplementedError
 
@@ -40,7 +45,7 @@ class IFileRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int):
+    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int, owner_id: int):
         raise NotImplementedError
 
     @abstractmethod

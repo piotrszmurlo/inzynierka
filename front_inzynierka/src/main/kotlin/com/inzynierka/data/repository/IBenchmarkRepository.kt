@@ -3,7 +3,7 @@ package com.inzynierka.data.repository
 import com.inzynierka.data.models.BenchmarkDTO
 
 interface IBenchmarkRepository {
-    suspend fun getAvailableAlgorithms(benchmarkName: String): List<String>
+    suspend fun getAvailableAlgorithms(benchmarkName: String, ownedOnly: Boolean): List<String>
     suspend fun getAvailableDimensions(benchmarkName: String): List<Int>
     suspend fun getAvailableFunctionNumbers(benchmarkName: String): List<Int>
 

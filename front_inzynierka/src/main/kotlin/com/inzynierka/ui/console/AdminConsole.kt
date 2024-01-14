@@ -2,8 +2,10 @@ package com.inzynierka.ui.console
 
 import com.inzynierka.domain.core.AdminConsoleAction
 import com.inzynierka.domain.core.AdminConsoleState
+import com.inzynierka.domain.core.DeleteAlgorithmFormState
 import com.inzynierka.domain.core.LoginAction
 import com.inzynierka.ui.AppManager
+import com.inzynierka.ui.StringResources
 import com.inzynierka.ui.StringResources.ADD_BENCHMARK_DESCRIPTION
 import com.inzynierka.ui.StringResources.ADMIN_CONSOLE_LABEL
 import com.inzynierka.ui.StringResources.ALGORITHM
@@ -23,6 +25,7 @@ import com.inzynierka.ui.StringResources.PROMOTE_USERS_DESCRIPTION
 import com.inzynierka.ui.StringResources.PROMOTE_USER_BUTTON_LABEL
 import com.inzynierka.ui.StringResources.TRIAL_COUNT
 import com.inzynierka.ui.divider
+import com.inzynierka.ui.show
 import io.kvision.core.AlignItems
 import io.kvision.core.Container
 import io.kvision.core.FlexDirection
@@ -35,6 +38,7 @@ import io.kvision.html.ButtonStyle
 import io.kvision.html.button
 import io.kvision.html.h5
 import io.kvision.panel.flexPanel
+import io.kvision.toast.Toast
 import io.kvision.utils.px
 import kotlinx.serialization.Serializable
 
@@ -52,7 +56,38 @@ fun Container.adminConsole(state: AdminConsoleState) {
         h5(ADMIN_CONSOLE_LABEL)
         divider()
         flexPanel(FlexDirection.ROW, alignItems = AlignItems.STRETCH, spacing = 32) {
-            removeAlgorithmForm(state)
+            removeAlgorithmForm(
+                state.deleteAlgorithmFormState,
+                state.deleteAlgorithmButtonDisabled,
+                onChangeBenchmark = {
+                    AppManager.store.dispatch(
+                        AdminConsoleAction.BenchmarkSelected(it)
+                    )
+                    AppManager.getAlgorithmNamesForBenchmark(
+                        it,
+                        actionOnsuccess = { AppManager.store.dispatch(AdminConsoleAction.FetchAlgorithmsSuccess(it)) },
+                        actionOnFail = { AppManager.store.dispatch(AdminConsoleAction.FetchAlgorithmsFailed) }
+                    )
+                },
+                onChangeAlgorithm = {
+                    AppManager.store.dispatch(
+                        AdminConsoleAction.AlgorithmSelected(
+                            algorithmName = it,
+                        )
+                    )
+                },
+                deleteAlgorithmData = { algorithm, benchmark ->
+                    AppManager.deleteAlgorithmData(
+                        algorithm,
+                        benchmark,
+                        onSuccess = {
+                            Toast.show(StringResources.TOAST_DELETE_ALGORITHM_DATA_SUCCESS)
+                            AppManager.loadAdminConsole()
+                            AppManager.store.dispatch(AdminConsoleAction.DeleteAlgorithmSuccess)
+                        }, onError = {}
+                    )
+                }
+            )
             deleteBenchmarkForm(state)
             promoteUsers(state)
             newBenchmarkForm(state)
@@ -84,7 +119,13 @@ fun Container.promoteUsers(state: AdminConsoleState) {
     }
 }
 
-fun Container.removeAlgorithmForm(state: AdminConsoleState) {
+fun Container.removeAlgorithmForm(
+    state: DeleteAlgorithmFormState,
+    buttonDisabled: Boolean,
+    onChangeBenchmark: (String) -> Unit,
+    onChangeAlgorithm: (String) -> Unit,
+    deleteAlgorithmData: (String, String) -> Unit
+) {
     flexPanel(FlexDirection.COLUMN, spacing = 8, alignItems = AlignItems.CENTER) {
         paddingTop = 32.px
         h5(DELETE_ALGORITHM_DESCRIPTION)
@@ -96,10 +137,7 @@ fun Container.removeAlgorithmForm(state: AdminConsoleState) {
             width = 250.px
         }.onChange {
             val benchmarkName = this.value!!
-            AppManager.store.dispatch(
-                AdminConsoleAction.BenchmarkSelected(benchmarkName)
-            )
-            AppManager.getAlgorithmNamesForBenchmark(benchmarkName)
+            onChangeBenchmark(benchmarkName)
         }
         select(
             options = state.algorithmNames.map { it to it },
@@ -108,25 +146,18 @@ fun Container.removeAlgorithmForm(state: AdminConsoleState) {
         ) {
             width = 250.px
         }.onChange {
-            AppManager.store.dispatch(
-                AdminConsoleAction.AlgorithmSelected(
-                    algorithmName = this.value!!,
-                )
-            )
+            onChangeAlgorithm(this.value!!)
         }
         button(
             DELETE_ALGORITHM_BUTTON_LABEL,
             style = ButtonStyle.DANGER,
-            disabled = state.deleteAlgorithmButtonDisabled
+            disabled = buttonDisabled
         ) {
             width = 250.px
         }.onClick {
             state.selectedAlgorithmName?.let { algorithmName ->
                 state.selectedBenchmarkName?.let { benchmark ->
-                    AppManager.deleteAlgorithmData(
-                        algorithmName,
-                        benchmark
-                    )
+                    deleteAlgorithmData(algorithmName, benchmark)
                 }
             }
         }
@@ -176,7 +207,7 @@ fun Container.deleteBenchmarkForm(state: AdminConsoleState) {
         paddingTop = 32.px
         h5(DELETE_BENCHMARK_DESCRIPTION)
         select(
-            options = state.benchmarkNames.map { it to it },
+            options = state.deleteAlgorithmFormState.benchmarkNames.map { it to it },
             value = state.selectedBenchmarkNameToDelete,
             label = BENCHMARK
         ) {

@@ -12,6 +12,8 @@ class LocalFile(Base):
     algorithm_name: Mapped[str] = mapped_column(String(255))
     dimension: Mapped[int]
     function_number: Mapped[int]
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["UserTable"] = relationship("UserTable")
     benchmark_id: Mapped[int] = mapped_column(ForeignKey("benchmarks.id", ondelete="CASCADE"))
     benchmark: Mapped["Benchmark"] = relationship("Benchmark", back_populates="files")
 
