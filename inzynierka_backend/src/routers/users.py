@@ -6,23 +6,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from starlette import status
 
-from src.dependencies.auth_helpers import verify_password, get_password_hash, generate_verification_code, create_access_token, Token, \
+from src.dependencies.auth_helpers import verify_password, get_password_hash, generate_verification_code, \
+    create_access_token, Token, \
     authenticate_user
 from src.dependencies.auth import get_current_active_user, user_service, get_current_user, send_verification_email, \
     user_repository
 from src.models.user import User
 
 router = APIRouter(prefix='/users')
-
-
-@router.get("/")
-async def get_all_users(current_user: Annotated[User, Depends(get_current_active_user)]):
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Current user does not have permission to perform this action"
-        )
-    return user_service.get_users()
 
 
 @router.post("/promote")
