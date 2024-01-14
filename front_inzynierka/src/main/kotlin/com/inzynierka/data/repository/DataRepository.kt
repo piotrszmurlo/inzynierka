@@ -62,15 +62,15 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     }
 
     override suspend fun getAvailableAlgorithms(benchmarkName: String): List<String> {
-        return client.get(urlString = "algorithms/$benchmarkName").body()
+        return client.get(urlString = "/benchmarks/$benchmarkName/algorithms").body()
     }
 
     override suspend fun getAvailableDimensions(benchmarkName: String): List<Int> {
-        return client.get(urlString = "dimensions/$benchmarkName").body()
+        return client.get(urlString = "/benchmarks/$benchmarkName/dimensions").body()
     }
 
     override suspend fun getAvailableFunctionNumbers(benchmarkName: String): List<Int> {
-        return client.get(urlString = "functions/$benchmarkName").body()
+        return client.get(urlString = "/benchmarks/$benchmarkName/functions").body()
     }
 
     override suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String) {
@@ -82,7 +82,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
 
     override suspend fun loginUser(email: String, password: String) {
         val token = client.submitForm(
-            url = "token",
+            url = "users/login",
             formParameters = Parameters.build {
                 append("username", email)
                 append("password", password)
@@ -93,7 +93,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
 
     override suspend fun registerUser(email: String, password: String) {
         val token = client.submitForm(
-            url = "register",
+            url = "users/register",
             formParameters = Parameters.build {
                 append("username", email)
                 append("password", password)
@@ -109,7 +109,7 @@ class DataRepository(private val client: HttpClient) : IDataRepository {
     }
 
     override suspend fun getAvailableBenchmarks(): List<BenchmarkDTO> {
-        return client.get(urlString = "benchmarks").body()
+        return client.get(urlString = "/benchmarks/").body()
     }
 
     override suspend fun promoteUserToAdmin(email: String) {

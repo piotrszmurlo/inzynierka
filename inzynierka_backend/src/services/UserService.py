@@ -1,4 +1,4 @@
-from src.IUserRepository import IUserRepository
+from src.repositories.IUserRepository import IUserRepository
 
 
 class UserService:

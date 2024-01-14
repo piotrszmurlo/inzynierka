@@ -1,8 +1,10 @@
 import base64
 from collections import defaultdict
 
-from src.models import LocalFile, ParseError
 import python_extensions as extensions
+
+from src.models.file import LocalFile
+from src.models.parse_error import ParseError
 
 ALLOWED_EXTENSIONS = ("txt", "dat")
 FINAL_ERROR_INDEX = 15

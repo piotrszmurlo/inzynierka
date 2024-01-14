@@ -1,13 +1,6 @@
 import base64
-
 import pytest
-
-from main import ROOT_DIR
-
-from src import parse_remote_filename, ParseError, parse_remote_results_file
-
-TEST_DATA_DIR = f"{ROOT_DIR}/tests/test_data"
-
+from src.dependencies.parser import parse_remote_filename, ParseError, parse_remote_results_file
 
 def test_parse_simple_file_name():
     file_name = 'IUMOEAII_1_10.txt'
@@ -78,18 +71,18 @@ def test_parse_file_name_missing_segments4():
         parse_remote_filename(file_name)
 
 
-def test_parse_remote_results_file_correct_input():
+def test_parse_remote_results_file_correct_input(request):
     file_name = 'jSObinexpEig_3_20.txt'
-    with open(f"{TEST_DATA_DIR}/correct_input/jSObinexpEig_3_20.txt", 'rb') as input_file, \
-         open(f"{TEST_DATA_DIR}/processed_input/jSObinexpEig_3_20_parsed_contents.txt", 'r') as parsed_file:
+    with open(f"{request.config.rootdir}/tests/test_data/correct_input/jSObinexpEig_3_20.txt", 'rb') as input_file, \
+         open(f"{request.config.rootdir}/tests/test_data/processed_input/jSObinexpEig_3_20_parsed_contents.txt", 'r') as parsed_file:
         b64_contents = base64.b64encode(input_file.read())
         expected_parsed_contents = parsed_file.read()
-        assert ('jSObinexpEig', 3, 20, expected_parsed_contents) == parse_remote_results_file(file_name, b64_contents)
+        assert ('jSObinexpEig', 3, 20, expected_parsed_contents) == parse_remote_results_file(file_name, b64_contents, 30)
 
 
-def test_parse_remote_results_file_incorrect_characters_in_data():
+def test_parse_remote_results_file_incorrect_characters_in_data(request):
     file_name = 'CHARACTERS_IN_DATA_2_20.txt'
-    with open(f"{TEST_DATA_DIR}/incorrect_input/CHARACTERS_IN_DATA_2_20.txt", 'rb') as input_file:
+    with open(f"{request.config.rootdir}/tests/test_data/incorrect_input/CHARACTERS_IN_DATA_2_20.txt", 'rb') as input_file:
         b64_contents = base64.b64encode(input_file.read())
         with pytest.raises(ParseError):
-            parse_remote_results_file(file_name, b64_contents)
+            parse_remote_results_file(file_name, b64_contents, 30)

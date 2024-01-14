@@ -2,12 +2,13 @@ import numpy as np
 import python_extensions as extensions
 from scipy.stats import wilcoxon
 
-from src import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, FileService, \
-    StatisticRankingEntry, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
+from src.models.benchmark import Benchmark
+from src.models.ranking_entry import StatisticRankingEntry
+from src.services import FileService
+from src.dependencies.parser import get_final_error_and_evaluation_number_for_files_grouped_by_algorithm, get_final_error_and_evaluations_number_array, ALL_DIMENSIONS, \
     get_final_error_and_evaluation_number_for_files, get_all_errors_and_evaluations_numbers_for_files
-from src.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model, \
+from src.dependencies.mappers import map_statistic_ranking_entries_to_pydantic_model, map_score_ranking_entries_to_pydantic_model, \
     map_revisited_ranking_entries_to_pydantic_model, map_ecdf_entries_to_pydantic_model
-from src.models import PairTestEntry, Benchmark
 
 DIM2BUDGET = {
     10: 200000,

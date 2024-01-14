@@ -1,6 +1,6 @@
 import python_extensions as extensions
 
-from src import StatisticRankingEntry, ScoreRankingEntry, RevisitedRankingEntry, EcdfEntry
+from src.models.ranking_entry import StatisticRankingEntry, ScoreRankingEntry, EcdfEntry, RevisitedRankingEntry
 
 
 def map_statistic_ranking_entries_to_pydantic_model(entries: list[extensions.StatisticsRankingEntry]) -> list[

@@ -4,7 +4,7 @@ from locust import HttpUser, task, between
 from locust.exception import RescheduleTask
 import urllib.parse
 
-from main import ROOT_DIR
+from src.main import ROOT_DIR
 
 BASE_URL = 'http://localhost:8000/'
 

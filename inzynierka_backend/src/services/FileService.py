@@ -1,4 +1,4 @@
-from src import IFileRepository
+from src.repositories import IFileRepository
 
 
 class FileService:

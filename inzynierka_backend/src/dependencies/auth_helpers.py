@@ -6,7 +6,7 @@ from jose import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from src import IUserRepository
+from src.repositories import IUserRepository
 from src.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
