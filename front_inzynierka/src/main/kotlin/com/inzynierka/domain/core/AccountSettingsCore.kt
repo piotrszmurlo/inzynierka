@@ -5,7 +5,7 @@ import com.inzynierka.common.DomainError
 data class AccountSettingsState(
     val passwordField: String? = null,
     val oldPasswordField: String? = null,
-    val oldPasswordValid: Boolean? = null,
+    val oldPasswordValid: Boolean = true,
     val emailField: String? = null,
     val emailValid: Boolean = true,
     val passwordValid: Boolean = true,
@@ -29,7 +29,13 @@ sealed class AccountSettingsAction : MainAppAction() {
 fun accountSettingsReducer(state: AccountSettingsState, action: AccountSettingsAction) = when (action) {
     is AccountSettingsAction.ChangePasswordFailed -> state.copy(error = action.error, isFetching = false)
     is AccountSettingsAction.ChangeStarted -> state.copy(isFetching = true)
-    is AccountSettingsAction.ChangePasswordSuccess -> state.copy(isFetching = false, handleSuccess = true)
+    is AccountSettingsAction.ChangePasswordSuccess -> state.copy(
+        isFetching = false,
+        handleSuccess = true,
+        oldPasswordField = null,
+        passwordField = null
+    )
+
     is AccountSettingsAction.ResultHandled -> state.copy(error = null, handleSuccess = false)
     is AccountSettingsAction.ChangeEmailFailed -> state.copy(isFetching = false, error = action.error)
     is AccountSettingsAction.ChangeEmailSuccess -> state.copy(

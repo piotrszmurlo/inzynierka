@@ -48,6 +48,7 @@ fun Container.changePasswordForm(state: AccountSettingsState) {
             type = InputType.PASSWORD,
             maxlength = MAX_PASSWORD_LENGTH,
         ) {
+            validationStatus = if (!state.oldPasswordValid) ValidationStatus.INVALID else null
             paddingTop = 24.px
             width = 250.px
         }

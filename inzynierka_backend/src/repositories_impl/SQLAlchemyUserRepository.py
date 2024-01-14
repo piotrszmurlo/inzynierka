@@ -29,7 +29,7 @@ class SQLAlchemyUserRepository(IUserRepository):
         self._db.commit()
 
     def modify_account(self, user_id: int, **kwargs):
-        if kwargs['email']:
+        if 'email' in kwargs:
             query = update(UserTable).where(UserTable.id == user_id).values(disabled=True)
             self._db.execute(query)
             self._db.commit()
