@@ -1,3 +1,4 @@
+from src.models.file import LocalFile
 from src.repositories import IFileRepository
 
 
@@ -32,17 +33,21 @@ class FileService:
     def get_function_numbers(self, benchmark_name: str):
         return self._repository.get_function_numbers(benchmark_name)
 
-    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int):
+    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int, owner_id: int):
         return self._repository.create_file(
             algorithm_name=algorithm_name,
             content=content,
             dimension=dimension,
             function_number=function_number,
-            benchmark_id=benchmark_id
+            benchmark_id=benchmark_id,
+            owner_id=owner_id
         )
 
     def delete_files(self, algorithm_name: str, benchmark_name: str):
         return self._repository.delete_files_for_algorithm_name(algorithm_name, benchmark_name)
+
+    def get_files_for_algorithm_name(self, algorithm_name: str, benchmark_name: str) -> list[LocalFile]:
+        return self._repository.get_files_for_algorithm_name(algorithm_name, benchmark_name)
 
     def delete_benchmark(self, benchmark_name: str):
         return self._repository.delete_benchmark(benchmark_name)

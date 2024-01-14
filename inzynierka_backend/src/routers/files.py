@@ -15,11 +15,14 @@ router = APIRouter()
 @router.delete("/file/{algorithm_name}")
 async def delete_files(algorithm_name: str, benchmark_name: str,
                        current_user: Annotated[User, Depends(get_current_active_user)]):
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Current user does not have permission to perform this action"
-        )
+    files = file_service.get_files_for_algorithm_name(algorithm_name, benchmark_name)
+
+    for file in files:
+        if file.owner_id != current_user.id and not current_user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Current user does not have permission to perform this action"
+            )
     file_service.delete_files(algorithm_name, benchmark_name)
 
 
@@ -49,7 +52,7 @@ async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
             file_service.delete_files(parsed_file_tuples[0][0], benchmark_data.name)
         for algorithm_name, function_number, dimension, content in parsed_file_tuples:
             file_service.create_file(algorithm_name=algorithm_name, function_number=function_number,
-                                     dimension=dimension, content=content, benchmark_id=benchmark_data.id)
+                                     dimension=dimension, content=content, benchmark_id=benchmark_data.id, owner_id=current_user.id)
     except IntegrityError:
         raise HTTPException(409, detail='File already exists')
     except ParseError as e:
