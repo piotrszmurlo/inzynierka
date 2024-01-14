@@ -91,14 +91,14 @@ def get_all_errors_and_evaluations_number(data_file: LocalFile) -> extensions.Al
     :return: TrialsVector containing all results from the file in form of FullTrial
     """
     rows = data_file.contents.split("\n")
-    result = []
-    for row in rows[:-1]:
-        result.append([float(x) for x in row.split()])
+    errors = []
+    for row in rows[:-2]: #
+        errors.append([float(x) for x in row.split()])
     return extensions.AllErrors(
         data_file.algorithm_name,
         data_file.function_number,
         data_file.dimension,
-        result,
+        errors,
         [int(x.split(".")[0]) for x in rows[FINAL_FES_INDEX].split()]
     )
 

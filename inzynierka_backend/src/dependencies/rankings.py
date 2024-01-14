@@ -86,8 +86,10 @@ class Rankings:
         _ecdf_data = get_all_errors_and_evaluations_numbers_for_files(
             self._file_service.get_files(benchmark.name)
         )
+        print(_ecdf_data[0])
         res = extensions.calculate_ecdf_data(_ecdf_data, self._thresholds, self.dimensionBudget)
         _ecdf_data = map_ecdf_entries_to_pydantic_model(res)
+        print(_ecdf_data[0])
         return _ecdf_data
 
     def get_wilcoxon_test(self, first_algorithm: str, second_algorithm: str, dimension: int, benchmark: Benchmark):
