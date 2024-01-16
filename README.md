@@ -52,7 +52,7 @@ Website can be hosted using e.g. Apache 2.4 (Ubuntu):
 
 
         <VirtualHost *:80>
-                ServerName localhost
+                ServerName <domain> [or localhost for testing]
         
                 DocumentRoot /var/www/aecomparison
         
