@@ -30,11 +30,44 @@ Generated coverage report path: /inzynierka_backend/htmlcov/index.html
 
 Building frontend app for production:
 
+Change API_URL constant in file `front_inzynierka/src/main/kotlin/com/inzynierka/Config.kt` to appropariate IP address and port
+
 `./gradlew clean zip`
 
-The package containing all of application files (index.html + main.bundle.js) will be saved as build/libs/template-1.0.0-SNAPSHOT.zip. Website can be hosted using e.g. Apache HTTP Server
+The package containing all of application files (index.html + main.bundle.js) will be saved as build/libs/template-1.0.0-SNAPSHOT.zip. 
 
-Running backend app for production (uvicorn: `pip install "uvicorn[standard]"`):
+Website can be hosted using e.g. Apache 2.4 (Ubuntu):
 
-`uvicorn main:app --host 0.0.0.0 --port 80`
+`sudo apt update`
+
+`sudo apt install apache2`
+
+`sudo mkdir /var/www/aecomparison/`
+
+`cd /etc/apache2/sites-available/`
+
+`sudo cp 000-default.conf aecomparison.conf`
+
+`sudo nano aecomparison.conf`
+
+
+`<VirtualHost *:80>
+        ServerName localhost
+
+        DocumentRoot /var/www/aecomparison
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>`
+
+`sudo service apache2 reload`
+
+`sudo service apache2 restart`
+
+Move `index.html` and `main.bundle.js` into `/var/www/aecomparison/`
+
+Run backend app for production (using uvicorn: `pip install "uvicorn[standard]"`):
+
+`uvicorn src.main:app --host 0.0.0.0 --port 8000`
 

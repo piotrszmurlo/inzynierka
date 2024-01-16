@@ -1,5 +1,6 @@
 package com.inzynierka.di
 
+import com.inzynierka.API_URL
 import com.inzynierka.data.repository.*
 import com.inzynierka.data.service.BenchmarkService
 import com.inzynierka.data.service.FileService
@@ -16,8 +17,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
-
-const val API_URL = "http://127.0.0.1:8000/"
 
 val client = HttpClient(Js) {
     install(ContentNegotiation) {
