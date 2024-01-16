@@ -30,7 +30,7 @@ Generated coverage report path: /inzynierka_backend/htmlcov/index.html
 
 Building frontend app for production:
 
-Change API_URL constant in file `front_inzynierka/src/main/kotlin/com/inzynierka/Config.kt` to appropariate IP address and port
+Change API_URL constant in file `front_inzynierka/src/main/kotlin/com/inzynierka/Config.kt` to appropariate IP address and port, then:
 
 `./gradlew clean zip`
 
@@ -51,15 +51,14 @@ Website can be hosted using e.g. Apache 2.4 (Ubuntu):
 `sudo nano aecomparison.conf`
 
 
-`<VirtualHost *:80>
-        ServerName localhost
-
-        DocumentRoot /var/www/aecomparison
-
-        ErrorLog ${APACHE_LOG_DIR}/error.log
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-</VirtualHost>`
+        <VirtualHost *:80>
+                ServerName localhost
+        
+                DocumentRoot /var/www/aecomparison
+        
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+        </VirtualHost>
 
 `sudo service apache2 reload`
 
