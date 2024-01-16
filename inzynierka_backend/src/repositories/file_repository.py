@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import List
+
+from src.models.benchmark import Benchmark
 
 
 class IFileRepository(ABC):
@@ -12,7 +15,7 @@ class IFileRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_benchmarks(self):
+    def get_benchmarks(self) -> List[Benchmark]:
         raise NotImplementedError
 
     @abstractmethod
@@ -42,6 +45,10 @@ class IFileRepository(ABC):
 
     @abstractmethod
     def get_function_numbers(self, benchmark_name: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_files_for_algorithm_name(self, algorithm_name: str, benchmark_name: str):
         raise NotImplementedError
 
     @abstractmethod

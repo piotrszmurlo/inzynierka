@@ -6,9 +6,8 @@ from jose import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from src.repositories import user_repository
 from src.config import settings
-from src.repositories.user_repository import IUserRepository
+from src.services.UserService import UserService
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,8 +31,8 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(repository: IUserRepository, email: str, password: str):
-    user = repository.get_user(email)
+def authenticate_user(user_service: UserService, email: str, password: str):
+    user = user_service.get_user(email)
     if not user:
         return False
     if not verify_password(password, user.password_hash):

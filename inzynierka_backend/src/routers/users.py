@@ -9,15 +9,17 @@ from starlette import status
 from src.dependencies.auth_helpers import verify_password, get_password_hash, generate_verification_code, \
     create_access_token, Token, \
     authenticate_user
-from src.dependencies.auth import get_current_active_user, user_service, get_current_user, send_verification_email, \
-    user_repository, CurrentActiveUserDep, CurrentUserDep
+from src.dependencies.auth import get_current_user, send_verification_email, CurrentUserDep, user_service, \
+    UserServiceDep
+from src.dependencies.auth import CurrentActiveUserDep
 from src.models.user import User
+from src.services.UserService import UserService
 
 router = APIRouter(prefix='/users')
 
 
 @router.post("/promote")
-async def promote_user(email: str, current_user: CurrentActiveUserDep):
+async def promote_user(email: str, current_user: CurrentActiveUserDep, user_service: UserService = UserServiceDep):
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -39,7 +41,7 @@ async def promote_user(email: str, current_user: CurrentActiveUserDep):
 
 
 @router.post("/password")
-async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()], current_user: CurrentUserDep):
+async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()], current_user: CurrentUserDep, user_service: UserService = UserServiceDep):
     user = user_service.get_user(current_user.email)
     if verify_password(new_password, user.password_hash):
         raise HTTPException(
@@ -55,7 +57,7 @@ async def change_password(new_password: Annotated[str, Form()], old_password: An
 
 
 @router.post("/email")
-async def change_email(new_email: Annotated[str, Form()], current_user: CurrentUserDep):
+async def change_email(new_email: Annotated[str, Form()], current_user: CurrentUserDep, user_service: UserService = UserServiceDep):
     try:
         user = user_service.get_user(current_user.email)
         code = generate_verification_code()
@@ -71,7 +73,7 @@ async def change_email(new_email: Annotated[str, Form()], current_user: CurrentU
 
 
 @router.post("/verify")
-async def login_for_access_token(code: str, current_user: CurrentUserDep):
+async def login_for_access_token(code: str, current_user: CurrentUserDep, user_service: UserService = UserServiceDep):
     user = user_service.get_user(current_user.email)
     if user.verification_hash == code:
         user_service.verify_user(current_user.email)
@@ -98,8 +100,8 @@ async def resend_verification_code(current_user: Annotated[User, Depends(get_cur
 
 
 @router.post("/register", response_model=Token)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user = user_repository.get_user(form_data.username)
+async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], user_service: UserService = UserServiceDep):
+    user = user_service.get_user(form_data.username)
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -109,7 +111,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     code = generate_verification_code()
 
     asyncio.create_task(send_verification_email(form_data.username, code))
-    user_repository.create_user(email=form_data.username, password_hash=get_password_hash(form_data.password),
+    user_service.create_user(email=form_data.username, password_hash=get_password_hash(form_data.password),
                                 verification_hash=code,
                                 disabled=True, is_admin=False)
     access_token = create_access_token(
@@ -120,7 +122,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
 
 @router.post("/login", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user = authenticate_user(user_repository, form_data.username, form_data.password)
+    user = authenticate_user(user_service, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

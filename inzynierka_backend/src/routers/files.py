@@ -1,19 +1,17 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, UploadFile
 from sqlalchemy.exc import IntegrityError
 from starlette import status
-
-from src.dependencies.auth import file_service, get_current_active_user, CurrentActiveUserDep
+from src.dependencies.auth import CurrentActiveUserDep
+from src.dependencies.auth import FileServiceDep
 from src.models.parse_error import ParseError
-from src.models.user import User
 from src.dependencies.parser import ALL_DIMENSIONS, check_filenames_integrity, parse_remote_filename, parse_remote_results_file
+from src.services.FileService import FileService
 
 router = APIRouter()
 
 
-@router.delete("/file/{algorithm_name}")
-async def delete_files(algorithm_name: str, benchmark_name: str, current_user: CurrentActiveUserDep):
+@router.delete("/file")
+async def delete_files(algorithm_name: str, benchmark_name: str, current_user: CurrentActiveUserDep, file_service: FileService = FileServiceDep):
     files = file_service.get_files_for_algorithm_name(algorithm_name, benchmark_name)
 
     for file in files:
@@ -26,7 +24,7 @@ async def delete_files(algorithm_name: str, benchmark_name: str, current_user: C
 
 
 @router.post("/file")
-async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool, current_user: CurrentActiveUserDep):
+async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool, current_user: CurrentActiveUserDep, file_service: FileService = FileServiceDep):
     try:
         benchmark_data = file_service.get_benchmark(benchmark)
         if not benchmark_data:

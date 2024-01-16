@@ -6,25 +6,49 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from starlette import status
 
-from src.models.user import User
-from src.services.FileService import FileService
 from src.dependencies.rankings_service import RankingsService
-from src.repositories_impl.sql_alchemy_file_repository import SQLAlchemyFileRepository, SessionLocal
-from src.repositories_impl.sql_alchemy_user_repository import SQLAlchemyUserRepository
-from src.services.UserService import UserService
+from src.models.user import User
 from src.dependencies.auth_helpers import TokenData
 from src.config import settings
+from src.repositories_impl.sql_alchemy_file_repository import SessionLocal, SQLAlchemyFileRepository
+from src.repositories_impl.sql_alchemy_user_repository import SQLAlchemyUserRepository
+from src.services.FileService import FileService
+from src.services.UserService import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-file_repository = SQLAlchemyFileRepository(SessionLocal())
+session = SessionLocal()
+file_repository = SQLAlchemyFileRepository(session)
 file_service = FileService(file_repository)
-rankings = RankingsService(file_service)
-user_repository = SQLAlchemyUserRepository(SessionLocal())
+rankings_service = RankingsService(file_service)
+user_repository = SQLAlchemyUserRepository(session)
 user_service = UserService(user_repository)
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_user_service():
+    return user_service
+
+
+def get_file_repository():
+    return SQLAlchemyFileRepository(session)
+
+
+def get_file_service():
+    return file_service
+
+
+def get_rankings_service():
+    return rankings_service
+
+
+FileServiceDep = Depends(get_file_service)
+RankingsServiceDep = Depends(get_rankings_service)
+
+
+UserServiceDep = Depends(get_user_service)
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service: UserService = UserServiceDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Can't authenticate user",
@@ -38,13 +62,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
-    user = user_repository.get_user(email=token_data.email)
+    user = user_service.get_user(email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
 
-CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
+
+CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 async def get_current_active_user(current_user: CurrentUserDep):
     if current_user.disabled:

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import create_engine, select, delete, and_, ScalarResult
+from sqlalchemy import create_engine, select, delete, and_
 from sqlalchemy.orm import sessionmaker, Session
 
 from src.models.benchmark import Benchmark
@@ -128,7 +128,7 @@ class SQLAlchemyFileRepository(IFileRepository):
             self._db.rollback()
             raise
 
-    def get_files_for_algorithm_name(self, algorithm_name: str, benchmark_name: str) -> ScalarResult[LocalFile]:
+    def get_files_for_algorithm_name(self, algorithm_name: str, benchmark_name: str):
         benchmark_id = self.get_benchmark(benchmark_name).id
         query = (select(LocalFile).where(
             and_

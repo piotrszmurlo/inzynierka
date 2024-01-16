@@ -25,5 +25,5 @@ class UserService:
     def verify_user(self, email):
         return self._repository.verify_account(email)
 
-    def create_user(self, email: str, password_hash: str, disabled: bool, is_admin: bool):
-        return self._repository.create_user(email, password_hash, disabled, is_admin)
+    def create_user(self, email: str, password_hash: str, verification_hash: str, disabled: bool, is_admin: bool):
+        return self._repository.create_user(email, password_hash, verification_hash, disabled, is_admin)

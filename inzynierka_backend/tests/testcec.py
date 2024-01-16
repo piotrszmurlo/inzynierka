@@ -1,4 +1,6 @@
-from src import LocalFile, FINAL_ERROR_INDEX, FINAL_FES_INDEX
+from src.dependencies.parser import FINAL_FES_INDEX, FINAL_ERROR_INDEX
+from src.models.file import LocalFile
+
 
 def cec2022(trial_count: int, dimension: int, input: list):
     number_of_functions = len(input)

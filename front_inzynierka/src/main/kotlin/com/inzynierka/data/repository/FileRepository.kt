@@ -28,9 +28,10 @@ class FileRepository(private val client: HttpClient) : IFileRepository {
     }
 
     override suspend fun deleteFilesForAlgorithm(algorithmName: String, benchmarkName: String) {
-        return client.delete(urlString = "file/$algorithmName") {
+        return client.delete(urlString = "file") {
             header("Authorization", "Bearer ${bearerToken?.accessToken}")
             parameter("benchmark_name", benchmarkName)
+            parameter("algorithm_name", algorithmName)
         }.body()
     }
 }
