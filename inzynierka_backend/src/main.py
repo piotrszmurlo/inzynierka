@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.models.base import Base
 from src.config import settings
-from src.repositories_impl.SQLAlchemyFileRepository import engine
+from src.repositories_impl.sql_alchemy_file_repository import engine
 from src.routers import users, benchmarks, files, rankings
 
 Base.metadata.create_all(bind=engine)

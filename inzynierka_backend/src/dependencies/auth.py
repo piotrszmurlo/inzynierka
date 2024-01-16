@@ -8,9 +8,9 @@ from starlette import status
 
 from src.models.user import User
 from src.services.FileService import FileService
-from src.dependencies.rankings import Rankings
-from src.repositories_impl.SQLAlchemyFileRepository import SQLAlchemyFileRepository, SessionLocal
-from src.repositories_impl.SQLAlchemyUserRepository import SQLAlchemyUserRepository
+from src.dependencies.rankings_service import RankingsService
+from src.repositories_impl.sql_alchemy_file_repository import SQLAlchemyFileRepository, SessionLocal
+from src.repositories_impl.sql_alchemy_user_repository import SQLAlchemyUserRepository
 from src.services.UserService import UserService
 from src.dependencies.auth_helpers import TokenData
 from src.config import settings
@@ -19,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 file_repository = SQLAlchemyFileRepository(SessionLocal())
 file_service = FileService(file_repository)
-rankings = Rankings(file_service)
+rankings = RankingsService(file_service)
 user_repository = SQLAlchemyUserRepository(SessionLocal())
 user_service = UserService(user_repository)
 

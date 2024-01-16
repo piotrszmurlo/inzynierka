@@ -17,7 +17,7 @@ DIM2BUDGET = {
 REVISITED_WEIGHT = 0.01
 
 
-class Rankings:
+class RankingsService:
 
     def __init__(
             self,

@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from src.models.benchmark import Benchmark
 from src.models.file import LocalFile
-from src.repositories.IFileRepository import IFileRepository
+from src.repositories.file_repository import IFileRepository
 from src.config import settings
 
 engine = create_engine(settings.DATABASE_URL)

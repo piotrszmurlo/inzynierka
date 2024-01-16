@@ -1,7 +1,7 @@
 from typing import Optional
 
 from src.models.file import LocalFile
-from src.repositories import IFileRepository
+from src.repositories import file_repository
 
 
 class FileService:

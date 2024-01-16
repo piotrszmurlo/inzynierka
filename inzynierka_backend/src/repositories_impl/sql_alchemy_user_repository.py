@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 
 from src.models.user import UserTable
-from src.repositories.IUserRepository import IUserRepository
+from src.repositories.user_repository import IUserRepository
 
 
 class SQLAlchemyUserRepository(IUserRepository):
