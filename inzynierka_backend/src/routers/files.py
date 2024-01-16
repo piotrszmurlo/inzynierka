@@ -13,8 +13,7 @@ router = APIRouter()
 
 
 @router.delete("/file/{algorithm_name}")
-async def delete_files(algorithm_name: str, benchmark_name: str,
-                       current_user: CurrentActiveUserDep):
+async def delete_files(algorithm_name: str, benchmark_name: str, current_user: CurrentActiveUserDep):
     files = file_service.get_files_for_algorithm_name(algorithm_name, benchmark_name)
 
     for file in files:
@@ -27,8 +26,7 @@ async def delete_files(algorithm_name: str, benchmark_name: str,
 
 
 @router.post("/file")
-async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
-                    current_user: CurrentActiveUserDep):
+async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool, current_user: CurrentActiveUserDep):
     try:
         benchmark_data = file_service.get_benchmark(benchmark)
         if not benchmark_data:

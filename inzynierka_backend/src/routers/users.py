@@ -39,8 +39,7 @@ async def promote_user(email: str, current_user: CurrentActiveUserDep):
 
 
 @router.post("/password")
-async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()],
-                          current_user: Annotated[User, Depends(get_current_user)]):
+async def change_password(new_password: Annotated[str, Form()], old_password: Annotated[str, Form()], current_user: CurrentUserDep):
     user = user_service.get_user(current_user.email)
     if verify_password(new_password, user.password_hash):
         raise HTTPException(
@@ -56,8 +55,7 @@ async def change_password(new_password: Annotated[str, Form()], old_password: An
 
 
 @router.post("/email")
-async def change_email(new_email: Annotated[str, Form()],
-                       current_user: CurrentUserDep):
+async def change_email(new_email: Annotated[str, Form()], current_user: CurrentUserDep):
     try:
         user = user_service.get_user(current_user.email)
         code = generate_verification_code()
@@ -73,7 +71,7 @@ async def change_email(new_email: Annotated[str, Form()],
 
 
 @router.post("/verify")
-async def login_for_access_token(code: str, current_user: Annotated[User, Depends(get_current_user)]):
+async def login_for_access_token(code: str, current_user: CurrentUserDep):
     user = user_service.get_user(current_user.email)
     if user.verification_hash == code:
         user_service.verify_user(current_user.email)
