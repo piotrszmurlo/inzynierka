@@ -10,14 +10,14 @@ from src.dependencies.auth_helpers import verify_password, get_password_hash, ge
     create_access_token, Token, \
     authenticate_user
 from src.dependencies.auth import get_current_active_user, user_service, get_current_user, send_verification_email, \
-    user_repository
+    user_repository, CurrentActiveUserDep, CurrentUserDep
 from src.models.user import User
 
 router = APIRouter(prefix='/users')
 
 
 @router.post("/promote")
-async def promote_user(email: str, current_user: Annotated[User, Depends(get_current_active_user)]):
+async def promote_user(email: str, current_user: CurrentActiveUserDep):
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -57,7 +57,7 @@ async def change_password(new_password: Annotated[str, Form()], old_password: An
 
 @router.post("/email")
 async def change_email(new_email: Annotated[str, Form()],
-                       current_user: Annotated[User, Depends(get_current_user)]):
+                       current_user: CurrentUserDep):
     try:
         user = user_service.get_user(current_user.email)
         code = generate_verification_code()
@@ -85,7 +85,7 @@ async def login_for_access_token(code: str, current_user: Annotated[User, Depend
 
 
 @router.get("/me")
-async def get_current_user_data(current_user: Annotated[User, Depends(get_current_user)]):
+async def get_current_user_data(current_user: CurrentUserDep):
     return User(email=current_user.email, disabled=current_user.disabled, is_admin=current_user.is_admin)
 
 

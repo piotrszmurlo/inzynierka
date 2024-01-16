@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, HTTPException, Depends
 from sqlalchemy.exc import IntegrityError
 
-from src.dependencies.auth import file_service, get_current_active_user, get_current_user
+from src.dependencies.auth import file_service, get_current_active_user, get_current_user, CurrentUserDep
 from src.models.user import User
 
 router = APIRouter(prefix='/benchmarks')
@@ -34,7 +34,7 @@ async def get_available_algorithms(benchmark_name: str):
 
 
 @router.get("/{benchmark_name}/algorithms/me")
-async def get_available_algorithms(benchmark_name: str, current_user: Annotated[User, Depends(get_current_user)]):
+async def get_available_algorithms(benchmark_name: str, current_user: CurrentUserDep):
     return file_service.get_algorithm_names(benchmark_name, current_user.id)
 
 

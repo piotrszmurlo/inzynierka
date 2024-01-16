@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from src.repositories import user_repository
 from src.config import settings
+from src.repositories.user_repository import IUserRepository
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

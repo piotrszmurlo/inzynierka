@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlalchemy.exc import IntegrityError
 from starlette import status
 
-from src.dependencies.auth import file_service, get_current_active_user
+from src.dependencies.auth import file_service, get_current_active_user, CurrentActiveUserDep
 from src.models.parse_error import ParseError
 from src.models.user import User
 from src.dependencies.parser import ALL_DIMENSIONS, check_filenames_integrity, parse_remote_filename, parse_remote_results_file
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.delete("/file/{algorithm_name}")
 async def delete_files(algorithm_name: str, benchmark_name: str,
-                       current_user: Annotated[User, Depends(get_current_active_user)]):
+                       current_user: CurrentActiveUserDep):
     files = file_service.get_files_for_algorithm_name(algorithm_name, benchmark_name)
 
     for file in files:
@@ -28,7 +28,7 @@ async def delete_files(algorithm_name: str, benchmark_name: str,
 
 @router.post("/file")
 async def post_file(files: list[UploadFile], benchmark: str, overwrite: bool,
-                    current_user: Annotated[User, Depends(get_current_active_user)]):
+                    current_user: CurrentActiveUserDep):
     try:
         benchmark_data = file_service.get_benchmark(benchmark)
         if not benchmark_data:

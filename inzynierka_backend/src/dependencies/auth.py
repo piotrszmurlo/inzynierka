@@ -43,10 +43,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
     return user
 
+CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
-async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)]
-):
+
+async def get_current_active_user(current_user: CurrentUserDep):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -62,3 +62,5 @@ async def send_verification_email(email: str, code: str):
             server.sendmail(settings.EMAIL_FROM, email, f"Verification code: {code}")
     except ConnectionRefusedError:
         print("SMTP server refused to connect")
+
+CurrentActiveUserDep = Annotated[User, Depends(get_current_active_user)]
