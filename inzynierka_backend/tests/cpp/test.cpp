@@ -553,7 +553,7 @@ TEST_CASE("parse correct input scientific notation", "[parser]") {
     REQUIRE_FALSE(inputBuffer.str() == "");
     REQUIRE_FALSE(exprectedBuffer.str() == "");
 
-    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 1000000);
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 30, 1000000);
 
     REQUIRE(result == exprectedBuffer.str());
 }
@@ -572,7 +572,7 @@ TEST_CASE("parse correct input with zeros", "[parser]") {
     REQUIRE_FALSE(inputBuffer.str() == "");
     REQUIRE_FALSE(exprectedBuffer.str() == "");
 
-    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 200000);
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 30, 200000);
 
     REQUIRE(result == exprectedBuffer.str());
 }
@@ -591,7 +591,7 @@ TEST_CASE("parse correct input mixed notation", "[parser]") {
     REQUIRE_FALSE(inputBuffer.str() == "");
     REQUIRE_FALSE(exprectedBuffer.str() == "");
 
-    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 1000000);
+    std::string result = parse_cec2022_results(inputBuffer.str(), fileName, 30, 1000000);
 
     REQUIRE(result == exprectedBuffer.str());
 }
@@ -605,7 +605,7 @@ TEST_CASE("parse incorrect input comma delimited incorrect budget recorded", "[p
 
     REQUIRE_FALSE(inputBuffer.str() == "");
     REQUIRE_THROWS_AS(
-        parse_cec2022_results(inputBuffer.str(), fileName, 200000),
+        parse_cec2022_results(inputBuffer.str(), fileName, 30, 200000),
         std::invalid_argument
     );
 }
@@ -619,7 +619,7 @@ TEST_CASE("parse incorrect input unexpected character in data", "[parser]") {
     inputBuffer << input.rdbuf();
 
     REQUIRE_THROWS_AS(
-        parse_cec2022_results(inputBuffer.str(), fileName, 1000000),
+        parse_cec2022_results(inputBuffer.str(), fileName, 30, 1000000),
         std::invalid_argument
     );
 }
@@ -632,7 +632,7 @@ TEST_CASE("parse incorrect input budget recorded when trial succeeded", "[parser
     inputBuffer << input.rdbuf();
 
     REQUIRE_THROWS_AS(
-        parse_cec2022_results(inputBuffer.str(), fileName, 200000),
+        parse_cec2022_results(inputBuffer.str(), fileName, 30, 200000),
         std::invalid_argument
     );
 }
