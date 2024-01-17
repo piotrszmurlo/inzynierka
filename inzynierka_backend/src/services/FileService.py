@@ -38,8 +38,7 @@ class FileService:
     def get_function_numbers(self, benchmark_name: str):
         return self._repository.get_function_numbers(benchmark_name)
 
-    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int,
-                    owner_id: int):
+    def create_file(self, algorithm_name: str, dimension: int, function_number: int, content: str, benchmark_id: int, owner_id: int):
         return self._repository.create_file(
             algorithm_name=algorithm_name,
             content=content,

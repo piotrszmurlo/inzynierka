@@ -18,6 +18,8 @@ modify database connection by changing DATABASE_URL in `.env` file
 
 `dialect+driver://username:password@host:port/database`
 
+`.env` also contains other setup, such as for SMTP server.
+
 Test SMTP server (necessary for verifying accounts):
 
 `python3 -m smtpd -c DebuggingServer -n localhost:1025`
